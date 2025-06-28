@@ -110,6 +110,7 @@ const Inventory = () => {
         title="Inventory Data"
         desc="Manage and track your inventory effectively."
         calendar={false}
+        addnew={true}
       />
       <div className="flex flex-col lg:flex-row gap-4">
         {/* left */}

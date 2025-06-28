@@ -14,6 +14,7 @@ import { useState } from "react";
 import NotePage from "../note/page";
 import FormNote from "@/components/note/FormNote";
 import { Note } from "@/lib/notes";
+import HeaderPage from "@/components/HeaderPage";
 
 const addNotePage = () => {
   const [openButtonSaveNote, setOpenButtonSaveNote] = useState(false);
@@ -52,8 +53,13 @@ const addNotePage = () => {
     <div className="grid grid-cols-1 lg:grid-cols-2 p-0">
       {/* left */}
       <div className="px-4 sm:px-7 pt-4 border-r border-r-border">
-        <h1 className="text-lg font-medium">Create New Note</h1>
-        <p className="font-medium mt-1">Fill in the note with details</p>
+        <HeaderPage
+          title="Add New Note"
+          desc="Fill in the note with details"
+          calendar={false}
+        />
+        {/* <h1 className="text-lg font-medium">Add New Note</h1>
+        <p className="font-medium mt-1">Fill in the note with details</p> */}
         {/* form */}
         <FormNote note={note} setNote={setNote} />
       </div>
