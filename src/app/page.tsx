@@ -1,27 +1,8 @@
+import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
 import OrderCard from "@/components/order/orderCard";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-import { CalendarIcon, ChevronDown } from "lucide-react";
 import Image from "next/image";
 
 const OrderCardData = [
@@ -105,45 +86,7 @@ const Home = () => {
       <div className="mt-3">
         <div className="flex items-center justify-between">
           <h1 className="font-medium text-base">Order List</h1>
-          <Popover>
-            <PopoverTrigger>
-              <Button
-                variant="outline"
-                className="text-base font-medium border-none"
-              >
-                Filters
-                <ChevronDown />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[180px] mr-8">
-              <span className="font-medium text-muted-foreground text-sm">
-                Order Status
-              </span>
-              <div className="mt-2 space-y-3">
-                {FilterStatusData.map((item) => (
-                  <div key={item.id} className="flex items-center gap-2">
-                    <Checkbox id={item.id} />
-                    <Label htmlFor={item.id}>{item.label}</Label>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <span className="font-medium text-muted-foreground text-sm">
-                  Filter By
-                </span>
-                <RadioGroup className="mt-2">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="recentOrder" id="recentOrder" />
-                    <Label htmlFor="recentOrder">Recent Order</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="oldOrder" id="oldOrder" />
-                    <Label htmlFor="oldOrder">Old Order</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <FiltersDropdown filterStatusData={FilterStatusData} />
         </div>
         <div className="mt-2 flex gap-3">
           {/* list card */}

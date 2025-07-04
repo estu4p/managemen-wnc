@@ -1,3 +1,4 @@
+import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -7,7 +8,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -106,12 +106,24 @@ const InventoryData = [
 const Inventory = () => {
   return (
     <div className="p-4 sm:px-7">
-      <HeaderPage
-        title="Inventory Data"
-        desc="Manage and track your inventory effectively."
-        calendar={false}
-        addnew={true}
-      />
+      <div className="flex items-end justify-between">
+        <HeaderPage
+          title="Inventory Data"
+          desc="Manage and track your inventory effectively."
+          calendar={false}
+        />
+        <Link href="/inventory/add" className="mb-3">
+          <Button variant="default" size="sm">
+            Add New
+          </Button>
+        </Link>
+      </div>
+      <div className="flex justify-end lg:hidden">
+        <FiltersDropdown
+          filterStatusData={FilterStatusData}
+          subTitle="Category"
+        />
+      </div>
       <div className="flex flex-col lg:flex-row gap-4">
         {/* left */}
         <div className="container mx-auto">
@@ -162,10 +174,9 @@ const Inventory = () => {
             </Button>
           </div>
         </div>
-
         {/* right */}
-        <div className="w-fit">
-          <Card className="min-w-[180px] h-fit rounded-md py-3 gap-4 max-sm:hidden">
+        <div className="w-fit max-lg:hidden">
+          <Card className="min-w-[180px] h-fit rounded-md py-3 gap-4">
             <CardHeader className="gap-0 px-4 font-semibold text-base">
               Filters
             </CardHeader>
@@ -201,73 +212,6 @@ const Inventory = () => {
         </div>
       </div>
     </div>
-    // <div className="px-4 sm:ps-7 flex flex-col lg:flex-row gap-4">
-    //   {/* left */}
-    //   <div className="pt-4 border-r border-r-border w-full pr-3">
-    //     <HeaderPage
-    //       title="Inventory Data"
-    //       desc="Manage and track your inventory effectively."
-    //       calendar={false}
-    //     />
-    //     {/* Table */}
-    // <div className="rounded-md border">
-    //   <Table>
-    //     <TableHeader>
-    //       <TableRow>
-    //         <TableHead className="min-w-[250px]">Product</TableHead>
-    //         <TableHead>Category</TableHead>
-    //         <TableHead>Stock</TableHead>
-    //         <TableHead className="text-right">Remaining</TableHead>
-    //       </TableRow>
-    //     </TableHeader>
-    //     <TableBody>
-    //       {InventoryData.map((item, index) => (
-    //         <TableRow key={index}>
-    //           <TableCell>{item.product}</TableCell>
-    //           <TableCell>{item.category}</TableCell>
-    //           <TableCell>{item.stock}</TableCell>
-    //           <TableCell className="text-right">{item.remaining}</TableCell>
-    //         </TableRow>
-    //       ))}
-    //     </TableBody>
-    //   </Table>
-    // </div>
-    //   </div>
-    //   {/* right */}
-    //   <div className="pt-4 lg:px-3 flex">
-    //     <Card className="min-w-[180px] h-fit rounded-md py-3 gap-4 max-sm:hidden">
-    //       <CardHeader className="gap-0 px-4 font-semibold text-base">
-    //         Filters
-    //       </CardHeader>
-    //       <CardContent className="px-4">
-    //         <span className="font-medium text-muted-foreground">Category</span>
-    //         <div className="mt-2 space-y-3">
-    //           {FilterStatusData.map((item) => (
-    //             <div key={item.id} className="flex items-center gap-2">
-    //               <Checkbox id={item.id} />
-    //               <Label htmlFor={item.id}>{item.label}</Label>
-    //             </div>
-    //           ))}
-    //         </div>
-    //         <div className="mt-4">
-    //           <span className="font-medium text-muted-foreground">
-    //             Filter By
-    //           </span>
-    //           <RadioGroup className="mt-2">
-    //             <div className="flex items-center gap-2">
-    //               <RadioGroupItem value="recentOrder" id="recentOrder" />
-    //               <Label htmlFor="recentOrder">Recent Order</Label>
-    //             </div>
-    //             <div className="flex items-center gap-2">
-    //               <RadioGroupItem value="oldOrder" id="oldOrder" />
-    //               <Label htmlFor="oldOrder">Old Order</Label>
-    //             </div>
-    //           </RadioGroup>
-    //         </div>
-    //       </CardContent>
-    //     </Card>
-    //   </div>
-    // </div>
   );
 };
 

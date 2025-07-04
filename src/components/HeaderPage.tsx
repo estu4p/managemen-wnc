@@ -10,12 +10,10 @@ const HeaderPage = ({
   title,
   desc,
   calendar = true,
-  addnew = false,
 }: {
   title: string;
   desc: string;
   calendar?: boolean;
-  addnew?: boolean;
 }) => {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-end justify-between mb-3">
@@ -41,15 +39,6 @@ const HeaderPage = ({
               <Calendar />
             </PopoverContent>
           </Popover>
-        </div>
-      )}
-      {addnew && (
-        <div className="text-end">
-          <Link href="/inventory/add">
-            <Button variant="default" size="sm">
-              Add New
-            </Button>
-          </Link>
         </div>
       )}
     </div>
