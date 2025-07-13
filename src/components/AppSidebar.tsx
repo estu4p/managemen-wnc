@@ -82,6 +82,10 @@ const generalItems = [
 export function AppSidebar() {
   const pathname = usePathname();
 
+  const isActive = (path: string) => {
+    return pathname == path || pathname.startsWith(path + "/");
+  };
+
   return (
     <Sidebar>
       <SidebarHeader className="py-4">
@@ -112,15 +116,15 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="text-white gap-2 mt-1">
               {menuItems.map((item) => {
-                const isActive = pathname === item.url;
+                // const isActive = pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
                       // isActive={activeItem === item.title}
-                      isActive={isActive}
+                      isActive={isActive(item.url)}
                       className={cn(
-                        isActive &&
+                        isActive(item.url) &&
                           "!text-secondary-green hover:!text-secondary-green"
                       )}
                       // className="data-[active=true]:border-l-4 data-[active=true]:border-primary data-[active=true]:font-semibold"
@@ -130,11 +134,13 @@ export function AppSidebar() {
                         href={item.url}
                         // onClick={() => handleItemClick(item.title)}
                         className={cn(
-                          isActive ? "text-secondary-green font-medium" : ""
+                          isActive(item.url)
+                            ? "text-secondary-green font-medium"
+                            : ""
                         )}
                         //   className="relative"
                       >
-                        {isActive && (
+                        {isActive(item.url) && (
                           <div className="absolute -left-1.5 top-0 w-1 h-8 bg-secondary-green rounded-s rotate-180" />
                         )}
                         {/* <div className="left-0 top-0 rounded-s rounded-full bg-secondary-green w-1 h-8" /> */}
@@ -150,24 +156,26 @@ export function AppSidebar() {
                 GENERAL
               </SidebarGroupLabel>
               {generalItems.map((item) => {
-                const isActive = pathname === item.url;
+                // const isActive = pathname === item.url;
                 return (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      isActive={isActive}
+                      isActive={isActive(item.url)}
                       className={cn(
-                        isActive &&
+                        isActive(item.url) &&
                           "!text-secondary-green hover:!text-secondary-green"
                       )}
                     >
                       <Link
                         href={item.url}
                         className={cn(
-                          isActive ? "text-secondary-green font-medium" : ""
+                          isActive(item.url)
+                            ? "text-secondary-green font-medium"
+                            : ""
                         )}
                       >
-                        {isActive && (
+                        {isActive(item.url) && (
                           <div className="absolute -left-1.5 top-0 w-1 h-8 bg-secondary-green rounded-s rotate-180" />
                         )}
                         <item.icon className="" />

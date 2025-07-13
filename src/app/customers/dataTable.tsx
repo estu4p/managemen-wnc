@@ -38,12 +38,12 @@ export function DataTable<TData, TValue>({
     <div className="">
       <div className="rounded-md border">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-primary-gray">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-primary">
                       {header.isPlaceholder
                         ? null
                         : flexRender(

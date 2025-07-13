@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoveUpRight } from "lucide-react";
+import Link from "next/link";
 
 export type CustomerRecord = {
   id: string;
@@ -65,9 +66,11 @@ export const columns: ColumnDef<CustomerRecord>[] = [
       const customer = row.original;
 
       return (
-        <Button size="iconXs">
-          <MoveUpRight />
-        </Button>
+        <Link href="/customers/details">
+          <Button size="iconXs">
+            <MoveUpRight />
+          </Button>
+        </Link>
       );
     },
   },

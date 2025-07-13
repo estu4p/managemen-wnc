@@ -9,7 +9,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +22,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Upload } from "lucide-react";
+import { Plus } from "lucide-react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -356,7 +355,7 @@ const OrderDetailsPage = () => {
             </div>
             {/* Payment */}
             <div className="flex flex-col sm:flex-row">
-              <div className="sm:w-[20%] lg:w-[30%] :">
+              <div className="sm:w-[20%] lg:w-[30%]">
                 <h2 className="font-medium">Payment</h2>
                 <p className="text-muted-foreground">Input Payment Details</p>
               </div>
@@ -370,7 +369,7 @@ const OrderDetailsPage = () => {
                       <h3 className="font-medium w-full">Price</h3>
                     </div>
                     {Array.from({ length: 2 }).map((_, index) => (
-                      <div className="flex gap-4 w-full">
+                      <div key={index} className="flex gap-4 w-full">
                         <Input value="Deep clean" className="w-full" disabled />
                         <Input
                           value="2"

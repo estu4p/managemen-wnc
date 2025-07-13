@@ -122,6 +122,7 @@ const Inventory = () => {
         <FiltersDropdown
           filterStatusData={FilterStatusData}
           subTitle="Category"
+          className="text-sm"
         />
       </div>
       <div className="flex flex-col lg:flex-row gap-4">
@@ -129,12 +130,16 @@ const Inventory = () => {
         <div className="container mx-auto">
           <div className=" rounded-md border h-fit">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-primary-gray">
                 <TableRow>
-                  <TableHead className="min-w-[250px]">Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead className="text-right">Details</TableHead>
+                  <TableHead className="min-w-[250px] text-primary">
+                    Product
+                  </TableHead>
+                  <TableHead className="text-primary">Category</TableHead>
+                  <TableHead className="text-primary">Stock</TableHead>
+                  <TableHead className="text-right text-primary">
+                    Details
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -155,7 +160,7 @@ const Inventory = () => {
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 mt-4">
+          <div className="flex items-center justify-end space-x-2 mt-3">
             <Button
               variant="outline"
               size="sm"
@@ -192,7 +197,7 @@ const Inventory = () => {
                   </div>
                 ))}
               </div>
-              <div className="mt-4">
+              <div className="mt-3">
                 <span className="font-medium text-muted-foreground">
                   Filter By
                 </span>

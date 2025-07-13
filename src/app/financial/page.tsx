@@ -69,7 +69,7 @@ const page = () => {
                 className="absolute top-0 left-10"
               />
               {Array.from({ length: 5 }).map((_, index) => (
-                <div>
+                <div key={index}>
                   <div
                     key={index}
                     className="flex items-center justify-between"
@@ -182,12 +182,14 @@ const page = () => {
               expenses.
             </p>
           </div>
-          <Button
-            className="mt-6 w-full bg-secondary-green"
-            variant="secondary"
-          >
-            Details Report
-          </Button>
+          <Link href="/financial/details">
+            <Button
+              className="mt-6 w-full bg-secondary-green"
+              variant="secondary"
+            >
+              Details Details
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

@@ -24,7 +24,7 @@ const HeaderPage = ({
       {calendar && (
         <div className="max-sm:w-full text-end">
           <Popover>
-            <PopoverTrigger>
+            <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"

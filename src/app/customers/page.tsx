@@ -90,15 +90,16 @@ export default async function CustomersPage() {
         desc="Find all customer records, categorized and easy to search."
         calendar={false}
       />
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between">
         <div className="relative">
-          <Input placeholder="Search By Name" />
+          <Input className="text-sm bg-accent" placeholder="Search By Name" />
           <Search className="absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
         <div className="flex justify-end lg:hidden">
           <FiltersDropdown
             filterStatusData={FilterStatusData}
             subTitle="Category"
+            className="text-sm"
           />
         </div>
       </div>
@@ -124,7 +125,7 @@ export default async function CustomersPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4">
+              <div className="mt-3">
                 <span className="font-medium text-muted-foreground">
                   Filter By
                 </span>

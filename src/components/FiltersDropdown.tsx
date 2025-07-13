@@ -5,12 +5,14 @@ import { ChevronDown } from "lucide-react";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
+import { cn } from "@/lib/utils";
 
 type FiltersDropdownProps = {
   filterStatusData: { id: string; label: string }[];
   title?: string;
   subTitle?: string;
   filterBy?: boolean;
+  className?: string;
 };
 
 function FiltersDropdown({
@@ -18,11 +20,15 @@ function FiltersDropdown({
   title = "Filters",
   filterBy = true,
   subTitle = "Order Status",
+  className,
 }: FiltersDropdownProps) {
   return (
     <Popover>
-      <PopoverTrigger>
-        <Button variant="outline" className="text-base font-medium border-none">
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn("font-medium border-none text-base", className)}
+        >
           {title}
           <ChevronDown />
         </Button>
