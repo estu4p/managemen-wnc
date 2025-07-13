@@ -132,12 +132,12 @@ const Inventory = () => {
             <Table>
               <TableHeader className="bg-primary-gray">
                 <TableRow>
-                  <TableHead className="min-w-[250px] text-primary">
+                  <TableHead className=" min-w-[250px] text-primary">
                     Product
                   </TableHead>
-                  <TableHead className="text-primary">Category</TableHead>
-                  <TableHead className="text-primary">Stock</TableHead>
-                  <TableHead className="text-right text-primary">
+                  <TableHead className=" text-primary">Category</TableHead>
+                  <TableHead className=" text-primary">Stock</TableHead>
+                  <TableHead className=" text-right text-primary">
                     Details
                   </TableHead>
                 </TableRow>
