@@ -23,7 +23,7 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import {
@@ -44,7 +44,7 @@ const FormSchema = z.object({
 });
 
 const OrderDetailsPage = () => {
-  const [totalItems, setTotalItems] = React.useState(1);
+  const [totalItems, setTotalItems] = useState(1);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

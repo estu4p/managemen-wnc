@@ -1,12 +1,10 @@
 "use client";
 import FinancialCard from "@/components/financial/FinancialCard";
 import HeaderPage from "@/components/HeaderPage";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ChevronRight, CircleAlert, Square } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 import {
   ChartConfig,
   ChartContainer,
@@ -165,7 +163,10 @@ const page = () => {
               </div>
             ))}
             <div className="flex items-center justify-end">
-              <Link href="#" className="text-[13px] text-muted-foreground">
+              <Link
+                href="/financial/target/"
+                className="text-[13px] text-muted-foreground"
+              >
                 Manage
                 <ChevronRight className="h-4 w-4 ml-0.5 inline" />
               </Link>
