@@ -17,10 +17,10 @@ const badgeVariants = cva(
           "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
         outline:
           "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
-        newOrder: "bg-blue-200 text-blue-500",
-        waitting: "bg-rose-100 text-rose-500",
-        onProgress: "bg-amber-100 text-amber-500",
-        readyPickUp: "bg-lime-100 text-lime-500",
+        NEW_ORDER: "bg-blue-200 text-blue-500",
+        WAITTING: "bg-rose-100 text-rose-500",
+        ON_PROGRESS: "bg-amber-100 text-amber-500",
+        PICKER_UP: "bg-lime-100 text-lime-500",
       },
     },
     defaultVariants: {

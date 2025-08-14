@@ -2,24 +2,14 @@
 import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
 import OrderCard from "@/components/order/OrderCard";
-import OrderList from "@/components/order/OrderList";
-import { Badge } from "@/components/ui/badge";
+import OrderTable from "@/components/order/OrderTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, List, MoveUpRight, Search } from "lucide-react";
+import { LayoutGrid, List, Search } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const OrderCardData = [
   {
@@ -67,8 +57,15 @@ const FilterStatusData = [
   },
 ];
 
-function Home() {
+const Home = () => {
   const [viewMode, setViewMode] = useState<"list" | "card">("list");
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    fetch("api/invoices")
+      .then((res) => res.json())
+      .then((data) => setOrders(data));
+  }, []);
 
   return (
     <div className="p-4 sm:px-7">
@@ -144,11 +141,15 @@ function Home() {
           </div>
         </div>
         <div className="mt-3 max-sm:mt-6 flex gap-3 transition-all duration-300 ease-in-out">
-          {viewMode === "list" ? <OrderList /> : <OrderCard />}
+          {viewMode === "list" ? (
+            <OrderTable data={orders} />
+          ) : (
+            <OrderCard data={orders} />
+          )}
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default Home;

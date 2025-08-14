@@ -9,12 +9,33 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { formatRupiah } from "@/lib/format";
+import { Badge } from "../ui/badge";
 
-const OrderCard = () => {
+const statusLabels = {
+  NEW_ORDER: "New Order",
+  WAITTING: "Waiting",
+  ON_PROGRESS: "On Progress",
+  PICKER_UP: "Ready for Pick Up", //PICK_UP
+};
+
+type Invoices = {
+  id: string;
+  name: string;
+  totalPayment: number;
+  date: Date;
+  items: { name: string; service: string; status: string }[];
+  notes: string;
+};
+
+const OrderCard = ({ data }: { data: Invoices[] }) => {
   return (
     <div className="flex items-center justify-between flex-wrap gap-4 max-[650px]:justify-center w-full lg:px-9">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <Card key={index} className="max-w-[290px] flex- h-fit rounded-md ">
+      {data.map((invoice, index) => (
+        <Card
+          key={index}
+          className="w-[290px] flex flex-col justify-between h-[411px] rounded-md"
+        >
           <CardHeader className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <Avatar className="size-9">
@@ -22,51 +43,49 @@ const OrderCard = () => {
                 <AvatarFallback>ES</AvatarFallback>
               </Avatar>
               <div className="">
-                <CardTitle>Reza Pramudya</CardTitle>
+                <CardTitle>{invoice.name}</CardTitle>
                 <CardDescription className="text-[13px]">
                   12:30 PM
                 </CardDescription>
               </div>
             </div>
-            <span className="py-0.5 px-3 rounded-xl bg-blue-200 font-medium text-blue-400">
-              New
-            </span>
+            <Badge variant={invoice.items[0].status as any}>
+              {statusLabels[
+                invoice.items[0].status as keyof typeof statusLabels
+              ] || invoice.items[0].status}
+            </Badge>
           </CardHeader>
-          <CardContent className="px-">
+          <CardContent className="">
             <div className="flex items-center justify-between w-[94%]">
               <div>
                 <h3 className="font-medium text-muted-foreground">Order ID</h3>
-                <span className="font-medium">WNC-250539</span>
+                <span className="font-medium">{invoice.id}</span>
               </div>
               <div>
                 <h3 className="font-medium text-muted-foreground">
                   Total Payment
                 </h3>
-                <span className="font-medium">Rp. 240,000</span>
+                <span className="font-medium">
+                  {formatRupiah(invoice.totalPayment)}
+                </span>
               </div>
             </div>
             {/*  */}
             <div className="mt-5 space-y-2">
-              <div className="flex items-center gap-2">
-                <Avatar className="size-9">
-                  <AvatarImage />
-                  <AvatarFallback>HL</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-medium capitalize">Adidas samba</h3>
-                  <p className="text-muted-foreground -mt-1">Deep Clean</p>
+              {invoice.items.slice(0, 2).map((item, idx) => (
+                <div className="flex items-center gap-2" key={idx}>
+                  <Avatar className="size-9">
+                    <AvatarImage />
+                    <AvatarFallback>HL</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-medium capitalize">{item.name}</h3>
+                    <p className="text-muted-foreground -mt-1">
+                      {item.service}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Avatar className="size-9">
-                  <AvatarImage />
-                  <AvatarFallback>GG</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="font-medium capitalize">Nike Air</h3>
-                  <p className="text-muted-foreground -mt-1">Regular Clean</p>
-                </div>
-              </div>
+              ))}
             </div>
             <div className="w-full flex items-end justify-end p-0">
               <Button
@@ -81,9 +100,11 @@ const OrderCard = () => {
               <span className="font-medium text-muted-foreground">
                 Order Notes
               </span>
-              <p className="text-wrap leading-tight">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-              </p>
+              {invoice.notes ? (
+                <p className="text-wrap leading-tight">{invoice.notes}</p>
+              ) : (
+                "-"
+              )}
             </div>
           </CardContent>
           <CardFooter>

@@ -9,3 +9,7 @@ monitoring page
 db
 1. tambah updatedAt
 2. invoice hapus estimatedCompleted
+
+db
+1. enum progress PICKER_UP => PICK_UP
+2. add status at items model

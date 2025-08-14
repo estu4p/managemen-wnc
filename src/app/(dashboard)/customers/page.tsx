@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { formatDate } from "@/lib/format";
 
 const FilterStatusData = [
   {
@@ -119,16 +120,7 @@ async function CustomersPage() {
                     {/* <TableCell>{customer.items.length}</TableCell>
                     <TableCell>{customer.items.length}</TableCell> */}
                     {/* <TableCell>{customer.invoices.length}</TableCell> */}
-                    <TableCell>
-                      {new Date(customer.createdAt).toLocaleDateString(
-                        "id-ID",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )}
-                    </TableCell>
+                    <TableCell>{formatDate(customer.createdAt)}</TableCell>
                     <TableCell className="text-right">
                       <Button size="iconXs">
                         <Link href={`/customers/details/${customer.id}`}>
