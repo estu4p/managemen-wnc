@@ -46,14 +46,15 @@ const RevenueTargetPage = () => {
     console.log("Form Data:", data);
   }
 
-  const handleTotalItem = () => {
+  function handleTotalItem() {
     setTotalTargets((prev) => prev + 1);
     // Reset the form for the new item
     form.reset({
       name: "",
       phone: "",
     });
-  };
+  }
+
   return (
     <div className="p-4 sm:px-7">
       <HeaderPage

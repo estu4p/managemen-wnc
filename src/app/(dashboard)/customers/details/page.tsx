@@ -89,7 +89,7 @@ const InventoryData = [
   },
 ];
 
-const CustomerDetailsPage = () => {
+function CustomerDetailsPage() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -109,9 +109,6 @@ const CustomerDetailsPage = () => {
           desc="View and manage customer details"
           calendar={false}
         />
-        <Button variant="default" size="sm" className="mb-3">
-          Preview
-        </Button>
       </div>
       <div className="mt-6">
         <Form {...form}>
@@ -300,6 +297,6 @@ const CustomerDetailsPage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default CustomerDetailsPage;

@@ -11,7 +11,7 @@ export type CustomerRecord = {
   photo: string;
   name: string;
   phone: string;
-  totalNotes: number;
+  totalInvoices: number;
   totalItems: number;
   firstTimeComing: string;
 };
@@ -49,7 +49,7 @@ export const columns: ColumnDef<CustomerRecord>[] = [
     header: "Phone",
   },
   {
-    accessorKey: "totalNotes",
+    accessorKey: "totalInvoices",
     header: "Total Notes",
   },
   {

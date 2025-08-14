@@ -1,0 +1,217 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id
+  username String @unique
+  name String
+  role UserRole
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id String @id
+  name String
+  phone String @unique
+  photo String?
+  invoices Invoice[]
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id Int @id @default(autoincrement())
+  name String @unique
+  price Decimal @db.Decimal(10, 2)
+  items Item[]
+}
+
+model Invoice {
+  id String @id
+  price Decimal @db.Decimal(10, 2)
+  addDiscount Decimal? @db.Decimal(6, 2)
+  note String?
+  estimatedCompletion DateTime?
+  customer Customer @relation(fields: [customerId], references: [id])
+  customerId String
+  items Item[]
+  discount Discount? @relation(fields: [discountId], references: [id])
+  discountId Int?
+  createdAt DateTime @default(now())
+}
+
+model Item {
+  id Int @id @default(autoincrement())
+  name String
+  itemCategory ItemCategory
+  material String?
+  size String?
+  color String?
+  photos Json?
+  note String?
+  estimatedCompletion DateTime?
+  progress Progress @default(NEW_ORDER)
+  service Service @relation(fields: [serviceId], references: [id])
+  serviceId Int
+  invoice Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Discount {
+  id Int @id @default(autoincrement())
+  name String
+  discount Decimal @db.Decimal(6, 2)
+  invoices Invoice[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Inventory{
+  id Int @id @default(autoincrement())
+  name String
+  category InventoryCategory
+  unit InventoryUnit
+  initialStock Float
+  currentStock Float
+  price Decimal? @db.Decimal(10, 2)
+  photo String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RevenueTarget {
+  id Int @id @default(autoincrement())
+  category PeriodCategory
+  fromDate DateTime
+  untilate DateTime
+  totalTarget Decimal @db.Decimal(12, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // @@unique([period, date])
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+  type TransactionType
+  category CashFlowCategory
+  amount Decimal @db.Decimal(12, 2)
+  description String?
+  createdAt DateTime @default(now())
+}
+
+model FinancialReport {
+  id Int @id @default(autoincrement())
+  period PeriodCategory
+  year Int
+  month Int?
+  week Int?
+  totalIncome Decimal @default(0.0) @db.Decimal(12, 2)
+  totalExpense Decimal @default(0.0) @db.Decimal(12, 2)
+  totalProfit Decimal @default(0.0) @db.Decimal(12, 2)
+  totalItemDone Int @default(0)
+  totalProductSold Int @default(0)
+  notes String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([period, year, month, week])
+}
+
+
+// ENUM
+enum UserRole {
+  ADMIN
+  SUPERADMIN
+}
+
+enum ItemCategory {
+  SHOE
+  BAG
+  HELMET
+  SANDAL
+  HAT
+  WALLET
+  OTHER
+}
+
+// enum WashingProgress {
+//   NEWORDER
+//   WAITTING
+//   WASHING
+//   DRYING
+//   FINISHING
+//   DONE
+//   PICKER_UP
+//   CANCELED
+// }
+
+enum Progress {
+  NEW_ORDER
+  WAITTING
+  ON_PROGRESS
+  FINISHING
+  DONE
+  PICKER_UP
+  CANCELED
+}
+
+enum InventoryCategory {
+  EQUIPMENT //peralatan toko
+  MATERIAL // bahan habis pakai
+  PRODUCT // produk dijual
+  OTHER // lain-lain / umum
+}
+
+enum InventoryUnit {
+  PSC
+  LITER
+  GRAM
+  METER
+  PAIRS
+  BOX
+  ROLL
+  OTHER
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+enum CashFlowCategory {
+  // income
+  SERVICE_INCOME  // income from services
+  PRODUCT_SALES   // income from selling product
+  OTHER_INCOME    // onther income
+  // expense
+  MATERIAL_PURCHASE   // buying soap, brushes, etc.
+  EQUIPMENT_PURCHASE  // buing maching, tools, etc.
+  SALARY              // employee wages
+  RENT                // shop rent
+  UTILITY             // elextricity, water, internet, etc.
+  MARKETING           // ads, printing, etc.
+  OTHER_EXPENSE       // miscellaneous expense
+}
+
+enum PeriodCategory {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+  OTHER
+}

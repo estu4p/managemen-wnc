@@ -1,10 +1,14 @@
-import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
-import { Button } from "@/components/ui/button";
+import React from "react";
+
+import { Input } from "@/components/ui/input";
+import { MoveUpRight, Search } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import FiltersDropdown from "@/components/FiltersDropdown";
+import prisma from "@/lib/prisma";
 import {
   Table,
   TableBody,
@@ -13,9 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { MoveUpRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import React from "react";
 
 const FilterStatusData = [
   {
@@ -52,105 +55,83 @@ const FilterStatusData = [
   },
 ];
 
-const InventoryData = [
-  {
-    id: "detoxy",
-    product: "Detoxy",
-    category: "Soap",
-    stock: "5 L",
-  },
-  {
-    id: "sikatSuede",
-    product: "Sikat Suede",
-    category: "Brush",
-    stock: "5 Pcs",
-  },
-  {
-    id: "premiumCleaner",
-    product: "Premium Cleaner",
-    category: "Cleaning Solution",
-    stock: "10 L",
-  },
-  {
-    id: "mikrofiberTowel",
-    product: "Mikrofiber Towel",
-    category: "Cloth",
-    stock: "20 Pcs",
-  },
-  {
-    id: "cupSoleBrush",
-    product: "Cup Sole Brush",
-    category: "Brush",
-    stock: "7 Pcs",
-  },
-  {
-    id: "deodorizerSpray",
-    product: "Deodorizer Spray",
-    category: "Spray",
-    stock: "12 Bottles",
-  },
-  {
-    id: "shoeTree",
-    product: "Shoe Tree",
-    category: "Accessory",
-    stock: "10 Pairs",
-  },
-  {
-    id: "essentialKitBox",
-    product: "Essential Kit Box",
-    category: "Package",
-    stock: "5 Boxes",
-  },
-];
+async function CustomersPage() {
+  const customers = await prisma.customer.findMany({
+    // include: {
+    //   items: true,
+    // },
+  });
 
-const Inventory = () => {
   return (
     <div className="p-4 sm:px-7">
-      <div className="flex items-end justify-between">
-        <HeaderPage
-          title="Inventory Data"
-          desc="Manage and track your inventory effectively."
-          calendar={false}
-        />
-        <Link href="/inventory/add" className="mb-3">
-          <Button variant="default" size="sm">
-            Add New
-          </Button>
-        </Link>
+      <HeaderPage
+        title="Customer Records"
+        desc="Find all customer records, categorized and easy to search."
+        calendar={false}
+      />
+      {/* {customers.map((customer, index) => (
+        <p key={customer.id}>{customer.name}</p>
+      ))} */}
+      <div className="mb-3 flex items-center justify-between">
+        <div className="relative">
+          <Input className="text-sm bg-accent" placeholder="Search By Name" />
+          <Search className="absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="flex justify-end lg:hidden">
+          <FiltersDropdown
+            filterStatusData={FilterStatusData}
+            subTitle="Category"
+            className="text-sm"
+          />
+        </div>
       </div>
-      <div className="flex justify-end lg:hidden">
-        <FiltersDropdown
-          filterStatusData={FilterStatusData}
-          subTitle="Category"
-          className="text-sm"
-        />
-      </div>
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex gap-4">
         {/* left */}
+        {/* <div className="container mx-auto">
+          <DataTable columns={columns} data={data} />
+        </div> */}
         <div className="container mx-auto">
           <div className=" rounded-md border h-fit">
             <Table>
               <TableHeader className="bg-primary-gray">
                 <TableRow>
-                  <TableHead className=" min-w-[250px] text-primary">
-                    Product
+                  <TableHead className="text-primary">ID</TableHead>
+                  <TableHead className="text-primary">Name</TableHead>
+                  <TableHead className="text-primary">Phone</TableHead>
+                  <TableHead className="text-primary">Total Items</TableHead>
+                  <TableHead className="text-primary">Total Invoices</TableHead>
+                  <TableHead className=" text-primary">
+                    First Time Coming
                   </TableHead>
-                  <TableHead className=" text-primary">Category</TableHead>
-                  <TableHead className=" text-primary">Stock</TableHead>
                   <TableHead className=" text-right text-primary">
                     Details
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {InventoryData.map((item, index) => (
+                {customers.map((customer, index) => (
                   <TableRow key={index}>
-                    <TableCell>{item.product}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.stock}</TableCell>
+                    <TableCell className="font-medium">{customer.id}</TableCell>
+                    <TableCell>{customer.name}</TableCell>
+                    <TableCell>{customer.phone}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    {/* <TableCell>{customer.items.length}</TableCell>
+                    <TableCell>{customer.items.length}</TableCell> */}
+                    {/* <TableCell>{customer.invoices.length}</TableCell> */}
+                    <TableCell>
+                      {new Date(customer.createdAt).toLocaleDateString(
+                        "id-ID",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        }
+                      )}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Button size="iconXs">
-                        <Link href={`/inventory/${item.id}`}>
+                        <Link href={`/customers/details/${customer.id}`}>
                           <MoveUpRight />
                         </Link>
                       </Button>
@@ -179,7 +160,6 @@ const Inventory = () => {
             </Button>
           </div>
         </div>
-        {/* right */}
         <div className="w-fit max-lg:hidden">
           <Card className="min-w-[180px] h-fit rounded-md py-3 gap-4">
             <CardHeader className="gap-0 px-4 font-semibold text-base">
@@ -218,6 +198,6 @@ const Inventory = () => {
       </div>
     </div>
   );
-};
+}
 
-export default Inventory;
+export default CustomersPage;

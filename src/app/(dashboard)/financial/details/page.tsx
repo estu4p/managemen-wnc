@@ -101,7 +101,7 @@ const InventoryData = [
   },
 ];
 
-const FinancialDetailsPage = () => {
+function FinancialDetailsPage() {
   return (
     <div className="p-4 sm:px-7">
       <HeaderPage title="Financial Details" desc="" />
@@ -190,6 +190,6 @@ const FinancialDetailsPage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default FinancialDetailsPage;

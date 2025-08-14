@@ -43,7 +43,7 @@ const FormSchema = z.object({
   }),
 });
 
-const OrderDetailsPage = () => {
+function OrderDetailsPage() {
   const [totalItems, setTotalItems] = useState(1);
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -485,6 +485,6 @@ const OrderDetailsPage = () => {
       </div>
     </div>
   );
-};
+}
 
 export default OrderDetailsPage;

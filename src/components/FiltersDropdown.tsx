@@ -15,13 +15,13 @@ type FiltersDropdownProps = {
   className?: string;
 };
 
-function FiltersDropdown({
+const FiltersDropdown = ({
   filterStatusData,
   title = "Filters",
   filterBy = true,
   subTitle = "Order Status",
   className,
-}: FiltersDropdownProps) {
+}: FiltersDropdownProps) => {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -68,6 +68,6 @@ function FiltersDropdown({
       </PopoverContent>
     </Popover>
   );
-}
+};
 
 export default FiltersDropdown;

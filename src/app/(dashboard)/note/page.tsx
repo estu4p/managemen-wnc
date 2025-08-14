@@ -48,7 +48,7 @@ interface NotePreviewProps {
   note: Note;
 }
 
-const NotePage = ({ note }: NotePreviewProps) => {
+function NotePage({ note }: NotePreviewProps) {
   return (
     <div className="flex justify-center">
       <div className="w-[40rem] min-h-screen md:m-3 p-4 rounded-md border border-border text-sm bg-background">
@@ -279,6 +279,6 @@ const NotePage = ({ note }: NotePreviewProps) => {
       </div>
     </div>
   );
-};
+}
 
 export default NotePage;

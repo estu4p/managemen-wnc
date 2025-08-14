@@ -68,7 +68,7 @@ const steps = [
 
 // { steps }: { steps: Step[] }
 
-export function TrackingMap() {
+const TrackingMap = () => {
   return (
     <div className="space-y-0 mt-2">
       {steps.map((step, index) => {
@@ -140,4 +140,6 @@ export function TrackingMap() {
       })}
     </div>
   );
-}
+};
+
+export default TrackingMap;

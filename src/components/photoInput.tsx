@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Upload, X, ImageIcon } from "lucide-react";
 import Image from "next/image";
 
-export default function PhotoInput() {
+const PhotoInput = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -136,4 +136,6 @@ export default function PhotoInput() {
       )}
     </div>
   );
-}
+};
+
+export default PhotoInput;

@@ -25,7 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
-export default async function InventoryDetailPage({
+async function InventoryDetailPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
@@ -131,3 +131,5 @@ export default async function InventoryDetailPage({
     </div>
   );
 }
+
+export default InventoryDetailPage;

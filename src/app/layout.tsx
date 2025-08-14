@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Urbanist } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/AppSidebar";
 import { cookies } from "next/headers";
 import Navbar from "@/components/Navbar";
+import AppSidebar from "@/components/AppSidebar";
 
-const urbanist = Urbanist({
-  variable: "--font-urbanist",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-});
+// const urbanist = Urbanist({
+//   variable: "--font-urbanist",
+//   subsets: ["latin"],
+//   display: "swap",
+//   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+// });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

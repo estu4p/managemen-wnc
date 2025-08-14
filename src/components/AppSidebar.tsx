@@ -79,7 +79,7 @@ const generalItems = [
   },
 ];
 
-export function AppSidebar() {
+const AppSidebar = () => {
   const pathname = usePathname();
 
   const isActive = (path: string) => {
@@ -192,4 +192,5 @@ export function AppSidebar() {
       <SidebarFooter />
     </Sidebar>
   );
-}
+};
+export default AppSidebar;
