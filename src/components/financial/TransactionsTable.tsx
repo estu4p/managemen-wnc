@@ -1,5 +1,6 @@
 "use client";
 
+import { formatDate, formatRupiah } from "@/lib/format";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import { Separator } from "../ui/separator";
 
@@ -30,25 +31,11 @@ const TransactionsTable = ({ data }: { data: Transactions[] }) => {
                 <div className="-space-y-1">
                   <h5 className="font-medium">{transaction.category}</h5>
                   <span className="text-muted-foreground text-[13px]">
-                    {new Date(transaction.createdAt).toLocaleDateString(
-                      "id-ID",
-                      {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      }
-                    )}
+                    {formatDate(transaction.createdAt)}
                   </span>
                 </div>
               </div>
-              <span className="">
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(transaction.amount)}
-              </span>
+              <span className="">{formatRupiah(transaction.amount)}</span>
             </div>
             <Separator className="my-0" />
           </div>

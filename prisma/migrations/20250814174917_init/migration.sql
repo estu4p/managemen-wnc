@@ -37,6 +37,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Customer" (
     "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "photo" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -54,6 +55,20 @@ CREATE TABLE "Service" (
 );
 
 -- CreateTable
+CREATE TABLE "Invoice" (
+    "id" TEXT NOT NULL,
+    "price" DECIMAL(10,2) NOT NULL,
+    "addDiscount" DECIMAL(6,2),
+    "note" TEXT,
+    "estimatedCompletion" TIMESTAMP(3),
+    "customerId" TEXT NOT NULL,
+    "discountId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Item" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
@@ -66,26 +81,11 @@ CREATE TABLE "Item" (
     "estimatedCompletion" TIMESTAMP(3),
     "progress" "Progress" NOT NULL DEFAULT 'NEW_ORDER',
     "serviceId" INTEGER NOT NULL,
-    "customerId" TEXT NOT NULL,
+    "invoiceId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Item_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "Invoice" (
-    "id" TEXT NOT NULL,
-    "price" DECIMAL(10,2) NOT NULL,
-    "addDiscount" DECIMAL(6,2),
-    "note" TEXT,
-    "estimatedCompletion" TIMESTAMP(3),
-    "customerId" TEXT NOT NULL,
-    "invoiceId" INTEGER NOT NULL,
-    "discountId" INTEGER,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT "Invoice_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -143,7 +143,7 @@ CREATE TABLE "Transaction" (
 -- CreateTable
 CREATE TABLE "FinancialReport" (
     "id" SERIAL NOT NULL,
-    "period" "PeriodCategory" NOT NULL,
+    "period" "PeriodCategory",
     "year" INTEGER NOT NULL,
     "month" INTEGER,
     "week" INTEGER,
@@ -168,20 +168,14 @@ CREATE UNIQUE INDEX "Customer_phone_key" ON "Customer"("phone");
 -- CreateIndex
 CREATE UNIQUE INDEX "Service_name_key" ON "Service"("name");
 
--- CreateIndex
-CREATE UNIQUE INDEX "FinancialReport_period_year_month_week_key" ON "FinancialReport"("period", "year", "month", "week");
+-- AddForeignKey
+ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_discountId_fkey" FOREIGN KEY ("discountId") REFERENCES "Discount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Item" ADD CONSTRAINT "Item_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "Service"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Item" ADD CONSTRAINT "Item_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_customerId_fkey" FOREIGN KEY ("customerId") REFERENCES "Customer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Item"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Invoice" ADD CONSTRAINT "Invoice_discountId_fkey" FOREIGN KEY ("discountId") REFERENCES "Discount"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Item" ADD CONSTRAINT "Item_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice"("id") ON DELETE SET NULL ON UPDATE CASCADE;

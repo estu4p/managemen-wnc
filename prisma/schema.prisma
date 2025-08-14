@@ -44,11 +44,11 @@ model Invoice {
   addDiscount Decimal? @db.Decimal(6, 2)
   note String?
   estimatedCompletion DateTime?
-  customer Customer @relation(fields: [customerId], references: [id])
   customerId String
+  customer Customer @relation(fields: [customerId], references: [id])
   items Item[]
-  discount Discount? @relation(fields: [discountId], references: [id])
   discountId Int?
+  discount Discount? @relation(fields: [discountId], references: [id])
   createdAt DateTime @default(now())
 }
 
@@ -63,10 +63,10 @@ model Item {
   note String?
   estimatedCompletion DateTime?
   progress Progress @default(NEW_ORDER)
-  service Service @relation(fields: [serviceId], references: [id])
   serviceId Int
-  invoice Invoice @relation(fields: [invoiceId], references: [id])
-  invoiceId String
+  service Service @relation(fields: [serviceId], references: [id])
+  invoiceId String?
+  invoice Invoice? @relation(fields: [invoiceId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -116,7 +116,7 @@ model Transaction {
 
 model FinancialReport {
   id Int @id @default(autoincrement())
-  period PeriodCategory
+  period PeriodCategory?
   year Int
   month Int?
   week Int?
@@ -129,7 +129,7 @@ model FinancialReport {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([period, year, month, week])
+  // @@unique([period, year, month, week])
 }
 
 

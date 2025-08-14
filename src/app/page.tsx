@@ -67,7 +67,7 @@ const FilterStatusData = [
   },
 ];
 
-const Home = () => {
+function Home() {
   const [viewMode, setViewMode] = useState<"list" | "card">("list");
 
   return (
@@ -149,6 +149,6 @@ const Home = () => {
       </div>
     </div>
   );
-};
+}
 
 export default Home;

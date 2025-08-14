@@ -1,0 +1,11 @@
+14/08
+
+revenue target
+db
+1. ganti nama untileate jadi 'untilDate' 
+2. tambah target sekarang/tidak
+
+monitoring page
+db
+1. tambah updatedAt
+2. invoice hapus estimatedCompleted
