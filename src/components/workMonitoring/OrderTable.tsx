@@ -29,6 +29,7 @@ const statusLabels = {
 };
 
 const OrderTable = ({ data }: { data: Invoices[] }) => {
+  const limitedData = data.slice(0, 6);
   return (
     <div className="container mx-auto">
       <div className=" rounded-md border h-fit">
@@ -44,7 +45,7 @@ const OrderTable = ({ data }: { data: Invoices[] }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((invoice, index) => (
+            {limitedData.map((invoice, index) => (
               <TableRow key={index}>
                 <TableCell className="flex items-center gap-2">
                   {/* <div className=""> */}

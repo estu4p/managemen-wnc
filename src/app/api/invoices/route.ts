@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   const invoices = await prisma.invoice.findMany({
-    take: 6,
+    // take: 6,
     include: {
       customer: true,
       items: { include: { service: true } },
@@ -14,6 +14,7 @@ export async function GET() {
     id: invoice.id,
     price: invoice.price,
     notes: invoice.note,
+    progress: invoice.progress,
     totalPayment: invoice.price,
     date: invoice.createdAt,
     name: invoice.customer.name,

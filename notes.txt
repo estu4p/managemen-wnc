@@ -2,14 +2,14 @@
 
 revenue target
 db
-1. ganti nama untileate jadi 'untilDate' 
+1. ganti nama untileate jadi 'untilDate' (ok)
 2. tambah target sekarang/tidak
 
 monitoring page
 db
-1. tambah updatedAt
-2. invoice hapus estimatedCompleted
+1. tambah updatedAt (ok)
+2. invoice hapus estimatedCompleted (ok)
 
 db
-1. enum progress PICKER_UP => PICK_UP
-2. add status at items model
+1. enum progress PICKER_UP => PICK_UP (ok)
+2. add status at items model (ok)

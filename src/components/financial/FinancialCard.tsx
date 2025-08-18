@@ -6,11 +6,11 @@ import { Eye, EyeOff, TrendingDown, TrendingUp } from "lucide-react";
 
 const FinancialCard = ({
   title,
-  value,
+  amount,
   statistic,
 }: {
   title: string;
-  value: string;
+  amount: number;
   statistic: string;
 }) => {
   const [eyeOff, setEyeOff] = useState(true);
@@ -18,6 +18,11 @@ const FinancialCard = ({
   const handleEyeOff = () => {
     setEyeOff(!eyeOff);
   };
+
+  const formatAmount = new Intl.NumberFormat("id-ID", {
+    style: "decimal",
+    maximumFractionDigits: 0,
+  }).format(amount);
 
   return (
     <Card className="min-w-[205px] w-[250px] h-[120px] flex-1 py-3 rounded-md flex justify-between gap-3">
@@ -37,7 +42,7 @@ const FinancialCard = ({
         <div className="flex">
           <span className="font-semibold -mt-2 mr-1">Rp.</span>
           <span className="text-xl font-semibold">
-            {eyeOff ? value : "********"}
+            {eyeOff ? formatAmount : "********"}
           </span>
         </div>
         {/* 

@@ -26,9 +26,25 @@ async function Financial() {
   const revenueTargetsData = revenueTargets.map((target) => ({
     id: target.id,
     category: target.category,
-    untilDate: target.untilate,
+    untilDate: target.untilDate,
     totalTarget: Number(target.totalTarget),
   }));
+
+  // Get Total Income, Total Expanse
+  const { totalIncome, totalExpanse } = transactions.reduce(
+    (acc, t) => {
+      if (t.type === "INCOME") {
+        acc.totalIncome += Number(t.amount);
+      } else if (t.type === "EXPENSE") {
+        acc.totalExpanse += Number(t.amount);
+      }
+      return acc;
+    },
+    { totalIncome: 0, totalExpanse: 0 }
+  );
+
+  // Get Total Balance
+  const totalBalance = totalIncome - totalExpanse;
 
   return (
     <div className="px-4 sm:ps-7 flex flex-col lg:flex-row gap-4 lg:gap-0">
@@ -41,11 +57,15 @@ async function Financial() {
         <div className="flex gap-3 flex-wrap">
           <FinancialCard
             title="Total Balance"
-            value="132,000,000"
+            amount={totalBalance}
             statistic="-25"
           />
-          <FinancialCard title="Income" value="32,000,000" statistic="12" />
-          <FinancialCard title="Expanse" value="2,000,0000" statistic="-30" />
+          <FinancialCard title="Income" amount={totalIncome} statistic="12" />
+          <FinancialCard
+            title="Expanse"
+            amount={totalExpanse}
+            statistic="-30"
+          />
         </div>
         <div className="mt-3 flex gap-3 flex-col lg:flex-row">
           <TransactionsTabel data={transactionsData} />

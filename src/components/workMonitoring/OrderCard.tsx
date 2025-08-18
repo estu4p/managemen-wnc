@@ -29,9 +29,10 @@ type Invoices = {
 };
 
 const OrderCard = ({ data }: { data: Invoices[] }) => {
+  const limitedData = data.slice(0, 6);
   return (
     <div className="flex items-center justify-between flex-wrap gap-4 max-[650px]:justify-center w-full lg:px-9">
-      {data.map((invoice, index) => (
+      {limitedData.map((invoice, index) => (
         <Card
           key={index}
           className="w-[290px] flex flex-col justify-between h-[411px] rounded-md"

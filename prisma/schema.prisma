@@ -43,13 +43,14 @@ model Invoice {
   price Decimal @db.Decimal(10, 2)
   addDiscount Decimal? @db.Decimal(6, 2)
   note String?
-  estimatedCompletion DateTime?
+  progress String @default("NEW_ORDER")
   customerId String
   customer Customer @relation(fields: [customerId], references: [id])
   items Item[]
   discountId Int?
   discount Discount? @relation(fields: [discountId], references: [id])
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Item {
@@ -97,7 +98,7 @@ model RevenueTarget {
   id Int @id @default(autoincrement())
   category PeriodCategory
   fromDate DateTime
-  untilate DateTime
+  untilDate DateTime
   totalTarget Decimal @db.Decimal(12, 2)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -166,7 +167,7 @@ enum Progress {
   ON_PROGRESS
   FINISHING
   DONE
-  PICKER_UP
+  PICKED_UP
   CANCELED
 }
 

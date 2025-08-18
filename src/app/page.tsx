@@ -1,8 +1,8 @@
 "use client";
 import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
-import OrderCard from "@/components/order/OrderCard";
-import OrderTable from "@/components/order/OrderTable";
+import OrderCard from "@/components/workMonitoring/OrderCard";
+import OrderTable from "@/components/workMonitoring/OrderTable";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,33 +10,7 @@ import { cn } from "@/lib/utils";
 import { LayoutGrid, List, Search } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-
-const OrderCardData = [
-  {
-    title: "New Order",
-    count: 18,
-    icon: "/icons/newOrders.png",
-    bgIcon: "bg-blue-200",
-  },
-  {
-    title: "Waitting",
-    count: 7,
-    icon: "/icons/waitting.png",
-    bgIcon: "bg-rose-100",
-  },
-  {
-    title: "On Progress",
-    count: 8,
-    icon: "/icons/onProgress.png",
-    bgIcon: "bg-amber-100",
-  },
-  {
-    title: "Ready for Pickup",
-    count: 9,
-    icon: "/icons/readyToTake.png",
-    bgIcon: "bg-lime-100",
-  },
-];
+import InvoiceMonitoring from "@/components/workMonitoring/InvoiceMonitoring";
 
 const FilterStatusData = [
   {
@@ -74,28 +48,8 @@ const Home = () => {
         desc="Monitor and track your work progress effectively."
       />
       {/* order data */}
-      <div className="flex items-center justify-center gap-3 flex-wrap max-w-full">
-        {OrderCardData.map((item) => (
-          <Card
-            key={item.title}
-            className="min-w-[130px] h-[110px] flex-1 py-3 rounded-md justify-between gap-0"
-          >
-            <CardHeader className="font-medium px-4 gap-0 leading-tight text-base">
-              {item.title}
-            </CardHeader>
-            <CardContent className="flex items-center justify-between px-4">
-              <span className="font-medium text-2xl">{item.count}</span>
-              <div className={cn("p-2 rounded-full", item.bgIcon)}>
-                <Image
-                  src={item.icon}
-                  alt="icon new order"
-                  height={20}
-                  width={20}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="">
+        <InvoiceMonitoring data={orders} />
       </div>
       {/*  */}
       <div className="mt-3">

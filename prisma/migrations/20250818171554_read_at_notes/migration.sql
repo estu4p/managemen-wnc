@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Invoice" ALTER COLUMN "updatedAt" DROP DEFAULT,
+ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE "RevenueTarget" ALTER COLUMN "untilDate" DROP DEFAULT,
+ALTER COLUMN "untilDate" SET DATA TYPE TIMESTAMP(3);
