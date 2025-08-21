@@ -1,4 +1,4 @@
-import CustomerDetails from "@/components/customer/CustomerDetails";
+import CustomerDetails from "@/components/customer/CustomerForm";
 import HeaderPage from "@/components/HeaderPage";
 import prisma from "@/lib/prisma";
 

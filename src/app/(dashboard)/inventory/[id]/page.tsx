@@ -1,5 +1,5 @@
 import HeaderPage from "@/components/HeaderPage";
-import InventoryDetails from "@/components/inventory/InventoryDetails";
+import InventoryDetails from "@/components/inventory/InventoryForm";
 import prisma from "@/lib/prisma";
 
 async function InventoryDetailsPage({ params }: { params: { id: string } }) {
