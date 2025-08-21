@@ -30,7 +30,7 @@ const HeaderPage = ({
                 className="rounded-full font-normal p-0"
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(new Date(), "PPP")}
+                {format(new Date(), "d MMMM yyyy")}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>

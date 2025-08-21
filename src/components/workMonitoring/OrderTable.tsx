@@ -17,6 +17,7 @@ type Invoices = {
   id: string;
   name: string;
   totalPayment: number;
+  progress: string;
   date: Date;
   items: { status: string }[];
 };
@@ -66,15 +67,15 @@ const OrderTable = ({ data }: { data: Invoices[] }) => {
                   </span>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={invoice.items[0].status as any}>
+                  <Badge variant={invoice.progress as any}>
                     {statusLabels[
-                      invoice.items[0].status as keyof typeof statusLabels
-                    ] || invoice.items[0].status}
+                      invoice.progress as keyof typeof statusLabels
+                    ] || invoice.progress}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right w-fit">
                   <Button size="iconXs">
-                    <Link href={`/order/details/`}>
+                    <Link href={`/invoice/${invoice.id}`}>
                       <MoveUpRight />
                     </Link>
                   </Button>

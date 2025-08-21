@@ -126,7 +126,7 @@ async function CustomersPage() {
                     <TableCell>{formatDate(customer.createdAt)}</TableCell>
                     <TableCell className="text-right">
                       <Button size="iconXs">
-                        <Link href={`/customers/details/${customer.id}`}>
+                        <Link href={`/customers/${customer.id}`}>
                           <MoveUpRight />
                         </Link>
                       </Button>

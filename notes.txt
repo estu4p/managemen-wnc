@@ -15,4 +15,13 @@ db
 2. add status at items model (ok) 18/08
 
 ---18/08---
-1. add data inventory
+1. get data inventory details
+
+
+---21/08---
+1. get data customer details [ok]
+2. 1 item bisa lebih dari 1 service
+3. tambah paymentStatus (paid/unpaid) di invoice
+4. tambah paymentMethod (cash/qris/transfer) di invoice
+5. tambah halaman manage discount
+6. dimodel discount tambah status discount (percentage/nominal)
