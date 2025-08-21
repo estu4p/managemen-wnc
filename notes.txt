@@ -26,3 +26,4 @@ db
 5. tambah halaman manage discount
 6. dimodel discount tambah status discount (percentage/nominal)
 7. tambah halaman manage service
+8. beri name dimodel revenue target
