@@ -53,15 +53,15 @@ const FilterStatusData = [
   },
 ];
 
-async function InventoryPage() {
+async function InventoriesPage() {
   const inventories = await prisma.inventory.findMany();
 
   return (
     <div className="p-4 sm:px-7">
       <div className="flex items-end justify-between">
         <HeaderPage
-          title="Inventory Data"
-          desc="Manage and track your inventory effectively."
+          title="Inventories Data"
+          desc="Manage and track your inventories effectively."
           calendar={false}
         />
         <Link href="/inventory/new" className="mb-3">
@@ -104,7 +104,7 @@ async function InventoryPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <Button size="iconXs">
-                        <Link href={`/inventory/${inventory.id}`}>
+                        <Link href={`/inventories/${inventory.id}`}>
                           <MoveUpRight />
                         </Link>
                       </Button>
@@ -164,4 +164,4 @@ async function InventoryPage() {
   );
 }
 
-export default InventoryPage;
+export default InventoriesPage;

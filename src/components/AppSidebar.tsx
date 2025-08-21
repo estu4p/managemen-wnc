@@ -8,7 +8,6 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarSeparator,
@@ -16,18 +15,14 @@ import {
 import { cn } from "@/lib/utils";
 import {
   Bolt,
-  Calendar,
   ChartColumn,
   FilePlus,
   Home,
-  Inbox,
   Package,
   Search,
-  Settings,
   ShieldAlert,
   UsersRound,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -39,8 +34,8 @@ const menuItems = [
     icon: Home,
   },
   {
-    title: "Financial",
-    url: "/financial",
+    title: "Financials",
+    url: "/financials",
     icon: ChartColumn,
   },
   {
@@ -49,13 +44,13 @@ const menuItems = [
     icon: UsersRound,
   },
   {
-    title: "Inventory",
-    url: "/inventory",
+    title: "Inventories",
+    url: "/inventories",
     icon: Package,
   },
   {
-    title: "Add Note",
-    url: "/addNote",
+    title: "Invoices",
+    url: "/invoices",
     icon: FilePlus,
   },
   {

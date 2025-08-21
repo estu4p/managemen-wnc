@@ -4,11 +4,9 @@ import HeaderPage from "@/components/HeaderPage";
 import OrderCard from "@/components/workMonitoring/OrderCard";
 import OrderTable from "@/components/workMonitoring/OrderTable";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { LayoutGrid, List, Search } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import InvoiceMonitoring from "@/components/workMonitoring/InvoiceMonitoring";
 
@@ -55,7 +53,7 @@ const Home = () => {
       <div className="mt-3">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3 max-sm:w-full justify-between">
-            <h1 className="font-medium text-base">Order List</h1>
+            <h1 className="font-medium text-base">Invoices List</h1>
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -88,7 +86,10 @@ const Home = () => {
           <div className="flex items-center justify-between max-sm:w-full gap-3 ">
             {/* SearchBar */}
             <div className="relative">
-              <Input className="text-sm bg-accent" placeholder="Search Order" />
+              <Input
+                className="text-sm bg-accent"
+                placeholder="Search Invoice"
+              />
               <Search className=" absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             </div>
             <FiltersDropdown filterStatusData={FilterStatusData} />

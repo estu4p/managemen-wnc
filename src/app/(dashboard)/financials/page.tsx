@@ -7,7 +7,7 @@ import prisma from "@/lib/prisma";
 import FinancialChart from "@/components/financial/FinancialChart";
 import RevenueTarget from "@/components/financial/RevenueTarget";
 
-async function FinancialPage() {
+async function FinancialsPage() {
   const transactions = await prisma.transaction.findMany({
     take: 5,
     orderBy: {
@@ -54,8 +54,8 @@ async function FinancialPage() {
       {/* left */}
       <div className="pt-4 lg:border-r lg:border-r-border w-full lg:pr-3">
         <HeaderPage
-          title="Financial Report"
-          desc="Detailed overview of your financial situation."
+          title="Financials Report"
+          desc="Detailed overview of your financials situation."
         />
         <div className="flex gap-3 flex-wrap">
           <FinancialCard
@@ -88,7 +88,7 @@ async function FinancialPage() {
               expenses.
             </p>
           </div>
-          <Link href="/financial/details">
+          <Link href="/financials/details">
             <Button
               className="mt-6 w-full bg-secondary-green"
               variant="secondary"
@@ -102,4 +102,4 @@ async function FinancialPage() {
   );
 }
 
-export default FinancialPage;
+export default FinancialsPage;

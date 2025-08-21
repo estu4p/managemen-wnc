@@ -25,3 +25,4 @@ db
 4. tambah paymentMethod (cash/qris/transfer) di invoice
 5. tambah halaman manage discount
 6. dimodel discount tambah status discount (percentage/nominal)
+7. tambah halaman manage service

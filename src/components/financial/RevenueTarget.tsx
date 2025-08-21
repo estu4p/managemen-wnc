@@ -36,7 +36,7 @@ const RevenueTarget = ({ data }: { data: Targets[] }) => {
         ))}
         <div className="flex items-center justify-end">
           <Link
-            href="/financial/target/"
+            href="/financials/target/"
             className="text-[13px] text-muted-foreground"
           >
             Manage
