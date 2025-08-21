@@ -82,15 +82,12 @@ const RevenueTargetPage = () => {
               >
                 <div className="flex flex-col sm:flex-row mt-2">
                   <div className="w-[20%] lg:w-[30%]">
-                    <h2 className="font-medium">Target {index + 1}</h2>
+                    <h2 className="font-medium text-base">
+                      Target {index + 1}
+                    </h2>
                   </div>
-                  {/* <div className="flex max-sm:w-[95%] mt-4 lg:mt-0 lg:w-[50%] max-lg:items-center max-lg:justify-center">
-                <div className="flex gap-6 items-start sm:w-[70%] lg:w-full"> */}
-                  {/* <div className="sm:w-[50%]  mt-2 sm:mt-0 flex items-center justify-center"> */}
-                  <div className="max-sm:w-[95%] lg:w-[50%] mt-2 sm:mt-0 flex max-lg:items-center max-lg:justify-center">
-                    {/* <div className="w-[95%] space-y-6"> */}
+                  <div className="max-sm:w-[95%] lg:w-[50%] mt-4 sm:mt-0 flex max-lg:items-center max-lg:justify-center">
                     <div className="space-y-6 w-full">
-                      {/* <div className="flex gap-4 w-full"> */}
                       <div className="flex gap-4 items-start">
                         <FormField
                           control={form.control}

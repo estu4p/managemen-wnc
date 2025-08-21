@@ -7,9 +7,12 @@ import prisma from "@/lib/prisma";
 import FinancialChart from "@/components/financial/FinancialChart";
 import RevenueTarget from "@/components/financial/RevenueTarget";
 
-async function Financial() {
+async function FinancialPage() {
   const transactions = await prisma.transaction.findMany({
     take: 5,
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 
   const transactionsData = transactions.map((transaction) => ({
@@ -99,4 +102,4 @@ async function Financial() {
   );
 }
 
-export default Financial;
+export default FinancialPage;

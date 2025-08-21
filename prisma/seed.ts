@@ -66,7 +66,6 @@ async function main() {
           ? faker.number.float({ min: 1000, max: 5000 })
           : null,
         note: faker.lorem.sentence(),
-        estimatedCompletion: faker.date.soon({ days: 7 }),
         customerId: randomCustomer.id,
         discountId: randomDiscount ? randomDiscount.id : null,
       },
@@ -119,7 +118,7 @@ async function main() {
           "OTHER",
         ]),
         unit: faker.helpers.arrayElement([
-          "PSC",
+          "PCS",
           "LITER",
           "GRAM",
           "METER",
@@ -150,7 +149,7 @@ async function main() {
           "OTHER",
         ]),
         fromDate,
-        untilate: untilDate,
+        untilDate: untilDate,
         totalTarget: faker.number.float({ min: 1000000, max: 5000000 }),
       },
     });

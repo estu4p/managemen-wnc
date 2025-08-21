@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 export async function GET() {
   const invoices = await prisma.invoice.findMany({
     // take: 6,
+    orderBy: {
+      createdAt: "desc",
+    },
     include: {
       customer: true,
       items: { include: { service: true } },

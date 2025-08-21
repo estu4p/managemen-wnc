@@ -58,6 +58,9 @@ const FilterStatusData = [
 
 async function CustomersPage() {
   const customers = await prisma.customer.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
     // include: {
     //   items: true,
     // },

@@ -108,11 +108,11 @@ function FinancialDetailsPage() {
       <div className="flex gap-3 flex-wrap">
         <FinancialCard
           title="Total Balance"
-          value="132,000,000"
+          amount={132000000}
           statistic="-25"
         />
-        <FinancialCard title="Income" value="32,000,000" statistic="12" />
-        <FinancialCard title="Expanse" value="2,000,0000" statistic="-30" />
+        <FinancialCard title="Income" amount={32000000} statistic="12" />
+        <FinancialCard title="Expanse" amount={20000000} statistic="-30" />
       </div>
       <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
         <div className="flex gap-1 items-center max-sm:justify-end max-sm:w-full">

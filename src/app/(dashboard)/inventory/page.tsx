@@ -53,58 +53,7 @@ const FilterStatusData = [
   },
 ];
 
-const InventoryData = [
-  {
-    id: "detoxy",
-    product: "Detoxy",
-    category: "Soap",
-    stock: "5 L",
-  },
-  {
-    id: "sikatSuede",
-    product: "Sikat Suede",
-    category: "Brush",
-    stock: "5 Pcs",
-  },
-  {
-    id: "premiumCleaner",
-    product: "Premium Cleaner",
-    category: "Cleaning Solution",
-    stock: "10 L",
-  },
-  {
-    id: "mikrofiberTowel",
-    product: "Mikrofiber Towel",
-    category: "Cloth",
-    stock: "20 Pcs",
-  },
-  {
-    id: "cupSoleBrush",
-    product: "Cup Sole Brush",
-    category: "Brush",
-    stock: "7 Pcs",
-  },
-  {
-    id: "deodorizerSpray",
-    product: "Deodorizer Spray",
-    category: "Spray",
-    stock: "12 Bottles",
-  },
-  {
-    id: "shoeTree",
-    product: "Shoe Tree",
-    category: "Accessory",
-    stock: "10 Pairs",
-  },
-  {
-    id: "essentialKitBox",
-    product: "Essential Kit Box",
-    category: "Package",
-    stock: "5 Boxes",
-  },
-];
-
-async function Inventory() {
+async function InventoryPage() {
   const inventories = await prisma.inventory.findMany();
 
   return (
@@ -115,7 +64,7 @@ async function Inventory() {
           desc="Manage and track your inventory effectively."
           calendar={false}
         />
-        <Link href="/inventory/add" className="mb-3">
+        <Link href="/inventory/new" className="mb-3">
           <Button variant="default" size="sm">
             Add New
           </Button>
@@ -215,4 +164,4 @@ async function Inventory() {
   );
 }
 
-export default Inventory;
+export default InventoryPage;

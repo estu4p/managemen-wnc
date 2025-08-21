@@ -179,7 +179,7 @@ enum InventoryCategory {
 }
 
 enum InventoryUnit {
-  PSC
+  PCS
   LITER
   GRAM
   METER
