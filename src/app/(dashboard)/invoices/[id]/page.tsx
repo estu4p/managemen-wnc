@@ -16,7 +16,12 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
   const invoice = await prisma.invoice.findUnique({
     where: { id },
     include: {
-      customer: true,
+      customer: {
+        select: {
+          name: true,
+          phone: true,
+        },
+      },
       items: {
         include: { service: true },
       },

@@ -49,8 +49,8 @@ const statusLabels = {
 const CustomerDetails = ({ customer }: { customer: any }) => {
   const [isEditing, setIsEditing] = useState(false);
 
-  const totalItems = customer.invoice.reduce(
-    (acc: number, invoice: any) => acc + invoice.items.length,
+  const totalItems = customer.invoices.reduce(
+    (sum: any, inv: { _count: { items: any } }) => sum + inv._count.items,
     0
   );
 
@@ -235,7 +235,7 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {customer.invoice.map((invoice: any, index: number) => (
+                    {customer.invoices.map((invoice: any, index: number) => (
                       <TableRow key={index}>
                         <TableCell>{invoice.id}</TableCell>
                         <TableCell>{formatRupiah(invoice.price)}</TableCell>

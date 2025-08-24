@@ -55,7 +55,15 @@ const FilterStatusData = [
 ];
 
 async function InventoriesPage() {
-  const inventories = await prisma.inventory.findMany();
+  const inventories = await prisma.inventory.findMany({
+    select: {
+      id: true,
+      name: true,
+      category: true,
+      currentStock: true,
+      unit: true,
+    },
+  });
 
   return (
     <div className="p-4 sm:px-7">
@@ -107,7 +115,7 @@ async function InventoriesPage() {
                     <TableCell>{inventory.name}</TableCell>
                     <TableCell>{inventory.category}</TableCell>
                     <TableCell>
-                      {inventory.initialStock.toFixed(0)} {inventory.unit}
+                      {inventory.currentStock.toFixed(0)} {inventory.unit}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button size="iconXs">

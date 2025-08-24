@@ -1,11 +1,23 @@
 import HeaderPage from "@/components/HeaderPage";
 import InventoryDetails from "@/components/inventory/InventoryForm";
+import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
 
-async function InventoryDetailsPage({ params }: { params: { id: string } }) {
+async function InventoryDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const inventory = await prisma.inventory.findUnique({
-    where: { id: Number(params.id) },
+    where: { id: parseInt(id) },
   });
+
+  if (!inventory) {
+    return <h2>Inventory not found</h2>;
+  }
+
+  const inventoryData = serialize(inventory);
 
   return (
     <div className="p-4 sm:px-7">
@@ -14,11 +26,7 @@ async function InventoryDetailsPage({ params }: { params: { id: string } }) {
         desc="Add detailed inventory data."
         calendar={false}
       />
-      {!inventory ? (
-        <h2>Inventory not found</h2>
-      ) : (
-        <InventoryDetails inventory={inventory} />
-      )}
+      <InventoryDetails inventory={inventoryData} />
     </div>
   );
 }

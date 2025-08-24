@@ -10,6 +10,13 @@ import RevenueTarget from "@/components/financial/RevenueTarget";
 async function FinancialsPage() {
   const transactions = await prisma.transaction.findMany({
     take: 5,
+    select: {
+      id: true,
+      category: true,
+      amount: true,
+      createdAt: true,
+      type: true,
+    },
     orderBy: {
       createdAt: "desc",
     },
@@ -28,7 +35,7 @@ async function FinancialsPage() {
 
   const revenueTargetsData = revenueTargets.map((target) => ({
     id: target.id,
-    category: target.category,
+    name: target.name,
     untilDate: target.untilDate,
     totalTarget: Number(target.totalTarget),
   }));

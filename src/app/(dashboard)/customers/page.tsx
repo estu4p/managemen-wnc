@@ -61,10 +61,28 @@ async function CustomersPage() {
     orderBy: {
       createdAt: "desc",
     },
-    // include: {
-    //   items: true,
-    // },
+    include: {
+      invoices: {
+        select: {
+          _count: {
+            select: {
+              items: true,
+            },
+          },
+        },
+      },
+    },
   });
+
+  const customersData = customers.map((cust) => ({
+    id: cust.id,
+    photo: cust.phone,
+    name: cust.name,
+    phone: cust.phone,
+    totalItem: cust.invoices.reduce((sum, inv) => sum + inv._count.items, 0),
+    totalInvoice: cust.invoices.length,
+    firstTime: cust.createdAt,
+  }));
 
   return (
     <div className="p-4 sm:px-7">
@@ -110,17 +128,18 @@ async function CustomersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {customers.map((customer, index) => (
+                {customersData.map((customer, index) => (
                   <TableRow key={index}>
                     <TableCell className="font-medium">{customer.id}</TableCell>
                     <TableCell>{customer.name}</TableCell>
                     <TableCell>{customer.phone}</TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    {/* <TableCell>{customer.items.length}</TableCell>
-                    <TableCell>{customer.items.length}</TableCell> */}
+                    <TableCell className="pl-8">{customer.totalItem}</TableCell>
+                    <TableCell className="pl-8">
+                      {customer.totalInvoice}
+                    </TableCell>
+                    {/* <TableCell>{customer.items.length}</TableCell> */}
                     {/* <TableCell>{customer.invoices.length}</TableCell> */}
-                    <TableCell>{formatDate(customer.createdAt)}</TableCell>
+                    <TableCell>{formatDate(customer.firstTime)}</TableCell>
                     <TableCell className="text-right">
                       <Button size="iconXs">
                         <Link href={`/customers/${customer.id}`}>

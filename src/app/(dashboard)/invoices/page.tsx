@@ -48,7 +48,11 @@ async function InvoicesPage() {
     orderBy: {
       createdAt: "desc",
     },
-    include: {
+    select: {
+      id: true,
+      price: true,
+      createdAt: true,
+      progress: true,
       customer: {
         select: {
           name: true,
@@ -56,6 +60,14 @@ async function InvoicesPage() {
         },
       },
     },
+    // include: {
+    //   customer: {
+    //     select: {
+    //       name: true,
+    //       photo: true,
+    //     },
+    //   },
+    // },
   });
 
   const invoiceData = invoice.map((inv) => ({

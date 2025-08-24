@@ -101,7 +101,6 @@ const generalItems = [
 const AppSidebar = () => {
   const pathname = usePathname();
   const [openItems, setOpenItems] = useState<string[]>([]);
-  console.log(pathname);
 
   const isActive = (path: string) => {
     return pathname == path || pathname.startsWith(path + "/");

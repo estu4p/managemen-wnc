@@ -1,28 +1,41 @@
 import CustomerDetails from "@/components/customer/CustomerForm";
 import HeaderPage from "@/components/HeaderPage";
+import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
 
-async function CustomerDetailsPage({ params }: { params: { id: string } }) {
+async function CustomerDetailsPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const customer = await prisma.customer.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       invoices: {
+        select: {
+          id: true,
+          price: true,
+          createdAt: true,
+          progress: true,
+          _count: {
+            select: {
+              items: true,
+            },
+          },
+        },
         orderBy: {
           createdAt: "desc",
         },
-        include: { items: true },
       },
     },
   });
 
-  const customerData = customer && {
-    ...customer,
-    invoice: customer.invoices.map((inv) => ({
-      ...inv,
-      price: inv.price.toNumber(),
-      addDiscount: inv.addDiscount?.toNumber(),
-    })),
-  };
+  if (!customer) {
+    return <h2>Customer not found</h2>;
+  }
+
+  const customerData = serialize(customer);
 
   return (
     <div className="p-4 sm:px-7">
@@ -33,11 +46,7 @@ async function CustomerDetailsPage({ params }: { params: { id: string } }) {
           calendar={false}
         />
       </div>
-      {!customer ? (
-        <h2>Customer not found</h2>
-      ) : (
-        <CustomerDetails customer={customerData} />
-      )}
+      <CustomerDetails customer={customerData} />
     </div>
   );
 }
