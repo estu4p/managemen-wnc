@@ -20,10 +20,14 @@ db
 
 ---21/08---
 1. get data customer details [ok]
-2. 1 item bisa lebih dari 1 service
-3. tambah paymentStatus (paid/unpaid) di invoice
-4. tambah paymentMethod (cash/qris/transfer) di invoice
+2. 1 item bisa lebih dari 1 service [ok]
+3. tambah paymentStatus (paid/unpaid) di invoice [ok]
+4. tambah paymentMethod (cash/qris/transfer) di invoice [ok]
 5. tambah halaman manage discount
-6. dimodel discount tambah status discount (percentage/nominal)
+6. dimodel discount tambah type discount (percentage/nominal) [ok]
 7. tambah halaman manage service
-8. beri name dimodel revenue target
+8. beri name dimodel revenue target [ok]
+9. item -> service M-N, invoice -> discount M-N [ok]
+
+--24/08--
+1. db ubah nama service menjadi services

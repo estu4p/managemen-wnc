@@ -44,11 +44,12 @@ model Invoice {
   addDiscount Decimal? @db.Decimal(6, 2)
   note String?
   progress String @default("NEW_ORDER")
+  paymentStatus PaymentStatus @default(UNPAID)
+  paymentMethod PaymentMethod
   customerId String
   customer Customer @relation(fields: [customerId], references: [id])
   items Item[]
-  discountId Int?
-  discount Discount? @relation(fields: [discountId], references: [id])
+  discounts Discount[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -64,8 +65,7 @@ model Item {
   note String?
   estimatedCompletion DateTime?
   progress Progress @default(NEW_ORDER)
-  serviceId Int
-  service Service @relation(fields: [serviceId], references: [id])
+  service Service[]
   invoiceId String?
   invoice Invoice? @relation(fields: [invoiceId], references: [id])
   createdAt DateTime @default(now())
@@ -76,6 +76,7 @@ model Discount {
   id Int @id @default(autoincrement())
   name String
   discount Decimal @db.Decimal(6, 2)
+  type DiscountType
   invoices Invoice[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,6 +97,7 @@ model Inventory{
 
 model RevenueTarget {
   id Int @id @default(autoincrement())
+  name String
   category PeriodCategory
   fromDate DateTime
   untilDate DateTime
@@ -215,4 +217,22 @@ enum PeriodCategory {
   MONTHLY
   YEARLY
   OTHER
+}
+
+enum DiscountType {
+  PERCENTAGE
+  NOMINAL
+}
+
+enum PaymentMethod {
+  CASH
+  QRIS
+  TRANSFER
+  DEBIT
+  OTHER
+}
+
+enum PaymentStatus {
+  PAID
+  UNPAID
 }

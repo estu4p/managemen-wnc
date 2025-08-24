@@ -44,6 +44,7 @@ async function main() {
       data: {
         name: `Discount ${i}`,
         discount: faker.number.float({ min: 5, max: 20 }),
+        type: faker.helpers.arrayElement(["PERCENTAGE", "NOMINAL"]) as any,
       },
     });
   }
@@ -56,18 +57,27 @@ async function main() {
   for (let i = 1; i <= 15; i++) {
     const randomCustomer =
       customers[Math.floor(Math.random() * customers.length)];
-    const randomDiscount = faker.helpers.arrayElement([null, ...discounts]);
+    const randomDiscount = faker.helpers.arrayElement(discounts);
 
     const invoice = await prisma.invoice.create({
       data: {
         id: `inv-${i}`,
         price: faker.number.float({ min: 50000, max: 200000 }),
-        addDiscount: randomDiscount
-          ? faker.number.float({ min: 1000, max: 5000 })
-          : null,
+
         note: faker.lorem.sentence(),
+        paymentMethod: faker.helpers.arrayElement([
+          "CASH",
+          "QRIS",
+          "TRANSFER",
+          "DEBIT",
+          "OTHER",
+        ]),
         customerId: randomCustomer.id,
-        discountId: randomDiscount ? randomDiscount.id : null,
+        discounts: randomDiscount
+          ? {
+              connect: [{ id: randomDiscount.id }],
+            }
+          : undefined,
       },
     });
 
@@ -99,7 +109,9 @@ async function main() {
             "FINISHING",
             "DONE",
           ]),
-          serviceId: randomService.id,
+          service: {
+            connect: [{ id: randomService.id }],
+          },
           invoiceId: invoice.id,
         },
       });
@@ -141,6 +153,7 @@ async function main() {
     const untilDate = faker.date.future();
     await prisma.revenueTarget.create({
       data: {
+        name: `saksake-${i}`,
         category: faker.helpers.arrayElement([
           "DAILY",
           "WEEKLY",

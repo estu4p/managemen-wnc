@@ -75,20 +75,10 @@ const OrderTable = ({ data }: { data: Invoices[] }) => {
                 </TableCell>
                 <TableCell className="text-right w-fit">
                   <Button size="iconXs">
-                    <Link href={`/invoice/${invoice.id}`}>
+                    <Link href={`/invoices/${invoice.id}`}>
                       <MoveUpRight />
                     </Link>
                   </Button>
-                  {/* <Button
-                    size="iconXs"
-                    variant="outline"
-                    className="border-none"
-                  > */}
-                  {/* <Link href={`/order/details/${item.id}`}> */}
-                  {/* <Link href={`/order/details`}>
-                      <MoveUpRight />
-                    </Link>
-                  </Button> */}
                 </TableCell>
               </TableRow>
             ))}

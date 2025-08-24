@@ -50,30 +50,36 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
 
   //   hitung service di item
   const itemServices: ServiceSummary[] = Object.values(
-    invoice.items.reduce((acc: any, item: any) => {
-      const id = item.service.id;
+    invoice.items.reduce((acc: Record<number, ServiceSummary>, item: any) => {
+      for (const srv of item.service) {
+        const id = srv.id;
 
-      if (!acc[id]) {
-        acc[id] = {
-          serviceId: id,
-          service: item.service.name,
-          qty: 0,
-          price: parseFloat(item.service.price),
-          total: 0,
-        };
+        if (!acc[id]) {
+          acc[id] = {
+            serviceId: id,
+            service: srv.name,
+            qty: 0,
+            price: parseFloat(srv.price),
+            total: 0,
+          };
+        }
+
+        acc[id].qty += 1;
+        acc[id].total = acc[id].qty * acc[id].price;
       }
 
-      acc[id].qty += 1;
-      acc[id].total = acc[id].qty * acc[id].price;
-
       return acc;
-    }, {} as Record<number, ServiceSummary>)
+    }, {})
   );
 
   //   Grand total
   const grandTotal = itemServices.reduce((sum, s) => sum + s.total, 0);
-  const discount = parseFloat(invoice.discount.discount ?? "0");
-  const discountValue = grandTotal * (discount / 100);
+  // const discount = parseFloat(invoice.discount.discount ?? "0");
+  const totalDiscountPercent = invoice.discounts.reduce(
+    (sum: number, d: { discount: string }) => sum + parseFloat(d.discount),
+    0
+  );
+  const discountValue = grandTotal * (totalDiscountPercent / 100);
   const finalDiscount = grandTotal - discountValue;
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -404,60 +410,76 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-col lg:flex-row gap-4 w-full items-start">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem className="w-">
-                      <FormLabel>Discount</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Total discount"
-                          value={invoice.discount.name}
-                          disabled
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <div className="flex items-end gap-2">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem className="">
-                        <FormLabel>Total Discount</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Total discount"
-                            value={invoice.discount.discount}
-                            disabled
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem className="w-fit">
-                        <FormControl>
-                          <Select defaultValue="nominal">
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="K" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="nominal">K</SelectItem>
-                              <SelectItem value="percentage">%</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+              <div className="space-y-2">
+                <div className="flex gap-4 w-full items-start">
+                  <h3 className="font-medium w-full">Discount Name</h3>
+                  <h3 className="font-medium w-[10%]">Discount</h3>
+                  <h3 className="font-medium w-full"></h3>
                 </div>
+                {invoice.discounts.map((discount: any) => (
+                  <div
+                    key={discount.id}
+                    className="flex gap-4 w-full items-start"
+                  >
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem className="w-fit">
+                          {/* <FormLabel>Discount Name</FormLabel> */}
+                          <FormControl>
+                            <Input
+                              placeholder="Discount name"
+                              value={discount.name}
+                              disabled
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex items-end gap-2">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem className="">
+                            {/* <FormLabel>Discount</FormLabel> */}
+                            <FormControl>
+                              <Input
+                                placeholder="Discount"
+                                value={discount.discount}
+                                disabled
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem className="w-fit">
+                            <FormControl>
+                              <Select
+                                defaultValue="nominal"
+                                value={discount.type}
+                                disabled={!isEditing}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="K" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="NOMINAL">K</SelectItem>
+                                  <SelectItem value="PERCENTAGE">%</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
               <div className="flex justify-end">
                 <Button size="sm">Add New Discount</Button>
@@ -471,21 +493,21 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
               </div>
               <div className="flex flex-col lg:flex-row gap-4 w-full">
                 <Label className="w-full">Payment Status</Label>
-                <Select>
+                <Select value={invoice.paymentStatus} disabled={!isEditing}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Payment Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="unpaid" defaultChecked>
-                      Unpaid
+                    <SelectItem value="PAID">Paid</SelectItem>
+                    <SelectItem value="UNPAID" defaultChecked>
+                      UNPAID
                     </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="flex flex-col lg:flex-row gap-4 w-full">
                 <Label className="w-full">Payment Method</Label>
-                <Select>
+                <Select value={invoice.paymentMethod} disabled={!isEditing}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Payment Method" />
                   </SelectTrigger>
@@ -495,6 +517,8 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
                       Cash
                     </SelectItem>
                     <SelectItem value="TRANSFER">Transfer</SelectItem>
+                    <SelectItem value="DEBIT">Debit</SelectItem>
+                    <SelectItem value="OTHER">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

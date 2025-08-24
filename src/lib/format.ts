@@ -20,3 +20,16 @@ export function formatTime(value: Date) {
     minute: "2-digit",
   });
 }
+
+// Decimal to Number
+export function serialize<T>(data: T): T {
+  return JSON.parse(
+    JSON.stringify(data, (key, value) => {
+      // Prisma Decimal biasanya punya method toNumber
+      if (value && typeof value === "object" && "toNumber" in value) {
+        return value.toNumber();
+      }
+      return value;
+    })
+  );
+}

@@ -8,6 +8,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
 
 async function OrderDetailsPage({ params }: { params: { id: string } }) {
@@ -16,12 +17,18 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
     where: { id },
     include: {
       customer: true,
-      items: { include: { service: true } },
-      discount: true,
+      items: {
+        include: { service: true },
+      },
+      discounts: true,
     },
   });
 
-  // console.log(invoice);
+  if (!invoice) {
+    return <h2>Invoice not found</h2>;
+  }
+
+  const invoiceData = serialize(invoice);
 
   return (
     <div className="p-4 sm:px-7">
@@ -48,11 +55,7 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
         </Sheet>
       </div>
       <div className="mt-6">
-        {!invoice ? (
-          <h2>Invoice not found</h2>
-        ) : (
-          <InvoiceForm invoice={invoice} />
-        )}
+        <InvoiceForm invoice={invoiceData} />
       </div>
     </div>
   );
