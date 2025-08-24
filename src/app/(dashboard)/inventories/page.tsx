@@ -3,6 +3,7 @@ import HeaderPage from "@/components/HeaderPage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -14,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import prisma from "@/lib/prisma";
-import { MoveUpRight } from "lucide-react";
+import { MoveUpRight, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -64,20 +65,26 @@ async function InventoriesPage() {
           desc="Manage and track your inventories effectively."
           calendar={false}
         />
-        <Link href="/inventory/new" className="mb-3">
+        <Link href="/inventories/new" className="mb-3">
           <Button variant="default" size="sm">
             Add New
           </Button>
         </Link>
       </div>
-      <div className="flex justify-end lg:hidden">
-        <FiltersDropdown
-          filterStatusData={FilterStatusData}
-          subTitle="Category"
-          className="text-sm"
-        />
+      <div className="mb-3 flex items-center justify-between">
+        <div className="relative">
+          <Input className="text-sm bg-accent" placeholder="Search By Name" />
+          <Search className="absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        </div>
+        <div className="flex justify-end lg:hidden">
+          <FiltersDropdown
+            filterStatusData={FilterStatusData}
+            subTitle="Category"
+            className="text-sm"
+          />
+        </div>
       </div>
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex gap-4">
         {/* left */}
         <div className="container mx-auto">
           <div className=" rounded-md border h-fit">

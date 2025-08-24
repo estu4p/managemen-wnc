@@ -19,7 +19,6 @@ type Invoices = {
   totalPayment: number;
   progress: string;
   date: Date;
-  items: { status: string }[];
 };
 
 const statusLabels = {

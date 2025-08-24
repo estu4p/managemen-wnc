@@ -109,7 +109,7 @@ const OrderCard = ({ data }: { data: Invoices[] }) => {
             </div>
           </CardContent>
           <CardFooter>
-            <Link href={`/invoice/${invoice.id}`} className="w-full">
+            <Link href={`/invoices/${invoice.id}`} className="w-full">
               <Button className="bg-primary-green w-full">Order details</Button>
             </Link>
           </CardFooter>

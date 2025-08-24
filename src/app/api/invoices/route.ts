@@ -22,11 +22,11 @@ export async function GET() {
     date: invoice.createdAt,
     name: invoice.customer.name,
     photo: invoice.customer.photo,
-    items: invoice.items.map((item) => ({
-      name: item.name,
-      service: item.service.name,
-      status: item.progress,
-    })),
+    // items: invoice.items.map((item) => ({
+    //   name: item.name,
+    //   service: item.service.name,
+    //   status: item.progress,
+    // })),
   }));
 
   return NextResponse.json(data);

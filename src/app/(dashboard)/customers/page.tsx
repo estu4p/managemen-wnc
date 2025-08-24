@@ -73,9 +73,6 @@ async function CustomersPage() {
         desc="Find all customer records, categorized and easy to search."
         calendar={false}
       />
-      {/* {customers.map((customer, index) => (
-        <p key={customer.id}>{customer.name}</p>
-      ))} */}
       <div className="mb-3 flex items-center justify-between">
         <div className="relative">
           <Input className="text-sm bg-accent" placeholder="Search By Name" />
