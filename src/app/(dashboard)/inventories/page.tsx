@@ -1,5 +1,6 @@
 import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
+import Pagination from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import prisma from "@/lib/prisma";
+import { ITEM_PER_PAGE } from "@/lib/settings";
 import { MoveUpRight, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -54,16 +56,27 @@ const FilterStatusData = [
   },
 ];
 
-async function InventoriesPage() {
-  const inventories = await prisma.inventory.findMany({
-    select: {
-      id: true,
-      name: true,
-      category: true,
-      currentStock: true,
-      unit: true,
-    },
-  });
+async function InventoriesPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+  const { page, ...queryParams } = searchParams;
+  const p = page ? parseInt(page) : 1;
+
+  const [data, count] = await prisma.$transaction([
+    prisma.inventory.findMany({
+      select: {
+        id: true,
+        name: true,
+        category: true,
+        currentStock: true,
+        unit: true,
+      },
+      take: ITEM_PER_PAGE,
+      skip: ITEM_PER_PAGE * (p - 1),
+    }),
+    prisma.inventory.count(),
+  ]);
 
   return (
     <div className="p-4 sm:px-7">
@@ -110,7 +123,7 @@ async function InventoriesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {inventories.map((inventory, index) => (
+                {data.map((inventory, index) => (
                   <TableRow key={index}>
                     <TableCell>{inventory.name}</TableCell>
                     <TableCell>{inventory.category}</TableCell>
@@ -129,14 +142,7 @@ async function InventoriesPage() {
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 mt-3">
-            <Button variant="outline" size="sm">
-              Previous
-            </Button>
-            <Button variant="outline" size="sm">
-              Next
-            </Button>
-          </div>
+          <Pagination page={p} count={count} />
         </div>
         {/* right */}
         <div className="w-fit max-lg:hidden">

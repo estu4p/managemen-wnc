@@ -1,6 +1,4 @@
 import HeaderPage from "@/components/HeaderPage";
-import React from "react";
-
 import { Input } from "@/components/ui/input";
 import { MoveUpRight, Search } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -20,6 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { formatDate } from "@/lib/format";
+import Pagination from "@/components/Pagination";
+import { ITEM_PER_PAGE } from "@/lib/settings";
 
 const FilterStatusData = [
   {
@@ -56,25 +56,36 @@ const FilterStatusData = [
   },
 ];
 
-async function CustomersPage() {
-  const customers = await prisma.customer.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      invoices: {
-        select: {
-          _count: {
-            select: {
-              items: true,
+async function CustomersPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+  const { page, ...queryParams } = searchParams;
+  const p = page ? parseInt(page) : 1;
+
+  const [data, count] = await prisma.$transaction([
+    prisma.customer.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        invoices: {
+          select: {
+            _count: {
+              select: {
+                items: true,
+              },
             },
           },
         },
       },
-    },
-  });
+      take: ITEM_PER_PAGE,
+      skip: ITEM_PER_PAGE * (p - 1),
+    }),
+    prisma.customer.count(),
+  ]);
 
-  const customersData = customers.map((cust) => ({
+  const customersData = data.map((cust) => ({
     id: cust.id,
     photo: cust.phone,
     name: cust.name,
@@ -152,24 +163,7 @@ async function CustomersPage() {
               </TableBody>
             </Table>
           </div>
-          <div className="flex items-center justify-end space-x-2 mt-3">
-            <Button
-              variant="outline"
-              size="sm"
-              //   onClick={() => table.previousPage()}
-              //   disabled={!table.getCanPreviousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              //   onClick={() => table.nextPage()}
-              //   disabled={!table.getCanNextPage()}
-            >
-              Next
-            </Button>
-          </div>
+          <Pagination page={p} count={count} />
         </div>
         <div className="w-fit max-lg:hidden">
           <Card className="min-w-[180px] h-fit rounded-md py-3 gap-4">

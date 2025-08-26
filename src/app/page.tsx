@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { LayoutGrid, List, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import InvoiceMonitoring from "@/components/workMonitoring/InvoiceMonitoring";
+import { useSearchParams } from "next/navigation";
 
 const FilterStatusData = [
   {
@@ -29,15 +30,36 @@ const FilterStatusData = [
   },
 ];
 
+type Invoice = {
+  id: string;
+  price: string;
+  notes: string;
+  progress: string;
+  totalPayment: number;
+  date: Date;
+  name: string;
+  photo: string;
+  items: { name: string; service: string; status: string }[];
+};
+
 const Home = () => {
   const [viewMode, setViewMode] = useState<"list" | "card">("list");
-  const [orders, setOrders] = useState([]);
+
+  const searchParams = useSearchParams();
+  const page = searchParams.get("page");
+  const p = page ? parseInt(page) : 1;
+
+  const [orders, setOrders] = useState<Invoice[]>([]);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    fetch("api/invoices")
+    fetch(`api/invoices?page=${page}`)
       .then((res) => res.json())
-      .then((data) => setOrders(data));
-  }, []);
+      .then((resData) => {
+        setOrders(resData.data);
+        setCount(resData.count);
+      });
+  }, [p]);
 
   return (
     <div className="p-4 sm:px-7">
@@ -97,9 +119,9 @@ const Home = () => {
         </div>
         <div className="mt-3 max-sm:mt-6 flex gap-3 transition-all duration-300 ease-in-out">
           {viewMode === "list" ? (
-            <OrderTable data={orders} />
+            <OrderTable data={orders} page={p} count={count} />
           ) : (
-            <OrderCard data={orders} />
+            <OrderCard data={orders} page={p} count={count} />
           )}
         </div>
       </div>

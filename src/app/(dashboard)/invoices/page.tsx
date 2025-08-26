@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import OrderTable from "@/components/workMonitoring/OrderTable";
 import prisma from "@/lib/prisma";
+import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Search } from "lucide-react";
 import Link from "next/link";
 
@@ -42,35 +43,37 @@ const FilterStatusData = [
   },
 ];
 
-async function InvoicesPage() {
-  const invoice = await prisma.invoice.findMany({
-    take: 6,
-    orderBy: {
-      createdAt: "desc",
-    },
-    select: {
-      id: true,
-      price: true,
-      createdAt: true,
-      progress: true,
-      customer: {
-        select: {
-          name: true,
-          photo: true,
+async function InvoicesPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+  const searchParams = await props.searchParams;
+  const { page, ...queryParams } = searchParams;
+  const p = page ? parseInt(page) : 1;
+
+  const [data, count] = await prisma.$transaction([
+    prisma.invoice.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        price: true,
+        createdAt: true,
+        progress: true,
+        customer: {
+          select: {
+            name: true,
+            photo: true,
+          },
         },
       },
-    },
-    // include: {
-    //   customer: {
-    //     select: {
-    //       name: true,
-    //       photo: true,
-    //     },
-    //   },
-    // },
-  });
+      take: ITEM_PER_PAGE,
+      skip: ITEM_PER_PAGE * (p - 1),
+    }),
+    prisma.invoice.count(),
+  ]);
 
-  const invoiceData = invoice.map((inv) => ({
+  const invoiceData = data.map((inv) => ({
     id: inv.id,
     name: inv.customer.name,
     totalPayment: Number(inv.price),
@@ -106,7 +109,7 @@ async function InvoicesPage() {
         </div>
       </div>
       <div className="flex gap-4">
-        <OrderTable data={invoiceData} />
+        <OrderTable data={invoiceData} page={p} count={count} />
       </div>
     </div>
   );

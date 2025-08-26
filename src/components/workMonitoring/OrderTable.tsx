@@ -12,6 +12,7 @@ import {
 import { MoveUpRight } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { formatDate, formatRupiah, formatTime } from "@/lib/format";
+import Pagination from "../Pagination";
 
 type Invoices = {
   id: string;
@@ -28,8 +29,15 @@ const statusLabels = {
   PICKER_UP: "Ready for Pick Up", //PICK_UP
 };
 
-const OrderTable = ({ data }: { data: Invoices[] }) => {
-  const limitedData = data.slice(0, 6);
+const OrderTable = ({
+  data,
+  page = 1,
+  count = 10,
+}: {
+  data: Invoices[];
+  page?: number;
+  count?: number;
+}) => {
   return (
     <div className="container mx-auto">
       <div className=" rounded-md border h-fit">
@@ -45,7 +53,7 @@ const OrderTable = ({ data }: { data: Invoices[] }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {limitedData.map((invoice, index) => (
+            {data.map((invoice, index) => (
               <TableRow key={index}>
                 <TableCell className="flex items-center gap-2">
                   {/* <div className=""> */}
@@ -84,24 +92,7 @@ const OrderTable = ({ data }: { data: Invoices[] }) => {
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 mt-3">
-        <Button
-          variant="outline"
-          size="sm"
-          //   onClick={() => table.previousPage()}
-          //   disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          //   onClick={() => table.nextPage()}
-          //   disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
-      </div>
+      <Pagination page={page} count={count} />
     </div>
   );
 };

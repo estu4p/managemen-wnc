@@ -11,6 +11,7 @@ import { Button } from "../ui/button";
 import Link from "next/link";
 import { formatRupiah } from "@/lib/format";
 import { Badge } from "../ui/badge";
+import Pagination from "../Pagination";
 
 const statusLabels = {
   NEW_ORDER: "New Order",
@@ -28,11 +29,18 @@ type Invoices = {
   notes: string;
 };
 
-const OrderCard = ({ data }: { data: Invoices[] }) => {
-  const limitedData = data.slice(0, 6);
+const OrderCard = ({
+  data,
+  page,
+  count,
+}: {
+  data: Invoices[];
+  page: number;
+  count: number;
+}) => {
   return (
     <div className="flex items-center justify-between flex-wrap gap-4 max-[650px]:justify-center w-full lg:px-9">
-      {limitedData.map((invoice, index) => (
+      {data.map((invoice, index) => (
         <Card
           key={index}
           className="w-[290px] flex flex-col justify-between h-[411px] rounded-md"
@@ -115,6 +123,9 @@ const OrderCard = ({ data }: { data: Invoices[] }) => {
           </CardFooter>
         </Card>
       ))}
+      <div className="w-full">
+        <Pagination page={page} count={count} />
+      </div>
     </div>
   );
 };
