@@ -44,7 +44,7 @@ const FinancialChart = () => {
             </div>
             <div className="space-x-1">
               <Square className="h-4 w-4 inline fill-secondary-green text-secondary-green" />
-              <span>Expanses</span>
+              <span>Expense</span>
             </div>
           </div>
         </div>

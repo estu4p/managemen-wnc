@@ -47,13 +47,13 @@ const Home = () => {
 
   const searchParams = useSearchParams();
   const page = searchParams.get("page");
-  const p = page ? parseInt(page) : 1;
+  const p = page ? parseInt(page, 10) : 1;
 
   const [orders, setOrders] = useState<Invoice[]>([]);
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    fetch(`api/invoices?page=${page}`)
+    fetch(`/api/invoices?page=${p}`)
       .then((res) => res.json())
       .then((resData) => {
         setOrders(resData.data);

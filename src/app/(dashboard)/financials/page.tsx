@@ -6,21 +6,25 @@ import TransactionsTabel from "@/components/financial/TransactionsTable";
 import prisma from "@/lib/prisma";
 import FinancialChart from "@/components/financial/FinancialChart";
 import RevenueTarget from "@/components/financial/RevenueTarget";
+import { getFinancialSummary } from "@/lib/financial";
 
 async function FinancialsPage() {
-  const transactions = await prisma.transaction.findMany({
-    take: 5,
-    select: {
-      id: true,
-      category: true,
-      amount: true,
-      createdAt: true,
-      type: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  const [transactions, summary] = await Promise.all([
+    prisma.transaction.findMany({
+      take: 5,
+      select: {
+        id: true,
+        category: true,
+        amount: true,
+        createdAt: true,
+        type: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+    getFinancialSummary(),
+  ]);
 
   const transactionsData = transactions.map((transaction) => ({
     id: transaction.id,
@@ -40,22 +44,6 @@ async function FinancialsPage() {
     totalTarget: Number(target.totalTarget),
   }));
 
-  // Get Total Income, Total Expanse
-  const { totalIncome, totalExpanse } = transactions.reduce(
-    (acc, t) => {
-      if (t.type === "INCOME") {
-        acc.totalIncome += Number(t.amount);
-      } else if (t.type === "EXPENSE") {
-        acc.totalExpanse += Number(t.amount);
-      }
-      return acc;
-    },
-    { totalIncome: 0, totalExpanse: 0 }
-  );
-
-  // Get Total Balance
-  const totalBalance = totalIncome - totalExpanse;
-
   return (
     <div className="px-4 sm:ps-7 flex flex-col lg:flex-row gap-4 lg:gap-0">
       {/* left */}
@@ -67,13 +55,17 @@ async function FinancialsPage() {
         <div className="flex gap-3 flex-wrap">
           <FinancialCard
             title="Total Balance"
-            amount={totalBalance}
+            amount={summary.totalBalance}
             statistic="-25"
           />
-          <FinancialCard title="Income" amount={totalIncome} statistic="12" />
           <FinancialCard
-            title="Expanse"
-            amount={totalExpanse}
+            title="Income"
+            amount={summary.totalIncome}
+            statistic="12"
+          />
+          <FinancialCard
+            title="Expense"
+            amount={summary.totalExpense}
             statistic="-30"
           />
         </div>

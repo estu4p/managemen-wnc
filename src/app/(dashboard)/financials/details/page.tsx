@@ -1,6 +1,8 @@
 import FiltersDropdown from "@/components/FiltersDropdown";
 import FinancialCard from "@/components/financial/FinancialCard";
 import HeaderPage from "@/components/HeaderPage";
+import Pagination from "@/components/Pagination";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,6 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getFinancialSummary } from "@/lib/financial";
+import { formatDate, formatRupiah, formatTime } from "@/lib/format";
+import prisma from "@/lib/prisma";
+import { ITEM_PER_PAGE } from "@/lib/settings";
 import { MoveUpRight, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -101,24 +107,52 @@ const InventoryData = [
   },
 ];
 
-function FinancialDetailsPage() {
+const typeLabels = {
+  INCOME: "Income",
+  EXPENSE: "Expense",
+};
+
+async function FinancialDetailsPage(params: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
+}) {
+  const searchParams = await params.searchParams;
+  const { page, queryParams } = searchParams;
+  const p = page ? parseInt(page) : 1;
+
+  const [data, count, summary] = await Promise.all([
+    prisma.transaction.findMany({
+      take: ITEM_PER_PAGE,
+      skip: ITEM_PER_PAGE * (p - 1),
+    }),
+    prisma.transaction.count(),
+    getFinancialSummary(),
+  ]);
+
   return (
     <div className="p-4 sm:px-7">
       <HeaderPage title="Financial Details" desc="" />
       <div className="flex gap-3 flex-wrap">
         <FinancialCard
           title="Total Balance"
-          amount={132000000}
+          amount={summary.totalBalance}
           statistic="-25"
         />
-        <FinancialCard title="Income" amount={32000000} statistic="12" />
-        <FinancialCard title="Expanse" amount={20000000} statistic="-30" />
+        <FinancialCard
+          title="Income"
+          amount={summary.totalIncome}
+          statistic="12"
+        />
+        <FinancialCard
+          title="Expense"
+          amount={summary.totalExpense}
+          statistic="-30"
+        />
       </div>
       <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
         <div className="flex gap-1 items-center max-sm:justify-end max-sm:w-full">
           <Button size="sm">All</Button>
           <Button size="sm">Income</Button>
-          <Button size="sm">Expanse</Button>
+          <Button size="sm">Expense</Button>
         </div>
         <div className="flex gap-3 items-center max-sm:justify-end max-sm:w-full">
           <div className="relative">
@@ -142,24 +176,38 @@ function FinancialDetailsPage() {
             <TableHeader className="bg-primary-gray">
               <TableRow>
                 <TableHead className="text-primary">Transaction Name</TableHead>
-                <TableHead className="text-primary">Order ID</TableHead>
-                <TableHead className="text-primary">Total Payment</TableHead>
-                <TableHead className="text-primary">Date</TableHead>
+                <TableHead className="text-primary">Type</TableHead>
                 <TableHead className="text-primary">Category</TableHead>
+                <TableHead className="text-primary">Amount</TableHead>
+                <TableHead className="text-primary">Date</TableHead>
                 <TableHead className="text-right"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {InventoryData.map((item, index) => (
+              {data.map((transaction, index) => (
                 <TableRow key={index}>
-                  <TableCell>{item.product}</TableCell>
-                  <TableCell>{item.category}</TableCell>
-                  <TableCell>{item.stock}</TableCell>
-                  <TableCell>{item.stock}</TableCell>
-                  <TableCell>{item.stock}</TableCell>
+                  <TableCell>{transaction.type}</TableCell>
+                  <TableCell>
+                    <Badge variant={transaction.type as any}>
+                      {typeLabels[
+                        transaction.type as keyof typeof typeLabels
+                      ] || transaction.type}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{transaction.category}</TableCell>
+                  <TableCell>
+                    {formatRupiah(Number(transaction.amount))}
+                  </TableCell>
+                  <TableCell>
+                    {formatDate(transaction.createdAt)}
+                    <span className="text-muted-foreground">
+                      {" "}
+                      - {formatTime(transaction.createdAt)}
+                    </span>
+                  </TableCell>
                   <TableCell className="text-right">
                     <Button size="iconXs">
-                      <Link href={`/inventory/${item.id}`}>
+                      <Link href={`/inventory/${transaction.id}`}>
                         <MoveUpRight />
                       </Link>
                     </Button>
@@ -169,24 +217,7 @@ function FinancialDetailsPage() {
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-end space-x-2 mt-3">
-          <Button
-            variant="outline"
-            size="sm"
-            //   onClick={() => table.previousPage()}
-            //   disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            //   onClick={() => table.nextPage()}
-            //   disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
+        <Pagination page={p} count={count} />
       </div>
     </div>
   );

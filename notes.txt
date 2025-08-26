@@ -31,3 +31,6 @@ db
 
 --24/08--
 1. db ubah nama service menjadi services
+
+--26/08 --
+1. db transaction tambah nama

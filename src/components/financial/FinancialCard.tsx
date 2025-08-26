@@ -54,7 +54,7 @@ const FinancialCard = ({
               </>
         */}
         <div className="flex items-center mt-1">
-          {title.toLowerCase().includes("expanse") ? (
+          {title.toLowerCase().includes("expense") ? (
             parseFloat(statistic) < 0 ? (
               <>
                 <TrendingDown className="mr-2 text-green-600 text-base w-4 h-4" />

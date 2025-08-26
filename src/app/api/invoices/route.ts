@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const page = searchParams.get("page");
-  const p = page ? parseInt(page) : 1;
+  const p = page ? parseInt(page, 10) : 1;
 
   const [invoices, count] = await prisma.$transaction([
     prisma.invoice.findMany({
