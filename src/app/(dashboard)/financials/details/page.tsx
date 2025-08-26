@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { getFinancialSummary } from "@/lib/financial";
 import { formatDate, formatRupiah, formatTime } from "@/lib/format";
 import prisma from "@/lib/prisma";
@@ -149,12 +150,30 @@ async function FinancialDetailsPage(params: {
         />
       </div>
       <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
-        <div className="flex gap-1 items-center max-sm:justify-end max-sm:w-full">
-          <Button size="sm">All</Button>
-          <Button size="sm">Income</Button>
-          <Button size="sm">Expense</Button>
-        </div>
-        <div className="flex gap-3 items-center max-sm:justify-end max-sm:w-full">
+        <ToggleGroup type="single" className="gap-2 rounded-none text-white">
+          <ToggleGroupItem
+            value="all"
+            className="bg-primary rounded-md w-fit px-4 hover:bg-secondary-green/80 data-[state=on]:bg-secondary-green data-[state=on]:text-black"
+            size="sm"
+          >
+            All
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="income"
+            className="bg-primary rounded-md w-fit px-4 hover:bg-secondary-green/80 data-[state=on]:bg-secondary-green data-[state=on]:text-black"
+            size="sm"
+          >
+            Income
+          </ToggleGroupItem>
+          <ToggleGroupItem
+            value="expense"
+            className="bg-primary rounded-md w-fit px-4 hover:bg-secondary-green/80 data-[state=on]:bg-secondary-green data-[state=on]:text-black"
+            size="sm"
+          >
+            Expense
+          </ToggleGroupItem>
+        </ToggleGroup>
+        <div className="flex gap-2 items-center max-sm:justify-end max-sm:w-full">
           <div className="relative">
             <Input
               className="text-sm bg-accent"
