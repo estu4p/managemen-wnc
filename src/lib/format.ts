@@ -6,7 +6,8 @@ export function formatRupiah(value: number) {
   }).format(value);
 }
 
-export function formatDate(value: Date) {
+export function formatDate(value?: Date) {
+  if (!value) return "";
   return new Date(value).toLocaleDateString("id-ID", {
     year: "numeric",
     month: "long",
@@ -31,4 +32,9 @@ export function serialize<T>(data: T): T {
       return value;
     })
   );
+}
+
+export function formatDateForInput(date?: Date): string {
+  if (!date) return "";
+  return date.toISOString().split("T")[0];
 }

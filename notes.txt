@@ -34,3 +34,6 @@ db
 
 --26/08 --
 1. db transaction tambah nama
+
+--27/08--
+1. halaman invoice settings: service, discount, 

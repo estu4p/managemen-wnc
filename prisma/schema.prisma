@@ -36,6 +36,8 @@ model Service {
   name String @unique
   price Decimal @db.Decimal(10, 2)
   items Item[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Invoice {
@@ -75,9 +77,11 @@ model Item {
 model Discount {
   id Int @id @default(autoincrement())
   name String
-  discount Decimal @db.Decimal(6, 2)
+  amount Decimal @db.Decimal(12, 2)
   type DiscountType
   invoices Invoice[]
+  fromDate DateTime
+  untilDate DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

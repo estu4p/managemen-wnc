@@ -62,7 +62,7 @@ const menuItems = [
       },
       {
         title: "Invoice Settings",
-        url: "/invoices/settings",
+        url: "/invoices/invoice-settings",
         icon: Bolt,
       },
     ],

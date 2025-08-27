@@ -49,7 +49,7 @@ async function FinancialsPage() {
       {/* left */}
       <div className="pt-4 lg:border-r lg:border-r-border w-full lg:pr-3">
         <HeaderPage
-          title="Financials Report"
+          title="Financial Reports"
           desc="Detailed overview of your financials situation."
         />
         <div className="flex gap-3 flex-wrap">

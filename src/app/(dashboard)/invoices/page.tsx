@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import OrderTable from "@/components/workMonitoring/OrderTable";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 
 const FilterStatusData = [
@@ -91,6 +91,7 @@ async function InvoicesPage(props: {
         />
         <Link href="/invoices/new" className="mb-3">
           <Button variant="default" size="sm">
+            <Plus />
             Add New
           </Button>
         </Link>

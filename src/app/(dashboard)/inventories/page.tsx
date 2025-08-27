@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { MoveUpRight, Search } from "lucide-react";
+import { MoveUpRight, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
@@ -82,12 +82,13 @@ async function InventoriesPage(props: {
     <div className="p-4 sm:px-7">
       <div className="flex items-end justify-between">
         <HeaderPage
-          title="Inventories Data"
+          title="Inventory Data"
           desc="Manage and track your inventories effectively."
           calendar={false}
         />
         <Link href="/inventories/new" className="mb-3">
           <Button variant="default" size="sm">
+            <Plus />
             Add New
           </Button>
         </Link>
