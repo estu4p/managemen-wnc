@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import TransactionsTabel from "@/components/financial/TransactionsTable";
 import prisma from "@/lib/prisma";
 import FinancialChart from "@/components/financial/FinancialChart";
-import RevenueTarget from "@/components/financial/RevenueTarget";
 import { getFinancialSummary } from "@/lib/financial";
+import RevenueTargetCard from "@/components/financial/RevenueTargetCard";
 
 async function FinancialsPage() {
   const [transactions, summary] = await Promise.all([
@@ -76,7 +76,7 @@ async function FinancialsPage() {
       </div>
       {/* right */}
       <div className="lg:pt-4 lg:px-3 flex max-[504px]:flex-col lg:flex-col gap-3">
-        <RevenueTarget data={revenueTargetsData} />
+        <RevenueTargetCard data={revenueTargetsData} />
         <div className="bg-primary-gray rounded-md w-[230px] p-3 flex flex-col justify-between">
           <div className="">
             <h3 className="font-medium text-base leading-snug">

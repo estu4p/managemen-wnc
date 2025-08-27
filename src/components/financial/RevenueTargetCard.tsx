@@ -12,7 +12,7 @@ type Targets = {
   totalTarget: number;
 };
 
-const RevenueTarget = ({ data }: { data: Targets[] }) => {
+const RevenueTargetCard = ({ data }: { data: Targets[] }) => {
   return (
     <Card className="w-[230px] max-h-fit flex-1 py-3 rounded-md flex gap-0 border-primary">
       <CardHeader className="font-medium text-base px-4 gap-0 leading-tight pb-0">
@@ -48,4 +48,4 @@ const RevenueTarget = ({ data }: { data: Targets[] }) => {
   );
 };
 
-export default RevenueTarget;
+export default RevenueTargetCard;

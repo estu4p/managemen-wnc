@@ -1,7 +1,6 @@
 import DiscountForm from "@/components/form/DiscountForm";
 import ServiceForm from "@/components/form/ServiceForm";
 import HeaderPage from "@/components/HeaderPage";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   Table,
@@ -13,7 +12,6 @@ import {
 } from "@/components/ui/table";
 import { formatDate, formatRupiah } from "@/lib/format";
 import prisma from "@/lib/prisma";
-import { Plus, SquarePen, Trash2 } from "lucide-react";
 
 async function InvoiceSettings() {
   const services = await prisma.service.findMany({
