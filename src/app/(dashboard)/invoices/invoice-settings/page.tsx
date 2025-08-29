@@ -113,8 +113,8 @@ async function InvoiceSettings() {
                         <TableCell>{discount.name}</TableCell>
                         <TableCell>
                           {discount.type === "PERCENTAGE"
-                            ? `${Number(discount.discount)} %`
-                            : formatRupiah(discount.discount)}
+                            ? `${Number(discount.amount)} %`
+                            : formatRupiah(discount.amount)}
                         </TableCell>
                         <TableCell>{formatDate(discount.createdAt)}</TableCell>
                         <TableCell>{formatDate(discount.createdAt)}</TableCell>
@@ -123,7 +123,8 @@ async function InvoiceSettings() {
                             mode="edit"
                             defaultValues={{
                               name: discount.name,
-                              discount: Number(discount.discount),
+                              amount: Number(discount.amount),
+                              type: discount.type,
                               date: discount.createdAt,
                             }}
                           />

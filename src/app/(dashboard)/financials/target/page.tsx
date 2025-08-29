@@ -1,5 +1,6 @@
 import RevenueTargetForm from "@/components/form/RevenueTargetForm";
 import HeaderPage from "@/components/HeaderPage";
+import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -10,6 +11,13 @@ import {
 } from "@/components/ui/table";
 import { formatDate, formatRupiah } from "@/lib/format";
 import prisma from "@/lib/prisma";
+import {
+  CheckCircle,
+  CircleCheck,
+  CircleX,
+  Timer,
+  XCircle,
+} from "lucide-react";
 
 const RevenueTargetPage = async () => {
   const revenueTargets = await prisma.revenueTarget.findMany();
@@ -30,6 +38,7 @@ const RevenueTargetPage = async () => {
                 <TableHead className="text-primary">Name</TableHead>
                 <TableHead className="text-primary">Category</TableHead>
                 <TableHead className="text-primary">Total Target</TableHead>
+                <TableHead className="text-primary w-[12%]">Status</TableHead>
                 <TableHead className="text-primary">From date</TableHead>
                 <TableHead className="text-primary">Until Date</TableHead>
                 <TableHead className="text-primary w-[0px] text-end">
@@ -44,6 +53,20 @@ const RevenueTargetPage = async () => {
                   <TableCell>{target.name}</TableCell>
                   <TableCell>{target.category}</TableCell>
                   <TableCell>{formatRupiah(target.totalTarget)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 py-1">
+                      <Progress value={80} className="h-1.5 flex-1" />
+                      {target.status === "PROCESS" && (
+                        <Timer className="text-secondary-green w-5 h-5" />
+                      )}
+                      {target.status === "SUCCESS" && (
+                        <CheckCircle className="text-green-500 w-5 h-5" />
+                      )}
+                      {target.status === "FAILED" && (
+                        <XCircle className="text-red-500 w-5 h-5" />
+                      )}
+                    </div>
+                  </TableCell>
                   <TableCell>{formatDate(target.fromDate)}</TableCell>
                   <TableCell>{formatDate(target.untilDate)}</TableCell>
                   <TableCell className="text-right w-fit space-x-1.5 flex">

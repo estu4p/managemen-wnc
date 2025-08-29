@@ -57,57 +57,6 @@ const FilterStatusData = [
   },
 ];
 
-const InventoryData = [
-  {
-    id: "detoxy",
-    product: "Detoxy",
-    category: "Soap",
-    stock: "5 L",
-  },
-  {
-    id: "sikatSuede",
-    product: "Sikat Suede",
-    category: "Brush",
-    stock: "5 Pcs",
-  },
-  {
-    id: "premiumCleaner",
-    product: "Premium Cleaner",
-    category: "Cleaning Solution",
-    stock: "10 L",
-  },
-  {
-    id: "mikrofiberTowel",
-    product: "Mikrofiber Towel",
-    category: "Cloth",
-    stock: "20 Pcs",
-  },
-  {
-    id: "cupSoleBrush",
-    product: "Cup Sole Brush",
-    category: "Brush",
-    stock: "7 Pcs",
-  },
-  {
-    id: "deodorizerSpray",
-    product: "Deodorizer Spray",
-    category: "Spray",
-    stock: "12 Bottles",
-  },
-  {
-    id: "shoeTree",
-    product: "Shoe Tree",
-    category: "Accessory",
-    stock: "10 Pairs",
-  },
-  {
-    id: "essentialKitBox",
-    product: "Essential Kit Box",
-    category: "Package",
-    stock: "5 Boxes",
-  },
-];
-
 const typeLabels = {
   INCOME: "Income",
   EXPENSE: "Expense",
@@ -150,11 +99,16 @@ async function FinancialDetailsPage(params: {
         />
       </div>
       <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
-        <ToggleGroup type="single" className="gap-2 rounded-none text-white">
+        <ToggleGroup
+          type="single"
+          className="gap-2 rounded-none text-white"
+          defaultValue="all"
+        >
           <ToggleGroupItem
             value="all"
             className="bg-primary rounded-md w-fit px-4 hover:bg-secondary-green/80 data-[state=on]:bg-secondary-green data-[state=on]:text-black"
             size="sm"
+            defaultChecked
           >
             All
           </ToggleGroupItem>

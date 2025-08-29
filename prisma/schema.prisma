@@ -102,10 +102,11 @@ model Inventory{
 model RevenueTarget {
   id Int @id @default(autoincrement())
   name String
-  category PeriodCategory
+  category PeriodCategory?
   fromDate DateTime
   untilDate DateTime
   totalTarget Decimal @db.Decimal(12, 2)
+  status RevenueTargetStatus @default(PROCESS)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -239,4 +240,10 @@ enum PaymentMethod {
 enum PaymentStatus {
   PAID
   UNPAID
+}
+
+enum RevenueTargetStatus {
+  SUCCESS
+  FAILED
+  PROCESS
 }

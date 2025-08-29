@@ -15,12 +15,19 @@ import {
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { formatDate, formatDateForInput } from "@/lib/format";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 type DiscountFormProps = {
   mode: "create" | "edit" | "delete";
   defaultValues?: {
     name?: string;
-    discount?: number;
+    amount?: number;
     type?: string;
     date?: Date;
   };
@@ -85,14 +92,36 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
                     defaultValue={defaultValues?.name ?? ""}
                   />
                 </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="discount">Discount</Label>
-                  <Input
-                    id="discount"
-                    name="discount"
-                    type="number"
-                    defaultValue={defaultValues?.discount ?? ""}
-                  />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="grid gap-3 w-full">
+                    <Label htmlFor="discount">Discount</Label>
+                    <Input
+                      id="discount"
+                      name="discount"
+                      type="number"
+                      defaultValue={defaultValues?.amount ?? ""}
+                    />
+                  </div>
+                  <div className="grid gap-3 w-1/4">
+                    <Label htmlFor="type">type</Label>
+                    {/* <Input
+                      id="type"
+                      name="type"
+                      defaultValue={defaultValues?.type ?? ""}
+                    /> */}
+                    <Select
+                      name="type"
+                      defaultValue={defaultValues?.type ?? ""}
+                    >
+                      <SelectTrigger className="w-fit">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent id="type">
+                        <SelectItem value="PERCENTAGE">%</SelectItem>
+                        <SelectItem value="NOMINAL">K</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="grid gap-3">
                   <Label htmlFor="date">Date</Label>

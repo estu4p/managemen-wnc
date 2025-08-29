@@ -40,10 +40,14 @@ async function main() {
 
   // 4. Discount
   for (let i = 1; i <= 5; i++) {
+    const fromDate = faker.date.past();
+    const untilDate = faker.date.future();
     await prisma.discount.create({
       data: {
         name: `Discount ${i}`,
-        discount: faker.number.float({ min: 5, max: 20 }),
+        amount: faker.number.float({ min: 5, max: 20 }),
+        fromDate,
+        untilDate: untilDate,
         type: faker.helpers.arrayElement(["PERCENTAGE", "NOMINAL"]) as any,
       },
     });
