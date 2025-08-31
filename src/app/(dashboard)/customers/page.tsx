@@ -20,6 +20,8 @@ import Link from "next/link";
 import { formatDate } from "@/lib/format";
 import Pagination from "@/components/Pagination";
 import { ITEM_PER_PAGE } from "@/lib/settings";
+import { DataTable } from "@/components/DataTable";
+import { columns } from "./columns";
 
 const FilterStatusData = [
   {
@@ -85,9 +87,9 @@ async function CustomersPage(props: {
     prisma.customer.count(),
   ]);
 
-  const customersData = data.map((cust) => ({
+  const customerData = data.map((cust) => ({
     id: cust.id,
-    photo: cust.phone,
+    photo: cust.photo,
     name: cust.name,
     phone: cust.phone,
     totalItem: cust.invoices.reduce((sum, inv) => sum + inv._count.items, 0),
@@ -121,48 +123,7 @@ async function CustomersPage(props: {
           <DataTable columns={columns} data={data} />
         </div> */}
         <div className="container mx-auto">
-          <div className=" rounded-md border h-fit">
-            <Table>
-              <TableHeader className="bg-primary-gray">
-                <TableRow>
-                  <TableHead className="text-primary">ID</TableHead>
-                  <TableHead className="text-primary">Name</TableHead>
-                  <TableHead className="text-primary">Phone</TableHead>
-                  <TableHead className="text-primary">Total Items</TableHead>
-                  <TableHead className="text-primary">Total Invoices</TableHead>
-                  <TableHead className=" text-primary">
-                    First Time Coming
-                  </TableHead>
-                  <TableHead className=" text-right text-primary">
-                    Details
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {customersData.map((customer, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{customer.id}</TableCell>
-                    <TableCell>{customer.name}</TableCell>
-                    <TableCell>{customer.phone}</TableCell>
-                    <TableCell className="pl-8">{customer.totalItem}</TableCell>
-                    <TableCell className="pl-8">
-                      {customer.totalInvoice}
-                    </TableCell>
-                    {/* <TableCell>{customer.items.length}</TableCell> */}
-                    {/* <TableCell>{customer.invoices.length}</TableCell> */}
-                    <TableCell>{formatDate(customer.firstTime)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button size="iconXs">
-                        <Link href={`/customers/${customer.id}`}>
-                          <MoveUpRight />
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <DataTable columns={columns} data={customerData} />
           <Pagination page={p} count={count} />
         </div>
         <div className="w-fit max-lg:hidden">

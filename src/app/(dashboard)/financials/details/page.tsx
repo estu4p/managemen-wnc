@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/DataTable";
 import FiltersDropdown from "@/components/FiltersDropdown";
 import FinancialCard from "@/components/financial/FinancialCard";
 import HeaderPage from "@/components/HeaderPage";
@@ -21,6 +22,7 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { MoveUpRight, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { columns } from "./columns";
 
 const FilterStatusData = [
   {
@@ -77,6 +79,15 @@ async function FinancialDetailsPage(params: {
     prisma.transaction.count(),
     getFinancialSummary(),
   ]);
+
+  const transactionData = data.map((transaction) => ({
+    id: transaction.id,
+    name: transaction.type,
+    type: transaction.type,
+    category: transaction.category,
+    amount: Number(transaction.amount),
+    date: transaction.createdAt,
+  }));
 
   return (
     <div className="p-4 sm:px-7">
@@ -144,52 +155,7 @@ async function FinancialDetailsPage(params: {
         </div>
       </div>
       <div className="container mx-auto mt-3">
-        <div className=" rounded-md border h-fit">
-          <Table>
-            <TableHeader className="bg-primary-gray">
-              <TableRow>
-                <TableHead className="text-primary">Transaction Name</TableHead>
-                <TableHead className="text-primary">Type</TableHead>
-                <TableHead className="text-primary">Category</TableHead>
-                <TableHead className="text-primary">Amount</TableHead>
-                <TableHead className="text-primary">Date</TableHead>
-                <TableHead className="text-right"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((transaction, index) => (
-                <TableRow key={index}>
-                  <TableCell>{transaction.type}</TableCell>
-                  <TableCell>
-                    <Badge variant={transaction.type as any}>
-                      {typeLabels[
-                        transaction.type as keyof typeof typeLabels
-                      ] || transaction.type}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{transaction.category}</TableCell>
-                  <TableCell>
-                    {formatRupiah(Number(transaction.amount))}
-                  </TableCell>
-                  <TableCell>
-                    {formatDate(transaction.createdAt)}
-                    <span className="text-muted-foreground">
-                      {" "}
-                      - {formatTime(transaction.createdAt)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button size="iconXs">
-                      <Link href={`/inventory/${transaction.id}`}>
-                        <MoveUpRight />
-                      </Link>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <DataTable columns={columns} data={transactionData} />
         <Pagination page={p} count={count} />
       </div>
     </div>

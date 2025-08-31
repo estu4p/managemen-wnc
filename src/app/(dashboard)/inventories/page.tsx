@@ -1,3 +1,4 @@
+import { DataTable } from "@/components/DataTable";
 import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
 import Pagination from "@/components/Pagination";
@@ -20,6 +21,7 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { MoveUpRight, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { columns } from "./columns";
 
 const FilterStatusData = [
   {
@@ -78,6 +80,14 @@ async function InventoriesPage(props: {
     prisma.inventory.count(),
   ]);
 
+  const inventoryData = data.map((inv) => ({
+    id: inv.id,
+    name: inv.name,
+    category: inv.category,
+    currentStock: inv.currentStock,
+    unit: inv.unit,
+  }));
+
   return (
     <div className="p-4 sm:px-7">
       <div className="flex items-end justify-between">
@@ -109,40 +119,7 @@ async function InventoriesPage(props: {
       <div className="flex gap-4">
         {/* left */}
         <div className="container mx-auto">
-          <div className=" rounded-md border h-fit">
-            <Table>
-              <TableHeader className="bg-primary-gray">
-                <TableRow>
-                  <TableHead className=" min-w-[250px] text-primary">
-                    Product
-                  </TableHead>
-                  <TableHead className=" text-primary">Category</TableHead>
-                  <TableHead className=" text-primary">Stock</TableHead>
-                  <TableHead className=" text-right text-primary">
-                    Details
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((inventory, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{inventory.name}</TableCell>
-                    <TableCell>{inventory.category}</TableCell>
-                    <TableCell>
-                      {inventory.currentStock.toFixed(0)} {inventory.unit}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button size="iconXs">
-                        <Link href={`/inventories/${inventory.id}`}>
-                          <MoveUpRight />
-                        </Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <DataTable columns={columns} data={inventoryData} />
           <Pagination page={p} count={count} />
         </div>
         {/* right */}

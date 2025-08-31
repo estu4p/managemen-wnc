@@ -1,12 +1,14 @@
+import { DataTable } from "@/components/DataTable";
 import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import OrderTable from "@/components/workMonitoring/OrderTable";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { columns } from "./columns";
+import Pagination from "@/components/Pagination";
 
 const FilterStatusData = [
   {
@@ -75,6 +77,7 @@ async function InvoicesPage(props: {
 
   const invoiceData = data.map((inv) => ({
     id: inv.id,
+    photo: inv.customer.photo,
     name: inv.customer.name,
     totalPayment: Number(inv.price),
     progress: inv.progress,
@@ -109,8 +112,10 @@ async function InvoicesPage(props: {
           />
         </div>
       </div>
-      <div className="flex gap-4">
-        <OrderTable data={invoiceData} page={p} count={count} />
+      <div className="">
+        {/* <OrderTable data={invoiceData} page={p} count={count} /> */}
+        <DataTable data={invoiceData} columns={columns} />
+        <Pagination page={p} count={count} />
       </div>
     </div>
   );

@@ -1,27 +1,23 @@
 "use client";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatRupiah, formatTime } from "@/lib/format";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoveUpRight } from "lucide-react";
 import Link from "next/link";
 
-export type Customer = {
+export type Invoice = {
   id: string;
   photo: string | null;
   name: string;
-  phone: string;
-  totalItem: number;
-  totalInvoice: number;
-  firstTime: Date;
+  totalPayment: number;
+  progress: string;
+  date: Date;
 };
 
-export const columns: ColumnDef<Customer>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
+export const columns: ColumnDef<Invoice>[] = [
   {
     accessorKey: "name",
     header: "Name",
@@ -47,23 +43,49 @@ export const columns: ColumnDef<Customer>[] = [
     },
   },
   {
-    accessorKey: "phone",
-    header: "Phone",
+    accessorKey: "id",
+    header: "Invoice ID",
   },
   {
-    accessorKey: "totalItem",
-    header: "Total Item",
-  },
-  {
-    accessorKey: "totalInvoice",
-    header: "Total Invoice",
-  },
-  {
-    accessorKey: "firstTime",
-    header: "First Time Coming",
+    accessorKey: "totalPayment",
+    header: "Total Payment",
     cell: ({ row }) => {
-      const time = row.original.firstTime;
-      return formatDate(time as Date);
+      const payment = row.original.totalPayment;
+      return formatRupiah(payment);
+    },
+  },
+  {
+    accessorKey: "date",
+    header: "Date & Time",
+    cell: ({ row }) => {
+      const date = row.getValue("date");
+      return (
+        <>
+          {formatDate(date as Date)}
+          <span className="text-muted-foreground">
+            - {formatTime(date as Date)}
+          </span>
+        </>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const progress = row.original.progress;
+      const statusLabels = {
+        NEW_ORDER: "New Order",
+        WAITTING: "Waiting",
+        ON_PROGRESS: "On Progress",
+        PICKER_UP: "Ready for Pick Up", //PICK_UP
+      };
+
+      return (
+        <Badge variant={progress as any}>
+          {statusLabels[progress as keyof typeof statusLabels] || progress}
+        </Badge>
+      );
     },
   },
   {
@@ -74,7 +96,7 @@ export const columns: ColumnDef<Customer>[] = [
       return (
         <div className="text-right">
           <Button size="iconXs" className="">
-            <Link href={`/customers/${id}`}>
+            <Link href={`/invoices/${id}`}>
               <MoveUpRight />
             </Link>
           </Button>

@@ -2,7 +2,6 @@
 import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
 import OrderCard from "@/components/workMonitoring/OrderCard";
-import OrderTable from "@/components/workMonitoring/OrderTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -10,6 +9,9 @@ import { LayoutGrid, List, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import InvoiceMonitoring from "@/components/workMonitoring/InvoiceMonitoring";
 import { useSearchParams } from "next/navigation";
+import { DataTable } from "@/components/DataTable";
+import { columns } from "./(dashboard)/invoices/columns";
+import Pagination from "@/components/Pagination";
 
 const FilterStatusData = [
   {
@@ -119,7 +121,11 @@ const Home = () => {
         </div>
         <div className="mt-3 max-sm:mt-6 flex gap-3 transition-all duration-300 ease-in-out">
           {viewMode === "list" ? (
-            <OrderTable data={orders} page={p} count={count} />
+            // <OrderTable data={orders} page={p} count={count} />
+            <div className="w-full">
+              <DataTable data={orders} columns={columns} />
+              <Pagination page={p} count={count} />
+            </div>
           ) : (
             <OrderCard data={orders} page={p} count={count} />
           )}
