@@ -80,7 +80,7 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                             <Input
                               placeholder="Inventory name"
                               {...field}
-                              value={transaction.name}
+                              value={transaction.title}
                               disabled={!isEditing}
                             />
                           </FormControl>
@@ -200,7 +200,7 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                                 <Textarea
                                   placeholder="Notes"
                                   {...field}
-                                  value={transaction.description}
+                                  value={transaction.notes}
                                   disabled={!isEditing}
                                 />
                               </FormControl>

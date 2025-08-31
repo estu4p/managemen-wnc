@@ -44,7 +44,7 @@ async function main() {
     const untilDate = faker.date.future();
     await prisma.discount.create({
       data: {
-        name: `Discount ${i}`,
+        title: `Discount ${i}`,
         amount: faker.number.float({ min: 5, max: 20 }),
         fromDate,
         untilDate: untilDate,
@@ -157,7 +157,7 @@ async function main() {
     const untilDate = faker.date.future();
     await prisma.revenueTarget.create({
       data: {
-        name: `saksake-${i}`,
+        title: `saksake-${i}`,
         category: faker.helpers.arrayElement([
           "DAILY",
           "WEEKLY",
@@ -177,6 +177,7 @@ async function main() {
     await prisma.transaction.create({
       data: {
         type: faker.helpers.arrayElement(["INCOME", "EXPENSE"]),
+        title: faker.commerce.productName(),
         category: faker.helpers.arrayElement([
           "SERVICE_INCOME",
           "PRODUCT_SALES",
@@ -190,7 +191,7 @@ async function main() {
           "OTHER_EXPENSE",
         ]),
         amount: faker.number.float({ min: 5000, max: 2000000 }),
-        description: faker.lorem.sentence(),
+        notes: faker.lorem.sentence(),
       },
     });
   }

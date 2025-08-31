@@ -7,7 +7,7 @@ import { formatDate, formatRupiah } from "@/lib/format";
 
 type Targets = {
   id: number;
-  name: string;
+  title: string;
   untilDate: Date;
   totalTarget: number;
 };
@@ -25,7 +25,7 @@ const RevenueTargetCard = ({ data }: { data: Targets[] }) => {
         {data.map((target, index) => (
           <div key={index} className="border rounded-md p-2 border-primary">
             <div className="flex items-center justify-between">
-              <span className="font-medium">{target.name}</span>
+              <span className="font-medium">{target.title}</span>
               <span className="">{formatRupiah(target.totalTarget)}</span>
             </div>
             <p className="text-muted-foreground text-[13px]">

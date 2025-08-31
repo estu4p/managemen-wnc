@@ -76,7 +76,7 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
   const grandTotal = itemServices.reduce((sum, s) => sum + s.total, 0);
   // const discount = parseFloat(invoice.discount.discount ?? "0");
   const totalDiscountPercent = invoice.discounts.reduce(
-    (sum: number, d: { discount: string }) => sum + parseFloat(d.discount),
+    (sum: number, d: { amount: string }) => sum + parseFloat(d.amount),
     0
   );
   const discountValue = grandTotal * (totalDiscountPercent / 100);
@@ -308,12 +308,12 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
                             Services<span className="text-red-700">*</span>
                           </FormLabel>
                           <FormControl>
-                            <Select>
+                            <Select value={item.service[0]}>
                               <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Select a service" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="Deep Clean">
+                                <SelectItem value={item.service[0]}>
                                   Deep Clean
                                 </SelectItem>
                                 <SelectItem value="Regular Clean">
@@ -430,7 +430,7 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
                           <FormControl>
                             <Input
                               placeholder="Discount name"
-                              value={discount.name}
+                              value={discount.title}
                               disabled
                             />
                           </FormControl>
@@ -447,7 +447,7 @@ const InvoiceForm = ({ invoice }: { invoice: any }) => {
                             <FormControl>
                               <Input
                                 placeholder="Discount"
-                                value={discount.discount}
+                                value={discount.amount}
                                 disabled
                               />
                             </FormControl>

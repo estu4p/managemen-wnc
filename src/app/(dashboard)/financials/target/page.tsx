@@ -11,13 +11,7 @@ import {
 } from "@/components/ui/table";
 import { formatDate, formatRupiah } from "@/lib/format";
 import prisma from "@/lib/prisma";
-import {
-  CheckCircle,
-  CircleCheck,
-  CircleX,
-  Timer,
-  XCircle,
-} from "lucide-react";
+import { CheckCircle, Timer, XCircle } from "lucide-react";
 
 const RevenueTargetPage = async () => {
   const revenueTargets = await prisma.revenueTarget.findMany();
@@ -50,7 +44,7 @@ const RevenueTargetPage = async () => {
               {revenueTargets.map((target: any, index: number) => (
                 <TableRow key={index}>
                   <TableCell>{index + 1}</TableCell>
-                  <TableCell>{target.name}</TableCell>
+                  <TableCell>{target.title}</TableCell>
                   <TableCell>{target.category}</TableCell>
                   <TableCell>{formatRupiah(target.totalTarget)}</TableCell>
                   <TableCell>
@@ -73,7 +67,7 @@ const RevenueTargetPage = async () => {
                     <RevenueTargetForm
                       mode="edit"
                       defaultValues={{
-                        name: target.name,
+                        title: target.title,
                         category: target.category,
                         totalTarget: Number(target.totalTarget),
                         fromDate: target.fromDate,
@@ -82,7 +76,7 @@ const RevenueTargetPage = async () => {
                     />
                     <RevenueTargetForm
                       mode="delete"
-                      defaultValues={{ name: target.name }}
+                      defaultValues={{ title: target.title }}
                     />
                   </TableCell>
                 </TableRow>

@@ -82,10 +82,11 @@ async function FinancialDetailsPage(params: {
 
   const transactionData = data.map((transaction) => ({
     id: transaction.id,
-    name: transaction.type,
+    title: transaction.title,
     type: transaction.type,
     category: transaction.category,
     amount: Number(transaction.amount),
+    // notes: transaction.notes,
     date: transaction.createdAt,
   }));
 

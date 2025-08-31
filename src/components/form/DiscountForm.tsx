@@ -26,7 +26,7 @@ import {
 type DiscountFormProps = {
   mode: "create" | "edit" | "delete";
   defaultValues?: {
-    name?: string;
+    title?: string;
     amount?: number;
     type?: string;
     date?: Date;
@@ -78,7 +78,7 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
           {mode === "delete" ? (
             <>
               <span className="font-semibold">
-                Delete this {defaultValues?.name} discount?
+                Delete this {defaultValues?.title} discount?
               </span>
             </>
           ) : (
@@ -89,7 +89,7 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
                   <Input
                     id="name"
                     name="name"
-                    defaultValue={defaultValues?.name ?? ""}
+                    defaultValue={defaultValues?.title ?? ""}
                   />
                 </div>
                 <div className="flex items-center justify-between gap-3">

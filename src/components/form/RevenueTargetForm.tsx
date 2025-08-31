@@ -19,7 +19,7 @@ type RevenueTargetsProps = {
   mode: "create" | "edit" | "delete";
   defaultValues?: {
     id?: number;
-    name?: string;
+    title?: string;
     category?: string;
     totalTarget?: number;
     fromDate?: Date;
@@ -72,7 +72,7 @@ const RevenueTargetForm = ({ mode, defaultValues }: RevenueTargetsProps) => {
           {mode === "delete" ? (
             <>
               <span className="font-semibold">
-                Delete this {defaultValues?.name} target?
+                Delete this {defaultValues?.title} target?
               </span>
             </>
           ) : (
@@ -83,7 +83,7 @@ const RevenueTargetForm = ({ mode, defaultValues }: RevenueTargetsProps) => {
                   <Input
                     id="name"
                     name="name"
-                    defaultValue={defaultValues?.name ?? ""}
+                    defaultValue={defaultValues?.title ?? ""}
                   />
                 </div>
                 <div className="grid gap-3">

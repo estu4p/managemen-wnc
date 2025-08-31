@@ -132,8 +132,14 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                     <h3 className="font-medium mb-2">Photo Profile</h3>
                     <div className="flex gap-4">
                       <Avatar className="size-9">
-                        <AvatarImage src="https://github.com/shadcn.png" />
-                        <AvatarFallback>ES</AvatarFallback>
+                        {customer.photo && <AvatarImage src={customer.photo} />}
+                        <AvatarFallback>
+                          {customer.name
+                            .split(" ")
+                            .map((n: any[]) => n[0])
+                            .join("")
+                            .toUpperCase()}
+                        </AvatarFallback>
                       </Avatar>
                       <div className="space-y-2">
                         <Button
@@ -255,7 +261,7 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                         </TableCell>
                         <TableCell className="text-right w-fit">
                           <Button size="iconXs">
-                            <Link href={`/order/details/`}>
+                            <Link href={`/invoices/${invoice.id}`}>
                               <MoveUpRight />
                             </Link>
                           </Button>

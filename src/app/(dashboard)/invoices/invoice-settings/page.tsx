@@ -110,7 +110,7 @@ async function InvoiceSettings() {
                     {discounts.map((discount: any, index: number) => (
                       <TableRow key={index}>
                         <TableCell>{index + 1}</TableCell>
-                        <TableCell>{discount.name}</TableCell>
+                        <TableCell>{discount.title}</TableCell>
                         <TableCell>
                           {discount.type === "PERCENTAGE"
                             ? `${Number(discount.amount)} %`
@@ -122,7 +122,7 @@ async function InvoiceSettings() {
                           <DiscountForm
                             mode="edit"
                             defaultValues={{
-                              name: discount.name,
+                              title: discount.title,
                               amount: Number(discount.amount),
                               type: discount.type,
                               date: discount.createdAt,
@@ -130,7 +130,7 @@ async function InvoiceSettings() {
                           />
                           <DiscountForm
                             mode="delete"
-                            defaultValues={{ name: discount.name }}
+                            defaultValues={{ title: discount.title }}
                           />
                         </TableCell>
                       </TableRow>

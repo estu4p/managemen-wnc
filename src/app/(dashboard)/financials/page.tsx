@@ -39,7 +39,7 @@ async function FinancialsPage() {
 
   const revenueTargetsData = revenueTargets.map((target) => ({
     id: target.id,
-    name: target.name,
+    title: target.title,
     untilDate: target.untilDate,
     totalTarget: Number(target.totalTarget),
   }));

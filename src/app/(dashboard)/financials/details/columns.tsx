@@ -9,7 +9,7 @@ import Link from "next/link";
 
 export type Transaction = {
   id: number;
-  name: string;
+  title: string;
   type: string;
   category: string;
   amount: number;
@@ -30,11 +30,11 @@ export const columns: ColumnDef<Transaction>[] = [
     },
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: "title",
+    header: "Title",
     cell: ({ row }) => {
-      const name = row.original.name;
-      return <span className="font-medium">{name}</span>;
+      const title = row.original.title;
+      return <span className="font-medium">{title}</span>;
     },
   },
   {
