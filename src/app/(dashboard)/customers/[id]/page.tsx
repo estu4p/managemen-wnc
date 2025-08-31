@@ -1,5 +1,6 @@
 import CustomerDetails from "@/components/customer/CustomerForm";
 import HeaderPage from "@/components/HeaderPage";
+import { Button } from "@/components/ui/button";
 import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
 
@@ -39,12 +40,15 @@ async function CustomerDetailsPage({
 
   return (
     <div className="p-4 sm:px-7">
-      <div className="flex items-center justify-between">
+      <div className="flex justify-between items-end">
         <HeaderPage
           title="Customer Details"
           desc="View and manage customer details"
           calendar={false}
         />
+        <Button size="sm" variant="destructive" className="mb-3">
+          Delete
+        </Button>
       </div>
       <CustomerDetails customer={customerData} />
     </div>

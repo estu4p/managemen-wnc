@@ -43,21 +43,26 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
           desc="View and manage order details, including items, customer information, and status updates."
           calendar={false}
         />
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="default" size="sm" className="mb-3">
-              Preview
-            </Button>
-          </SheetTrigger>
-          <SheetContent className="max-sm:w-[90%]">
-            <SheetTitle>Order Preview</SheetTitle>
-            <SheetDescription>
-              This is a preview of the order details. You can review the
-              customer information, items, and payment details before finalizing
-              the order.
-            </SheetDescription>
-          </SheetContent>
-        </Sheet>
+        <div className="flex gap-2 mb-3">
+          <Button size="sm" variant="destructive">
+            Delete
+          </Button>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="default" size="sm">
+                Preview
+              </Button>
+            </SheetTrigger>
+            <SheetContent className="max-sm:w-[90%]">
+              <SheetTitle>Order Preview</SheetTitle>
+              <SheetDescription>
+                This is a preview of the order details. You can review the
+                customer information, items, and payment details before
+                finalizing the order.
+              </SheetDescription>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
       <div className="mt-6">
         <InvoiceForm invoice={invoiceData} />

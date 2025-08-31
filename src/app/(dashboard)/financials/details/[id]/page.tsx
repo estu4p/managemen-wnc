@@ -1,5 +1,6 @@
 import TransactionDetails from "@/components/form/TransactionForm";
 import HeaderPage from "@/components/HeaderPage";
+import { Button } from "@/components/ui/button";
 import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
 
@@ -21,12 +22,16 @@ async function TransactionDetailsPage({
 
   return (
     <div className="p-4 sm:px-7">
-      <HeaderPage
-        title="Transaction Details"
-        desc="View and manage detailed transaction information."
-        calendar={false}
-      />
-      {/* <InventoryDetails inventory={inventoryData} /> */}
+      <div className="flex justify-between items-end">
+        <HeaderPage
+          title="Transaction Details"
+          desc="View and manage detailed transaction information."
+          calendar={false}
+        />
+        <Button size="sm" variant="destructive" className="mb-3">
+          Delete
+        </Button>
+      </div>
       <TransactionDetails transaction={transactionData} />
     </div>
   );
