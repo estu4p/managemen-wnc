@@ -84,7 +84,7 @@ export const columns: ColumnDef<Transaction>[] = [
       return (
         <div className="text-right">
           <Button size="iconXs" className="">
-            <Link href={`/inventories/${id}`}>
+            <Link href={`/financials/details/${id}`}>
               <MoveUpRight />
             </Link>
           </Button>

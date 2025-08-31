@@ -1,5 +1,5 @@
 "use client";
-import HeaderPage from "@/components/HeaderPage";
+
 import PhotoInput from "@/components/photoInput";
 import { Button } from "@/components/ui/button";
 import {

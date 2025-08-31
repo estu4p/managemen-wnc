@@ -1,5 +1,5 @@
 import HeaderPage from "@/components/HeaderPage";
-import InventoryDetails from "@/components/inventory/InventoryForm";
+import InventoryDetails from "@/components/form/InventoryForm";
 import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
 

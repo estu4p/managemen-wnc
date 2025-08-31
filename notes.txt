@@ -33,7 +33,7 @@ db
 1. db ubah nama service menjadi services
 
 --26/08 --
-1. db transaction tambah nama
+1. db transaction tambah nama, tambah enum other
 
 --27/08--
 1. halaman invoice settings: service, discount, 

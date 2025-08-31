@@ -118,7 +118,7 @@ model Transaction {
   type TransactionType
   category CashFlowCategory
   amount Decimal @db.Decimal(12, 2)
-  description String?
+  notes String?
   createdAt DateTime @default(now())
 }
 
@@ -202,11 +202,9 @@ enum TransactionType {
 }
 
 enum CashFlowCategory {
-  // income
   SERVICE_INCOME  // income from services
   PRODUCT_SALES   // income from selling product
   OTHER_INCOME    // onther income
-  // expense
   MATERIAL_PURCHASE   // buying soap, brushes, etc.
   EQUIPMENT_PURCHASE  // buing maching, tools, etc.
   SALARY              // employee wages
