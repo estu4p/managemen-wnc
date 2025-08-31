@@ -29,11 +29,12 @@ db
 8. beri name dimodel revenue target [ok]
 9. item -> service M-N, invoice -> discount M-N [ok]
 
---24/08--
-1. db ubah nama service menjadi services
-
 --26/08 --
-1. db transaction tambah nama, tambah enum other
+1. db: transaction tambah nama, tambah enum other
 
 --27/08--
-1. halaman invoice settings: service, discount, 
+1. halaman invoice settings: service, discount, [ok]
+
+--31/08--
+1. db: buat model notification (id, title, message, catogory:enum, isRead, date,)
+dangerouslySetInnerHTML={{ __html: content.body }} (render tag html)

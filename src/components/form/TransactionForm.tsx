@@ -1,6 +1,5 @@
 "use client";
 
-import PhotoInput from "@/components/photoInput";
 import { Button } from "@/components/ui/button";
 import {
   Form,

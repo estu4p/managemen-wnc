@@ -1,4 +1,5 @@
 "use client";
+
 import { ChevronDown, CirclePlus, LogOut, Settings, User } from "lucide-react";
 import {
   DropdownMenu,
@@ -12,6 +13,7 @@ import { SidebarTrigger } from "./ui/sidebar";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { useState } from "react";
+import Notification from "./Notification";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
@@ -49,13 +51,16 @@ const Navbar = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <Link
-        href="/addNote"
-        className="px-3 py-1 text-sm font-medium border border-gray-300 rounded-full flex items-center hover:bg-accent hover:text-accent-foreground transition-all"
-      >
-        Add New Product
-        <CirclePlus className="ml-2" strokeWidth={1} />
-      </Link>
+      <div className="flex gap-3 items-center">
+        <Notification />
+        <Link
+          href="/addNote"
+          className="px-3 py-1 text-sm font-medium border border-gray-300 rounded-full flex items-center hover:bg-accent hover:text-accent-foreground transition-all"
+        >
+          Add Transaction
+          <CirclePlus className="ml-2" strokeWidth={1} />
+        </Link>
+      </div>
     </nav>
   );
 };
