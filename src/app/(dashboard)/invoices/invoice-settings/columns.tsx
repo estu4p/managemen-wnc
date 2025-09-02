@@ -51,11 +51,15 @@ export const serviceColumns: ColumnDef<Service>[] = [
           <ServiceForm
             mode="edit"
             defaultValues={{
+              id: service.id,
               name: service.name,
               price: Number(service.price),
             }}
           />
-          <ServiceForm mode="delete" defaultValues={{ name: service.name }} />
+          <ServiceForm
+            mode="delete"
+            defaultValues={{ id: service.id, name: service.name }}
+          />
         </div>
       );
     },
