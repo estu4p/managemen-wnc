@@ -12,11 +12,22 @@ import {
 import { SidebarTrigger } from "./ui/sidebar";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Notification from "./Notification";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetch("/api/notifications")
+      .then((res) => res.json())
+      .then((resData) => {
+        setNotifications(resData);
+      });
+  }, []);
+
+  console.log(notifications);
 
   return (
     <nav className="p-4 pb-3 flex items-center justify-between bg-background sticky top-0 z-50 border-b border-border">
@@ -52,7 +63,7 @@ const Navbar = () => {
         </DropdownMenu>
       </div>
       <div className="flex gap-3 items-center">
-        <Notification />
+        <Notification data={notifications} />
         <Link
           href="/addNote"
           className="px-3 py-1 text-sm font-medium border border-gray-300 rounded-full flex items-center hover:bg-accent hover:text-accent-foreground transition-all"
