@@ -29,7 +29,8 @@ type DiscountFormProps = {
     title?: string;
     amount?: number;
     type?: string;
-    date?: Date;
+    fromDate?: Date;
+    untilDate?: Date;
   };
 };
 
@@ -123,14 +124,27 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
                     </Select>
                   </div>
                 </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="date">Date</Label>
-                  <Input
-                    id="date"
-                    name="date"
-                    type="date"
-                    defaultValue={formatDateForInput(defaultValues?.date)}
-                  />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="grid gap-3">
+                    <Label htmlFor="fromDate">From Date</Label>
+                    <Input
+                      id="fromDate"
+                      name="fromDate"
+                      type="date"
+                      defaultValue={formatDateForInput(defaultValues?.fromDate)}
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="untilDate">Until Date</Label>
+                    <Input
+                      id="untilDate"
+                      name="untilDate"
+                      type="date"
+                      defaultValue={formatDateForInput(
+                        defaultValues?.untilDate
+                      )}
+                    />
+                  </div>
                 </div>
               </div>
             </>

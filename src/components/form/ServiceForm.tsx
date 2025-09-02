@@ -56,6 +56,7 @@ const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
           <Button
             size={mode === "create" ? "sm" : "iconXs"}
             variant={mode === "delete" ? "destructive" : "default"}
+            className="cursor-pointer"
           >
             {icon}
           </Button>

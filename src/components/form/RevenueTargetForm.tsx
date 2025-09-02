@@ -13,14 +13,14 @@ import {
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import { formatDateForInput } from "@/lib/format";
+import { formatDateForInput, formatRupiah } from "@/lib/format";
 
 type RevenueTargetsProps = {
   mode: "create" | "edit" | "delete";
   defaultValues?: {
     id?: number;
     title?: string;
-    category?: string;
+    category?: string | null;
     totalTarget?: number;
     fromDate?: Date;
     untilDate?: Date;
@@ -103,23 +103,27 @@ const RevenueTargetForm = ({ mode, defaultValues }: RevenueTargetsProps) => {
                     defaultValue={defaultValues?.totalTarget ?? ""}
                   />
                 </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="fromDate">From Date</Label>
-                  <Input
-                    id="fromDate"
-                    name="fromDate"
-                    type="date"
-                    defaultValue={formatDateForInput(defaultValues?.fromDate)}
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="untilDate">Until Date</Label>
-                  <Input
-                    id="untilDate"
-                    name="untilDate"
-                    type="date"
-                    defaultValue={formatDateForInput(defaultValues?.untilDate)}
-                  />
+                <div className="flex items-center justify-between gap-3">
+                  <div className="grid gap-3">
+                    <Label htmlFor="fromDate">From Date</Label>
+                    <Input
+                      id="fromDate"
+                      name="fromDate"
+                      type="date"
+                      defaultValue={formatDateForInput(defaultValues?.fromDate)}
+                    />
+                  </div>
+                  <div className="grid gap-3">
+                    <Label htmlFor="untilDate">Until Date</Label>
+                    <Input
+                      id="untilDate"
+                      name="untilDate"
+                      type="date"
+                      defaultValue={formatDateForInput(
+                        defaultValues?.untilDate
+                      )}
+                    />
+                  </div>
                 </div>
               </div>
             </>

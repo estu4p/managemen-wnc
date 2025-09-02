@@ -1,29 +1,37 @@
+import { DataTable } from "@/components/DataTable";
 import DiscountForm from "@/components/form/DiscountForm";
 import ServiceForm from "@/components/form/ServiceForm";
 import HeaderPage from "@/components/HeaderPage";
 import { Separator } from "@/components/ui/separator";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { formatDate, formatRupiah } from "@/lib/format";
 import prisma from "@/lib/prisma";
+import { discountColumns, serviceColumns } from "./columns";
 
 async function InvoiceSettings() {
   const services = await prisma.service.findMany({
-    // orderBy: {
-    //     createdAt: "desc",
-    // }
+    orderBy: {
+      name: "desc",
+    },
   });
   const discounts = await prisma.discount.findMany({
     orderBy: {
       createdAt: "desc",
     },
   });
+
+  const serviceData = services.map((service) => ({
+    id: service.id,
+    name: service.name,
+    price: Number(service.price),
+  }));
+
+  const discountData = discounts.map((disc) => ({
+    id: disc.id,
+    title: disc.title,
+    amount: Number(disc.amount),
+    type: disc.type,
+    fromDate: disc.fromDate,
+    untilDate: disc.untilDate,
+  }));
 
   return (
     <div className="p-4 sm:px-7">
@@ -42,42 +50,7 @@ async function InvoiceSettings() {
             <p className="text-muted-foreground">Manage service data</p>
           </div>
           <div className="container mx-auto">
-            <div className=" rounded-md border h-fit">
-              <Table>
-                <TableHeader className="bg-primary-gray">
-                  <TableRow>
-                    <TableHead className="text-primary">No</TableHead>
-                    <TableHead className="text-primary">Name</TableHead>
-                    <TableHead className="text-primary">Price</TableHead>
-                    <TableHead className="text-primary w-[0px] text-end">
-                      Action
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {services.map((service: any, index: number) => (
-                    <TableRow key={index}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>{service.name}</TableCell>
-                      <TableCell>{formatRupiah(service.price)}</TableCell>
-                      <TableCell className="text-right w-fit space-x-1.5 flex">
-                        <ServiceForm
-                          mode="edit"
-                          defaultValues={{
-                            name: service.name,
-                            price: Number(service.price),
-                          }}
-                        />
-                        <ServiceForm
-                          mode="delete"
-                          defaultValues={{ name: service.name }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <DataTable columns={serviceColumns} data={serviceData} />
             <div className="mt-3">
               <ServiceForm mode="create" />
             </div>
@@ -92,52 +65,7 @@ async function InvoiceSettings() {
               <p className="text-muted-foreground">Manage discount data</p>
             </div>
             <div className="container mx-auto">
-              <div className=" rounded-md border h-fit">
-                <Table>
-                  <TableHeader className="bg-primary-gray">
-                    <TableRow>
-                      <TableHead className="text-primary">No</TableHead>
-                      <TableHead className="text-primary">Name</TableHead>
-                      <TableHead className="text-primary">Discount</TableHead>
-                      <TableHead className="text-primary">From Date</TableHead>
-                      <TableHead className="text-primary">Until Date</TableHead>
-                      <TableHead className="text-primary w-[0px] text-end">
-                        Action
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {discounts.map((discount: any, index: number) => (
-                      <TableRow key={index}>
-                        <TableCell>{index + 1}</TableCell>
-                        <TableCell>{discount.title}</TableCell>
-                        <TableCell>
-                          {discount.type === "PERCENTAGE"
-                            ? `${Number(discount.amount)} %`
-                            : formatRupiah(discount.amount)}
-                        </TableCell>
-                        <TableCell>{formatDate(discount.createdAt)}</TableCell>
-                        <TableCell>{formatDate(discount.createdAt)}</TableCell>
-                        <TableCell className="text-right w-fit space-x-1.5 flex">
-                          <DiscountForm
-                            mode="edit"
-                            defaultValues={{
-                              title: discount.title,
-                              amount: Number(discount.amount),
-                              type: discount.type,
-                              date: discount.createdAt,
-                            }}
-                          />
-                          <DiscountForm
-                            mode="delete"
-                            defaultValues={{ title: discount.title }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+              <DataTable columns={discountColumns} data={discountData} />
               <div className="mt-3">
                 <DiscountForm mode="create" />
               </div>
