@@ -138,7 +138,6 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
     if (dialogOpen) {
       form.reset(safeDefaults);
     }
-    console.log("buka");
   }, [dialogOpen]);
 
   return (

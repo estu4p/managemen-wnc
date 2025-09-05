@@ -5,7 +5,11 @@ import prisma from "@/lib/prisma";
 import { Columns } from "./columns";
 
 const RevenueTargetPage = async () => {
-  const revenueTargets = await prisma.revenueTarget.findMany();
+  const revenueTargets = await prisma.revenueTarget.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
   const revenueTargetData = revenueTargets.map((target) => ({
     id: target.id,

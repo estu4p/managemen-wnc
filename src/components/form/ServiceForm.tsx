@@ -116,7 +116,6 @@ const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
     if (dialogOpen) {
       form.reset(defaultValues);
     }
-    console.log("buka 1");
   }, [dialogOpen]);
 
   return (

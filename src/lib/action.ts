@@ -1,6 +1,10 @@
 "use server";
 
-import { DiscountSchema, ServiceSchema } from "./formValidationSchemas";
+import {
+  DiscountSchema,
+  RevenueTargetSchema,
+  ServiceSchema,
+} from "./formValidationSchemas";
 import prisma from "./prisma";
 
 type CurrentState = { success: boolean; error: boolean };
@@ -128,6 +132,74 @@ export const deleteDiscount = async (
     return { success: true, error: false };
   } catch (err) {
     console.log(err);
+    return { success: false, error: true };
+  }
+};
+
+export const createRevenueTarget = async (
+  currentState: CurrentState,
+  data: RevenueTargetSchema
+) => {
+  try {
+    await prisma.revenueTarget.create({
+      data: {
+        title: data.title,
+        category: data.category,
+        fromDate: data.fromDate,
+        untilDate: data.untilDate,
+        totalTarget: data.totalTarget,
+        status: data.status,
+      },
+    });
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateRevenueTarget = async (
+  currentState: CurrentState,
+  data: RevenueTargetSchema
+) => {
+  try {
+    await prisma.revenueTarget.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        title: data.title,
+        category: data.category,
+        fromDate: data.fromDate,
+        untilDate: data.untilDate,
+        totalTarget: data.totalTarget,
+        status: data.status,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteRevenueTarget = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  try {
+    const id = data.get("id") as string;
+
+    await prisma.revenueTarget.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
     return { success: false, error: true };
   }
 };

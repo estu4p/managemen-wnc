@@ -87,16 +87,18 @@ export const Columns: ColumnDef<RevenueTarget>[] = [
           <RevenueTargetForm
             mode="edit"
             defaultValues={{
+              id: target.id,
               title: target.title,
               category: target.category,
               totalTarget: Number(target.totalTarget),
               fromDate: target.fromDate,
               untilDate: target.untilDate,
+              status: target.status,
             }}
           />
           <RevenueTargetForm
             mode="delete"
-            defaultValues={{ title: target.title }}
+            defaultValues={{ id: target.id, title: target.title }}
           />
         </div>
       );
