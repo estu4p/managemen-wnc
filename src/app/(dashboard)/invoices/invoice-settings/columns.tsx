@@ -118,6 +118,7 @@ export const discountColumns: ColumnDef<Discount>[] = [
           <DiscountForm
             mode="edit"
             defaultValues={{
+              id: discount.id,
               title: discount.title,
               amount: Number(discount.amount),
               type: discount.type,
@@ -127,7 +128,7 @@ export const discountColumns: ColumnDef<Discount>[] = [
           />
           <DiscountForm
             mode="delete"
-            defaultValues={{ title: discount.title }}
+            defaultValues={{ id: discount.id, title: discount.title }}
           />
         </div>
       );

@@ -89,9 +89,7 @@ const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    startTransition(() => {
-      formAction(data);
-    });
+    startTransition(() => formAction(data));
   });
 
   const router = useRouter();
@@ -108,9 +106,18 @@ const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
         descriptionClassName: "text-black",
       });
       setDialogOpen(false);
-      router.refresh();
+      setTimeout(() => {
+        router.refresh();
+      }, 300);
     }
   }, [state, mode, router]);
+
+  useEffect(() => {
+    if (dialogOpen) {
+      form.reset(defaultValues);
+    }
+    console.log("buka 1");
+  }, [dialogOpen]);
 
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -175,6 +182,7 @@ const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
                         <FormLabel>Price</FormLabel>
                         <FormControl>
                           <Input
+                            placeholder="Input service price"
                             type="number"
                             {...field}
                             value={field.value ?? ""}
