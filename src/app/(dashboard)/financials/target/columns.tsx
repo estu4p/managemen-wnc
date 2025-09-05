@@ -1,5 +1,6 @@
 "use client";
 
+import DialogDelete from "@/components/form/DialogDelete";
 import DiscountForm from "@/components/form/DiscountForm";
 import RevenueTargetForm from "@/components/form/RevenueTargetForm";
 import { Progress } from "@/components/ui/progress";
@@ -96,10 +97,7 @@ export const Columns: ColumnDef<RevenueTarget>[] = [
               status: target.status,
             }}
           />
-          <RevenueTargetForm
-            mode="delete"
-            defaultValues={{ id: target.id, title: target.title }}
-          />
+          <DialogDelete table="target" title={target.title} id={target.id} />
         </div>
       );
     },

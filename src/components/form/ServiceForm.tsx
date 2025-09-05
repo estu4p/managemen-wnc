@@ -16,7 +16,7 @@ import { Input } from "../ui/input";
 import { ServiceSchema, serviceSchema } from "@/lib/formValidationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { createService, deleteService, updateService } from "@/lib/action";
+import { createService, updateService } from "@/lib/action";
 import {
   Form,
   FormControl,
@@ -30,7 +30,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 type ServiceFormProps = {
-  mode: "create" | "edit" | "delete";
+  mode: "create" | "edit";
   defaultValues?: {
     id?: number;
     name?: string;
@@ -41,29 +41,20 @@ type ServiceFormProps = {
 const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const title =
-    mode === "create"
-      ? "Add Service"
-      : mode === "edit"
-      ? "Edit Service"
-      : "Delete Service";
+  const title = mode === "create" ? "Add Service" : "Edit Service";
 
   const desc =
     mode === "create"
       ? "Create a new service by filling in the details below."
-      : mode === "edit"
-      ? "Change the service here. Click save when finished."
-      : "Are you sure you want to delete this service? This action cannot be undone.";
+      : "Change the service here. Click save when finished.";
 
   const icon =
     mode === "create" ? (
       <>
         <Plus /> Add Service
       </>
-    ) : mode === "edit" ? (
-      <SquarePen />
     ) : (
-      <Trash2 />
+      <SquarePen />
     );
 
   // const {
@@ -123,7 +114,6 @@ const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
       <DialogTrigger asChild>
         <Button
           size={mode === "create" ? "sm" : "iconXs"}
-          variant={mode === "delete" ? "destructive" : "default"}
           className="cursor-pointer"
         >
           {icon}
@@ -138,75 +128,51 @@ const ServiceForm = ({ mode, defaultValues }: ServiceFormProps) => {
         <Form {...form}>
           <form onSubmit={onSubmit} className="space-y-4">
             <>
-              {mode === "delete" ? (
-                <>
-                  <span className="font-semibold">
-                    Delete this {defaultValues?.name} service?
-                  </span>
-                </>
-              ) : (
-                <>
-                  {/* <div className="grid gap-4"> */}
-                  {/* <div className="grid gap-3">
-                      <Label htmlFor="name">Service Name</Label>
+              <FormField
+                control={form.control}
+                name="id"
+                render={({ field }) => <input type="hidden" {...field} />}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Service Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Input service name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price</FormLabel>
+                    <FormControl>
                       <Input
-                        id="name"
-                        name="name"
-                        defaultValue={defaultValues?.name ?? ""}
+                        placeholder="Input service price"
+                        type="number"
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
                       />
-                    </div> */}
-                  <FormField
-                    control={form.control}
-                    name="id"
-                    render={({ field }) => <input type="hidden" {...field} />}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Service Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Input service name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="price"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Price</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Input service price"
-                            type="number"
-                            {...field}
-                            value={field.value ?? ""}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {/* </div> */}
-                </>
-              )}
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <DialogFooter>
                 <DialogClose asChild>
                   <Button variant="outline">Cancel</Button>
                 </DialogClose>
-                {mode === "create" && <Button type="submit">Create</Button>}
-                {mode === "edit" && <Button type="submit">Save changes</Button>}
-                {mode === "delete" && (
-                  <Button type="submit" variant="destructive">
-                    Delete
-                  </Button>
+                {mode === "create" ? (
+                  <Button type="submit">Create</Button>
+                ) : (
+                  <Button type="submit">Save changes</Button>
                 )}
               </DialogFooter>
             </>

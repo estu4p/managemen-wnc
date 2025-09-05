@@ -1,5 +1,6 @@
 "use client";
 
+import DialogDelete from "@/components/form/DialogDelete";
 import DiscountForm from "@/components/form/DiscountForm";
 import ServiceForm from "@/components/form/ServiceForm";
 import { formatDate, formatRupiah } from "@/lib/format";
@@ -56,10 +57,7 @@ export const serviceColumns: ColumnDef<Service>[] = [
               price: Number(service.price),
             }}
           />
-          <ServiceForm
-            mode="delete"
-            defaultValues={{ id: service.id, name: service.name }}
-          />
+          <DialogDelete table="service" id={service.id} title={service.name} />
         </div>
       );
     },
@@ -126,9 +124,10 @@ export const discountColumns: ColumnDef<Discount>[] = [
               untilDate: discount.untilDate,
             }}
           />
-          <DiscountForm
-            mode="delete"
-            defaultValues={{ id: discount.id, title: discount.title }}
+          <DialogDelete
+            table="discount"
+            id={discount.id}
+            title={discount.title}
           />
         </div>
       );

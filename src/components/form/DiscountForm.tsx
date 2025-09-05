@@ -38,7 +38,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 type DiscountFormProps = {
-  mode: "create" | "edit" | "delete";
+  mode: "create" | "edit";
   defaultValues?: {
     id?: number;
     title?: string;
@@ -52,29 +52,20 @@ type DiscountFormProps = {
 const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const title =
-    mode === "create"
-      ? "Add Discount"
-      : mode === "edit"
-      ? "Edit Discount"
-      : "Delete Discount";
+  const title = mode === "create" ? "Add Discount" : "Edit Discount";
 
   const desc =
     mode === "create"
       ? "Create a new discount by filling in the details below."
-      : mode === "edit"
-      ? "Change the discount here. Click save when finished."
-      : "Are you sure you want to delete this discount? This action cannot be undone.";
+      : "Change the discount here. Click save when finished.";
 
   const icon =
     mode === "create" ? (
       <>
         <Plus /> Add Discount
       </>
-    ) : mode === "edit" ? (
-      <SquarePen />
     ) : (
-      <Trash2 />
+      <SquarePen />
     );
 
   const [state, formAction] = useActionState(
@@ -145,7 +136,7 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
       <DialogTrigger asChild>
         <Button
           size={mode === "create" ? "sm" : "iconXs"}
-          variant={mode === "delete" ? "destructive" : "default"}
+          className="cursor-pointer"
         >
           {icon}
         </Button>
@@ -157,137 +148,123 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={onSubmit} className="space-y-4">
-            {mode === "delete" ? (
-              <>
-                <span className="font-semibold">
-                  Delete this {defaultValues?.title} discount?
-                </span>
-              </>
-            ) : (
-              <>
-                <FormField
-                  control={form.control}
-                  name="id"
-                  render={({ field }) => <input type="hidden" {...field} />}
-                />
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Discount Title</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Input discount title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex items-center justify-between gap-3">
-                  <FormField
-                    control={form.control}
-                    name="amount"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Discount Amount</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Input discount amount"
-                            {...field}
-                            type="number"
-                            value={field.value ?? ""}
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type</FormLabel>
-                        <FormControl>
-                          <Select
-                            name="type"
-                            value={field.value ?? ""}
-                            onValueChange={field.onChange}
-                          >
-                            <SelectTrigger className="w-fit">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent id="type">
-                              <SelectItem value="PERCENTAGE">%</SelectItem>
-                              <SelectItem value="NOMINAL">K</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex items-center justify-between gap-3">
-                  <FormField
-                    control={form.control}
-                    name="fromDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Form Date</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="date"
-                            value={
-                              field.value ? formatDateForInput(field.value) : ""
-                            }
-                            onChange={(e) =>
-                              field.onChange(new Date(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="untilDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Until Date</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="date"
-                            value={
-                              field.value ? formatDateForInput(field.value) : ""
-                            }
-                            onChange={(e) =>
-                              field.onChange(new Date(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </>
-            )}
+            <FormField
+              control={form.control}
+              name="id"
+              render={({ field }) => <input type="hidden" {...field} />}
+            />
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Discount Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Input discount title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-center justify-between gap-3">
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Discount Amount</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Input discount amount"
+                        {...field}
+                        type="number"
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Type</FormLabel>
+                    <FormControl>
+                      <Select
+                        name="type"
+                        value={field.value ?? ""}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-fit">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent id="type">
+                          <SelectItem value="PERCENTAGE">%</SelectItem>
+                          <SelectItem value="NOMINAL">K</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <FormField
+                control={form.control}
+                name="fromDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Form Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
+                        value={
+                          field.value ? formatDateForInput(field.value) : ""
+                        }
+                        onChange={(e) =>
+                          field.onChange(new Date(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="untilDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Until Date</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="date"
+                        value={
+                          field.value ? formatDateForInput(field.value) : ""
+                        }
+                        onChange={(e) =>
+                          field.onChange(new Date(e.target.value))
+                        }
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <DialogFooter>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              {mode === "create" && <Button type="submit">Create</Button>}
-              {mode === "edit" && <Button type="submit">Save changes</Button>}
-              {mode === "delete" && (
-                <Button type="submit" variant="destructive">
-                  Delete
-                </Button>
+              {mode === "create" ? (
+                <Button type="submit">Create</Button>
+              ) : (
+                <Button type="submit">Save changes</Button>
               )}
             </DialogFooter>
           </form>
