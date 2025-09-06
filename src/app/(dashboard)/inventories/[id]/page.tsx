@@ -1,5 +1,6 @@
 import HeaderPage from "@/components/HeaderPage";
-import InventoryDetails from "@/components/form/InventoryForm";
+import DialogDelete from "@/components/form/DialogDelete";
+import InventoryForm from "@/components/form/InventoryForm";
 import { Button } from "@/components/ui/button";
 import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
@@ -24,15 +25,20 @@ async function InventoryDetailsPage({
     <div className="p-4 sm:px-7">
       <div className="flex justify-between items-end">
         <HeaderPage
-          title="Add New Inventory"
+          title="Inventory Details"
           desc="Add detailed inventory data."
           calendar={false}
         />
-        <Button size="sm" variant="destructive" className="mb-3">
+        {/* <Button size="sm" variant="destructive" className="mb-3">
           Delete
-        </Button>
+        </Button> */}
+        <DialogDelete
+          table="inventory"
+          id={inventoryData.id}
+          title={inventoryData.name}
+        />
       </div>
-      <InventoryDetails inventory={inventoryData} />
+      <InventoryForm mode="update" defaultValues={inventoryData} />
     </div>
   );
 }

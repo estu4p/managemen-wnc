@@ -2,6 +2,7 @@
 
 import {
   DiscountSchema,
+  InventorySchema,
   RevenueTargetSchema,
   ServiceSchema,
 } from "./formValidationSchemas";
@@ -188,10 +189,79 @@ export const deleteRevenueTarget = async (
   currentState: CurrentState,
   data: FormData
 ) => {
-  try {
-    const id = data.get("id") as string;
+  const id = data.get("id") as string;
 
+  try {
     await prisma.revenueTarget.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const createInventory = async (
+  currentState: CurrentState,
+  data: InventorySchema
+) => {
+  try {
+    await prisma.inventory.create({
+      data: {
+        name: data.name,
+        category: data.category,
+        unit: data.unit,
+        initialStock: data.initialStock,
+        currentStock: data.currentStock,
+        price: data.price,
+        photo: data.photo,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+export const updateInventory = async (
+  currentState: CurrentState,
+  data: InventorySchema
+) => {
+  try {
+    await prisma.inventory.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        category: data.category,
+        unit: data.unit,
+        initialStock: data.initialStock,
+        currentStock: data.currentStock,
+        price: data.price,
+        photo: data.photo,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+export const deleteInventory = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+
+  try {
+    await prisma.inventory.delete({
       where: {
         id: parseInt(id),
       },

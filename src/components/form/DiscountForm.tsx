@@ -207,6 +207,7 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
                         </SelectContent>
                       </Select>
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

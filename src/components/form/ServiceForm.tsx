@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, SquarePen, Trash2 } from "lucide-react";
+import { Plus, SquarePen } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Dialog,

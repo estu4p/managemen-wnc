@@ -8,6 +8,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -17,10 +18,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createInventory, updateInventory } from "@/lib/action";
 import { formatRupiah } from "@/lib/format";
+import { inventorySchema, InventorySchema } from "@/lib/formValidationSchemas";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const FormSchema = z.object({
@@ -40,26 +45,59 @@ const FormSchema = z.object({
 //   initialStock: number;
 //   currentStock: number;
 // };
+type InventoryFormProps = {
+  mode: "create" | "update";
+  defaultValues?: any;
+};
 
-const InventoryDetails = ({ inventory }: { inventory: any }) => {
-  const [isEditing, setIsEditing] = useState(false);
+const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
+  const [isEditing, setIsEditing] = useState(mode === "create");
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
+  const [state, formAction] = useActionState(
+    mode === "create" ? createInventory : updateInventory,
+    { success: false, error: false }
+  );
+
+  const form = useForm<InventorySchema>({
+    resolver: zodResolver(inventorySchema),
+    defaultValues: defaultValues ?? {
+      id: undefined,
       name: "",
-      phone: "",
+      category: "OTHER",
+      unit: "OTHER",
+      initialStock: 0,
+      currentStock: 0,
+      price: 0,
+      photo: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Form Data:", data);
-  }
+  const onSubmit = form.handleSubmit((data) => {
+    startTransition(() => formAction(data));
+  });
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.success) {
+      toast(
+        `Inventory has been ${mode === "create" ? "created" : "updated"}!`,
+        {
+          duration: 4000,
+          position: "top-center",
+          className: "font-semibold text-black",
+          descriptionClassName: "text-black",
+        }
+      );
+      mode === "create" ? router.back() : router.refresh();
+      setIsEditing(false);
+    }
+  }, [state, router, mode]);
 
   return (
     <div className="mt-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
           <div className="transition-all duration-300 ease-in-out transform space-y-4 mt-4 sm:mt-0">
             <div className="flex flex-col sm:flex-row mt-2">
               <div className="w-full lg:w-[30%]">
@@ -80,16 +118,16 @@ const InventoryDetails = ({ inventory }: { inventory: any }) => {
                             <Input
                               placeholder="Inventory name"
                               {...field}
-                              value={inventory.name}
                               disabled={!isEditing}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="category"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormLabel>
@@ -97,13 +135,14 @@ const InventoryDetails = ({ inventory }: { inventory: any }) => {
                           </FormLabel>
                           <FormControl>
                             <Select
-                              value={inventory.category}
+                              value={field.value ?? ""}
+                              onValueChange={field.onChange}
                               disabled={!isEditing}
                             >
                               <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Inventory category" />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent id="category">
                                 <SelectItem value="EQUIPMENT">
                                   Equipment
                                 </SelectItem>
@@ -115,6 +154,7 @@ const InventoryDetails = ({ inventory }: { inventory: any }) => {
                               </SelectContent>
                             </Select>
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -123,104 +163,112 @@ const InventoryDetails = ({ inventory }: { inventory: any }) => {
                   <div className="items-start">
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="price"
                       render={({ field }) => (
                         <FormItem className="w-1/2">
                           <FormLabel>Price</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="Inventory Price"
-                              {...field}
-                              value={formatRupiah(inventory.price)}
-                              disabled={!isEditing}
-                            />
+                            {isEditing ? (
+                              <Input
+                                {...field}
+                                placeholder="Inventory price"
+                                type="number"
+                                value={field.value ?? 0}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                              />
+                            ) : (
+                              <Input
+                                placeholder="Inventory price"
+                                type="text"
+                                value={
+                                  field.value ? formatRupiah(field.value) : "0"
+                                }
+                                disabled
+                              />
+                            )}
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
-                  <div className="flex gap-4 items-start">
+                  <div className="flex gap-4 items-end">
+                    {/* <div className="flex gap-2 items-end w-full"> */}
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="initialStock"
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          <FormLabel>
-                            Initial Stock{" "}
-                            <span className="text-red-700">*</span>
-                          </FormLabel>
-                          <div className="flex gap-2">
-                            <FormControl>
-                              <Input
-                                placeholder="Initial Stock"
-                                {...field}
-                                value={inventory.initialStock}
-                                disabled={!isEditing}
-                              />
-                            </FormControl>
-                            <FormControl>
-                              <Select
-                                value={inventory.unit}
-                                disabled={!isEditing}
-                              >
-                                <SelectTrigger className="w-fit">
-                                  <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="PCS">PCS</SelectItem>
-                                  <SelectItem value="LITER">LITER</SelectItem>
-                                  <SelectItem value="GRAM">GRAM</SelectItem>
-                                  <SelectItem value="METER">METER</SelectItem>
-                                  <SelectItem value="PAIRS">PAIRS</SelectItem>
-                                  <SelectItem value="BOX">BOX</SelectItem>
-                                  <SelectItem value="ROLL">ROLL</SelectItem>
-                                  <SelectItem value="OTHER">Other</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                          </div>
+                          <FormLabel>Initial Stock</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input discount amount"
+                              {...field}
+                              type="number"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                              disabled={!isEditing}
+                            />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="unit"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Select
+                              name="unit"
+                              value={field.value ?? ""}
+                              onValueChange={field.onChange}
+                              disabled={!isEditing}
+                            >
+                              <SelectTrigger className="w-fit">
+                                <SelectValue placeholder="Unit" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="PCS">PCS</SelectItem>
+                                <SelectItem value="LITER">LITER</SelectItem>
+                                <SelectItem value="GRAM">GRAM</SelectItem>
+                                <SelectItem value="METER">METER</SelectItem>
+                                <SelectItem value="PAIRS">PAIRS</SelectItem>
+                                <SelectItem value="BOX">BOX</SelectItem>
+                                <SelectItem value="ROLL">ROLL</SelectItem>
+                                <SelectItem value="OTHER">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {/* </div> */}
+                    <FormField
+                      control={form.control}
+                      name="currentStock"
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          <FormLabel>
-                            Current Stock{" "}
-                            <span className="text-red-700">*</span>
-                          </FormLabel>
-                          <div className="flex gap-2">
-                            <FormControl>
-                              <Input
-                                placeholder="Current Stock"
-                                {...field}
-                                value={inventory.currentStock}
-                                disabled={!isEditing}
-                              />
-                            </FormControl>
-                            <FormControl>
-                              <Select
-                                value={inventory.unit}
-                                disabled={!isEditing}
-                              >
-                                <SelectTrigger className="w-fit">
-                                  <SelectValue placeholder="Unit" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="PCS">PCS</SelectItem>
-                                  <SelectItem value="LITER">LITER</SelectItem>
-                                  <SelectItem value="GRAM">GRAM</SelectItem>
-                                  <SelectItem value="METER">METER</SelectItem>
-                                  <SelectItem value="PAIRS">PAIRS</SelectItem>
-                                  <SelectItem value="BOX">BOX</SelectItem>
-                                  <SelectItem value="ROLL">ROLL</SelectItem>
-                                  <SelectItem value="OTHER">Other</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                          </div>
+                          <FormLabel>Current Stock</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="Input discount amount"
+                              {...field}
+                              type="number"
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(Number(e.target.value))
+                              }
+                              disabled={!isEditing}
+                            />
+                          </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -243,6 +291,7 @@ const InventoryDetails = ({ inventory }: { inventory: any }) => {
                         size="sm"
                         className="cursor-pointer"
                         onClick={() => setIsEditing(true)}
+                        type="button"
                       >
                         Edit
                       </Button>
@@ -252,13 +301,19 @@ const InventoryDetails = ({ inventory }: { inventory: any }) => {
                           variant="destructive"
                           size="sm"
                           className="cursor-pointer"
+                          type="button"
+                          onClick={() => {
+                            form.reset(defaultValues);
+                            setIsEditing(false);
+                          }}
                         >
-                          Delete
+                          Cancel
                         </Button>
                         <Button
                           variant="default"
                           size="sm"
                           className="cursor-pointer"
+                          type="submit"
                         >
                           Save
                         </Button>
@@ -275,4 +330,4 @@ const InventoryDetails = ({ inventory }: { inventory: any }) => {
   );
 };
 
-export default InventoryDetails;
+export default InventoryForm;

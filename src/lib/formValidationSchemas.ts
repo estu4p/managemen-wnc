@@ -34,3 +34,27 @@ export const revenueTargetSchema = z.object({
 });
 
 export type RevenueTargetSchema = z.infer<typeof revenueTargetSchema>;
+
+export const inventorySchema = z.object({
+  id: z.coerce.number().optional(),
+  name: z
+    .string()
+    .min(2, { message: "Inventory name must be at least 2 character!" }),
+  category: z.enum(["EQUIPMENT", "MATERIAL", "PRODUCT", "OTHER"]),
+  unit: z.enum([
+    "PCS",
+    "LITER",
+    "GRAM",
+    "METER",
+    "PAIRS",
+    "BOX",
+    "ROLL",
+    "OTHER",
+  ]),
+  initialStock: z.number().min(1, { message: "Initial Stock is required!" }),
+  currentStock: z.number(),
+  price: z.coerce.number().min(1, { message: "Price is required!" }),
+  photo: z.string().optional(),
+});
+
+export type InventorySchema = z.infer<typeof inventorySchema>;

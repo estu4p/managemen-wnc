@@ -15,6 +15,7 @@ import {
 import { Trash2 } from "lucide-react";
 import {
   deleteDiscount,
+  deleteInventory,
   deleteRevenueTarget,
   deleteService,
 } from "@/lib/action";
@@ -25,10 +26,11 @@ const deleteActionMap = {
   service: deleteService,
   discount: deleteDiscount,
   target: deleteRevenueTarget,
+  inventory: deleteInventory,
 };
 
 type DialogDeleteProps = {
-  table: "service" | "discount" | "target";
+  table: "service" | "discount" | "target" | "inventory";
   title?: string;
   id?: number | string;
 };
@@ -44,39 +46,48 @@ const DialogDelete = ({ table, id, title }: DialogDeleteProps) => {
   const router = useRouter();
 
   useEffect(() => {
-    toast(`${title} has been deleted!`);
-    setDialogOpen(false);
-    setTimeout(() => {
-      router.refresh();
-    }, 300);
+    if (state.success) {
+      toast(`${title} has been deleted!`);
+      setDialogOpen(false);
+      setTimeout(() => {
+        ["service", "discount", "target"].includes(table)
+          ? router.refresh()
+          : (router.back(), router.refresh());
+      }, 300);
+    }
   }, [state, router]);
 
   return (
     <Dialog>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
-          <Button
-            size="iconXs"
-            variant="destructive"
-            className="cursor-pointer"
-          >
-            <Trash2 />
-          </Button>
+          {["service", "discount", "target"].includes(table) ? (
+            <Button
+              size="iconXs"
+              variant="destructive"
+              className="cursor-pointer"
+            >
+              {" "}
+              <Trash2 />{" "}
+            </Button>
+          ) : (
+            <Button size="sm" variant="destructive" className="cursor-pointer">
+              {" "}
+              Delete{" "}
+            </Button>
+          )}
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Delete {table}</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this data? This action cannot be
-              undone.
-            </DialogDescription>
+            <DialogDescription></DialogDescription>
           </DialogHeader>
           <form action={formAction} className="space-y-4">
             <input hidden name="id" defaultValue={id} />
-            <span className="font-semibold">
+            <span className="text-sm">
               Are you sure you want to delete this {title}?
             </span>
-            <DialogFooter>
+            <DialogFooter className="mt-2">
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>

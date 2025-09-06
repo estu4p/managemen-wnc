@@ -8,17 +8,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { MoveUpRight, Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { columns } from "./columns";
@@ -67,6 +59,9 @@ async function InventoriesPage(props: {
 
   const [data, count] = await prisma.$transaction([
     prisma.inventory.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       select: {
         id: true,
         name: true,
