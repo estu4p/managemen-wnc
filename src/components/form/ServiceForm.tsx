@@ -30,7 +30,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 type ServiceFormProps = {
-  mode: "create" | "edit";
+  mode: "create" | "update";
   defaultValues?: {
     id?: number;
     name?: string;

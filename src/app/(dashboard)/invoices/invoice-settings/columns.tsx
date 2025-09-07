@@ -50,7 +50,7 @@ export const serviceColumns: ColumnDef<Service>[] = [
       return (
         <div className="text-right flex gap-1.5 justify-end">
           <ServiceForm
-            mode="edit"
+            mode="update"
             defaultValues={{
               id: service.id,
               name: service.name,
@@ -114,7 +114,7 @@ export const discountColumns: ColumnDef<Discount>[] = [
       return (
         <div className="text-right flex gap-1.5 justify-end">
           <DiscountForm
-            mode="edit"
+            mode="update"
             defaultValues={{
               id: discount.id,
               title: discount.title,

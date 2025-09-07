@@ -3,25 +3,13 @@ import FiltersDropdown from "@/components/FiltersDropdown";
 import FinancialCard from "@/components/financial/FinancialCard";
 import HeaderPage from "@/components/HeaderPage";
 import Pagination from "@/components/Pagination";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { getFinancialSummary } from "@/lib/financial";
-import { formatDate, formatRupiah, formatTime } from "@/lib/format";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { MoveUpRight, Search } from "lucide-react";
-import Link from "next/link";
-import React from "react";
+import { Search } from "lucide-react";
 import { columns } from "./columns";
 
 const FilterStatusData = [
@@ -64,7 +52,7 @@ const typeLabels = {
   EXPENSE: "Expense",
 };
 
-async function FinancialDetailsPage(params: {
+async function TransactionDetailsPage(params: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const searchParams = await params.searchParams;
@@ -73,6 +61,9 @@ async function FinancialDetailsPage(params: {
 
   const [data, count, summary] = await Promise.all([
     prisma.transaction.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
@@ -92,7 +83,7 @@ async function FinancialDetailsPage(params: {
 
   return (
     <div className="p-4 sm:px-7">
-      <HeaderPage title="Financial Details" desc="" />
+      <HeaderPage title="Transaction Details" desc="" />
       <div className="flex gap-3 flex-wrap">
         <FinancialCard
           title="Total Balance"
@@ -163,4 +154,4 @@ async function FinancialDetailsPage(params: {
   );
 }
 
-export default FinancialDetailsPage;
+export default TransactionDetailsPage;

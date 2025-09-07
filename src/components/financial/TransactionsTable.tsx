@@ -6,7 +6,7 @@ import { Separator } from "../ui/separator";
 
 type Transactions = {
   id: number;
-  category: string;
+  title: string;
   amount: number;
   createdAt: Date;
 };
@@ -23,19 +23,23 @@ const TransactionsTable = ({ data }: { data: Transactions[] }) => {
         <Separator orientation="vertical" className="absolute top-0 left-10" />
         {data.map((transaction, index) => (
           <div key={index}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center w-full">
                 <div className="h-7 w-7 ">
                   <span className="font-medium">{index + 1}</span>
                 </div>
                 <div className="-space-y-1">
-                  <h5 className="font-medium">{transaction.category}</h5>
+                  <h5 className="font-medium whitespace-nowrap overflow-hidden text-ellipsis capitalize">
+                    {transaction.title}
+                  </h5>
                   <span className="text-muted-foreground text-[13px]">
                     {formatDate(transaction.createdAt)}
                   </span>
                 </div>
               </div>
-              <span className="">{formatRupiah(transaction.amount)}</span>
+              <span className="text-end">
+                {formatRupiah(transaction.amount)}
+              </span>
             </div>
             <Separator className="my-0" />
           </div>

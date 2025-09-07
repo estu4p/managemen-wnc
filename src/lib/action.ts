@@ -5,6 +5,7 @@ import {
   InventorySchema,
   RevenueTargetSchema,
   ServiceSchema,
+  TransactionSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 
@@ -262,6 +263,74 @@ export const deleteInventory = async (
 
   try {
     await prisma.inventory.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const createTransaction = async (
+  currentState: CurrentState,
+  data: TransactionSchema
+) => {
+  try {
+    await prisma.transaction.create({
+      data: {
+        id: data.id,
+        title: data.title,
+        type: data.type,
+        category: data.category,
+        amount: data.amount,
+        notes: data.notes,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateTransaction = async (
+  currentState: CurrentState,
+  data: TransactionSchema
+) => {
+  try {
+    await prisma.transaction.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        id: data.id,
+        title: data.title,
+        type: data.type,
+        category: data.category,
+        amount: data.amount,
+        notes: data.notes,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteTransaction = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.transaction.delete({
       where: {
         id: parseInt(id),
       },

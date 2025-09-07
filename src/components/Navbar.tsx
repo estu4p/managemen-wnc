@@ -63,7 +63,7 @@ const Navbar = () => {
       <div className="flex gap-3 items-center">
         <Notification data={notifications} />
         <Link
-          href="/addNote"
+          href="/financials/transactions/new"
           className="px-3 py-1 text-sm font-medium border border-gray-300 rounded-full flex items-center hover:bg-accent hover:text-accent-foreground transition-all"
         >
           Add Transaction

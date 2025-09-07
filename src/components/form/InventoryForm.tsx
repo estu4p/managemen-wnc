@@ -63,11 +63,11 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
     defaultValues: defaultValues ?? {
       id: undefined,
       name: "",
-      category: "OTHER",
+      category: "",
       unit: "OTHER",
-      initialStock: 0,
+      initialStock: undefined,
       currentStock: 0,
-      price: 0,
+      price: undefined,
       photo: "",
     },
   });
@@ -89,7 +89,7 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
           descriptionClassName: "text-black",
         }
       );
-      mode === "create" ? router.back() : router.refresh();
+      router.refresh();
       setIsEditing(false);
     }
   }, [state, router, mode]);
@@ -173,7 +173,7 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
                                 {...field}
                                 placeholder="Inventory price"
                                 type="number"
-                                value={field.value ?? 0}
+                                value={field.value ?? ""}
                                 onChange={(e) =>
                                   field.onChange(Number(e.target.value))
                                 }
@@ -304,7 +304,11 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
                           type="button"
                           onClick={() => {
                             form.reset(defaultValues);
-                            setIsEditing(false);
+                            if (mode === "create") {
+                              router.back();
+                            } else {
+                              setIsEditing(false);
+                            }
                           }}
                         >
                           Cancel

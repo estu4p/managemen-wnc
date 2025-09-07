@@ -14,7 +14,7 @@ async function FinancialsPage() {
       take: 5,
       select: {
         id: true,
-        category: true,
+        title: true,
         amount: true,
         createdAt: true,
         type: true,
@@ -28,7 +28,7 @@ async function FinancialsPage() {
 
   const transactionsData = transactions.map((transaction) => ({
     id: transaction.id,
-    category: transaction.category,
+    title: transaction.title,
     amount: Number(transaction.amount),
     createdAt: transaction.createdAt,
   }));
@@ -80,19 +80,19 @@ async function FinancialsPage() {
         <div className="bg-primary-gray rounded-md w-[230px] p-3 flex flex-col justify-between">
           <div className="">
             <h3 className="font-medium text-base leading-snug">
-              Financial Details
+              Transaction Details
             </h3>
             <p className="mt-2 leading-tight text-[13px] text-muted-foreground">
-              See your financial details to get a overview of your income and
+              See your transaction details to get a overview of your income and
               expenses.
             </p>
           </div>
-          <Link href="/financials/details">
+          <Link href="/financials/transactions/">
             <Button
               className="mt-6 w-full bg-secondary-green"
               variant="secondary"
             >
-              Details Details
+              Transaction Details
             </Button>
           </Link>
         </div>

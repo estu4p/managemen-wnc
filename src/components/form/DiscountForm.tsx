@@ -38,7 +38,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 type DiscountFormProps = {
-  mode: "create" | "edit";
+  mode: "create" | "update";
   defaultValues?: {
     id?: number;
     title?: string;

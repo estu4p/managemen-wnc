@@ -7,6 +7,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,48 +19,71 @@ import {
 } from "@/components/ui/select";
 import { formatRupiah } from "@/lib/format";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Textarea } from "../ui/textarea";
+import { createTransaction, updateTransaction } from "@/lib/action";
+import {
+  transactionSchema,
+  TransactionSchema,
+} from "@/lib/formValidationSchemas";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-const FormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  phone: z.string().min(10, {
-    message: "Phone number must be at least 10 characters.",
-  }),
-});
+type TransactionFormProps = {
+  mode: "create" | "update";
+  defaultValues?: any;
+};
 
-// type Transaction = {
-//   name: string;
-//   category: string;
-//   price: number;
-//   unit: string;
-//   initialStock: number;
-//   currentStock: number;
-// };
+const TransactionForm = ({
+  mode = "create",
+  defaultValues,
+}: TransactionFormProps) => {
+  const [isEditing, setIsEditing] = useState(mode === "create");
 
-const TransactionDetails = ({ transaction }: { transaction: any }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [state, formAction] = useActionState(
+    mode === "create" ? createTransaction : updateTransaction,
+    { success: false, error: false }
+  );
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: "",
-      phone: "",
+  const form = useForm<TransactionSchema>({
+    resolver: zodResolver(transactionSchema),
+    defaultValues: defaultValues ?? {
+      id: undefined,
+      title: "",
+      type: "",
+      amount: undefined,
+      category: "",
+      notes: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    console.log("Form Data:", data);
-  }
+  const onSubmit = form.handleSubmit((data) => {
+    startTransition(() => formAction(data));
+  });
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.success) {
+      toast(
+        `Transaction has been ${mode === "create" ? "created" : "updated"}!`,
+        {
+          duration: 4000,
+          position: "top-center",
+          className: "font-semibold text-black",
+          descriptionClassName: "text-black",
+        }
+      );
+      router.refresh();
+      setIsEditing(false);
+    }
+  }, [state, router, mode]);
 
   return (
     <div className="mt-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
           <div className="transition-all duration-300 ease-in-out transform space-y-4 mt-4 sm:mt-0">
             <div className="flex flex-col sm:flex-row mt-2">
               <div className="w-full lg:w-[30%]">
@@ -70,26 +94,26 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                   <div className="flex gap-4 items-start">
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="title"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormLabel>
-                            Name <span className="text-red-700">*</span>
+                            Title <span className="text-red-700">*</span>
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Inventory name"
+                              placeholder="Transaction name"
                               {...field}
-                              value={transaction.title}
                               disabled={!isEditing}
                             />
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="type"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormLabel>
@@ -97,11 +121,12 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                           </FormLabel>
                           <FormControl>
                             <Select
-                              value={transaction.type}
+                              value={field.value ?? ""}
+                              onValueChange={field.onChange}
                               disabled={!isEditing}
                             >
                               <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Inventory category" />
+                                <SelectValue placeholder="Transaction category" />
                               </SelectTrigger>
                               <SelectContent>
                                 <SelectItem value="INCOME">Income</SelectItem>
@@ -110,6 +135,7 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                               </SelectContent>
                             </Select>
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -118,24 +144,41 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                   <div className="flex gap-4 items-start">
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="amount"
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          <FormLabel>Amount</FormLabel>
+                          <FormLabel>
+                            Amount <span className="text-red-700">*</span>
+                          </FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="Amount"
-                              {...field}
-                              value={formatRupiah(transaction.amount)}
-                              disabled={!isEditing}
-                            />
+                            {isEditing ? (
+                              <Input
+                                {...field}
+                                placeholder="Transaction price"
+                                type="number"
+                                value={field.value ?? ""}
+                                onChange={(e) =>
+                                  field.onChange(Number(e.target.value))
+                                }
+                              />
+                            ) : (
+                              <Input
+                                placeholder="Transaction price"
+                                type="text"
+                                value={
+                                  field.value ? formatRupiah(field.value) : "0"
+                                }
+                                disabled
+                              />
+                            )}
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="category"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormLabel>
@@ -143,11 +186,12 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                           </FormLabel>
                           <FormControl>
                             <Select
-                              value={transaction.category}
+                              value={field.value ?? ""}
+                              onValueChange={field.onChange}
                               disabled={!isEditing}
                             >
                               <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Inventory category" />
+                                <SelectValue placeholder="Transaction category" />
                               </SelectTrigger>
                               <SelectContent>
                                 {/* Income */}
@@ -180,6 +224,7 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                               </SelectContent>
                             </Select>
                           </FormControl>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -188,25 +233,19 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                   <div className="">
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="notes"
                       render={({ field }) => (
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem className="w-full">
-                              <FormLabel>Notes</FormLabel>
-                              <FormControl>
-                                <Textarea
-                                  placeholder="Notes"
-                                  {...field}
-                                  value={transaction.notes}
-                                  disabled={!isEditing}
-                                />
-                              </FormControl>
-                            </FormItem>
-                          )}
-                        />
+                        <FormItem className="w-full">
+                          <FormLabel>Notes</FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Notes"
+                              {...field}
+                              disabled={!isEditing}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
                       )}
                     />
                   </div>
@@ -217,6 +256,7 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                         size="sm"
                         className="cursor-pointer"
                         onClick={() => setIsEditing(true)}
+                        type="button"
                       >
                         Edit
                       </Button>
@@ -226,13 +266,23 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
                           variant="destructive"
                           size="sm"
                           className="cursor-pointer"
+                          type="button"
+                          onClick={() => {
+                            form.reset(defaultValues);
+                            if (mode === "create") {
+                              router.back();
+                            } else {
+                              setIsEditing(false);
+                            }
+                          }}
                         >
-                          Delete
+                          Cancel
                         </Button>
                         <Button
                           variant="default"
                           size="sm"
                           className="cursor-pointer"
+                          type="submit"
                         >
                           Save
                         </Button>
@@ -249,4 +299,4 @@ const TransactionDetails = ({ transaction }: { transaction: any }) => {
   );
 };
 
-export default TransactionDetails;
+export default TransactionForm;

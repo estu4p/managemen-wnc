@@ -1,4 +1,5 @@
-import TransactionDetails from "@/components/form/TransactionForm";
+import DialogDelete from "@/components/form/DialogDelete";
+import TransactionForm from "@/components/form/TransactionForm";
 import HeaderPage from "@/components/HeaderPage";
 import { Button } from "@/components/ui/button";
 import { serialize } from "@/lib/format";
@@ -25,14 +26,19 @@ async function TransactionDetailsPage({
       <div className="flex justify-between items-end">
         <HeaderPage
           title="Transaction Details"
-          desc="View and manage detailed transaction information."
+          desc="Update transaction data."
           calendar={false}
         />
-        <Button size="sm" variant="destructive" className="mb-3">
+        {/* <Button size="sm" variant="destructive" className="mb-3">
           Delete
-        </Button>
+        </Button> */}
+        <DialogDelete
+          table="transaction"
+          id={transaction.id}
+          title={transaction.title}
+        />
       </div>
-      <TransactionDetails transaction={transactionData} />
+      <TransactionForm mode="update" defaultValues={transactionData} />
     </div>
   );
 }

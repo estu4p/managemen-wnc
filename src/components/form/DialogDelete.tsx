@@ -18,6 +18,7 @@ import {
   deleteInventory,
   deleteRevenueTarget,
   deleteService,
+  deleteTransaction,
 } from "@/lib/action";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -27,10 +28,11 @@ const deleteActionMap = {
   discount: deleteDiscount,
   target: deleteRevenueTarget,
   inventory: deleteInventory,
+  transaction: deleteTransaction,
 };
 
 type DialogDeleteProps = {
-  table: "service" | "discount" | "target" | "inventory";
+  table: "service" | "discount" | "target" | "inventory" | "transaction";
   title?: string;
   id?: number | string;
 };
@@ -71,7 +73,11 @@ const DialogDelete = ({ table, id, title }: DialogDeleteProps) => {
               <Trash2 />{" "}
             </Button>
           ) : (
-            <Button size="sm" variant="destructive" className="cursor-pointer">
+            <Button
+              size="sm"
+              variant="destructive"
+              className="cursor-pointer mb-3"
+            >
               {" "}
               Delete{" "}
             </Button>
@@ -89,9 +95,15 @@ const DialogDelete = ({ table, id, title }: DialogDeleteProps) => {
             </span>
             <DialogFooter className="mt-2">
               <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" className="cursor-pointer">
+                  Cancel
+                </Button>
               </DialogClose>
-              <Button type="submit" variant="destructive">
+              <Button
+                type="submit"
+                variant="destructive"
+                className="cursor-pointer"
+              >
                 Delete
               </Button>
             </DialogFooter>
