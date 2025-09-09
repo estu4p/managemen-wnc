@@ -1,8 +1,11 @@
 "use server";
 
+import { faker } from "@faker-js/faker";
 import {
+  CustomerSchema,
   DiscountSchema,
   InventorySchema,
+  InvoiceSchema,
   RevenueTargetSchema,
   ServiceSchema,
   TransactionSchema,
@@ -44,7 +47,6 @@ export const updateService = async (
         price: data.price,
       },
     });
-    console.log(data);
 
     return { success: true, error: false };
   } catch (err) {
@@ -308,7 +310,6 @@ export const updateTransaction = async (
         id: data.id,
       },
       data: {
-        id: data.id,
         title: data.title,
         type: data.type,
         category: data.category,
@@ -331,6 +332,216 @@ export const deleteTransaction = async (
   const id = data.get("id") as string;
   try {
     await prisma.transaction.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const createCustomer = async (
+  currentState: CurrentState,
+  data: CustomerSchema
+) => {
+  try {
+    await prisma.customer.create({
+      data: {
+        id: data.id ?? `cust-${Date.now()}-${faker.number.int(9999)}`,
+        name: data.name,
+        phone: data.phone,
+        photo: data.photo,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateCustomer = async (
+  currentState: CurrentState,
+  data: CustomerSchema
+) => {
+  try {
+    await prisma.customer.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        name: data.name,
+        phone: data.phone,
+        photo: data.photo,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteCustomer = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.customer.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const createInvoice = async (
+  currentState: CurrentState,
+  data: InvoiceSchema
+) => {
+  await prisma.invoice.create({
+    data: {
+      id: data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`,
+      price: data.price,
+      addDiscount: data.addDiscount,
+      note: data.note,
+      progress: data.progress,
+      paymentStatus: data.paymentStatus,
+      paymentMethod: data.paymentMethod,
+      customer: {
+        connectOrCreate: {
+          where: { phone: data.customer.phone },
+          create: {
+            id:
+              data.customer.id ??
+              `cust-${Date.now()}-${faker.number.int(9999)}`,
+            name: data.customer.name,
+            phone: data.customer.phone,
+            photo: data.customer.photo,
+          },
+        },
+      },
+      items: {
+        create: data.items.map((item) => ({
+          name: item.name,
+          itemCategory: item.itemCategory,
+          material: item.material,
+          size: item.size,
+          color: item.color,
+          photos: item.photos,
+          note: item.note,
+          estimatedCompletion: item.estimatedCompletion,
+          progress: item.progress,
+          service: {
+            connect: item.service.map((id) => ({ id })),
+          },
+        })),
+      },
+    },
+  });
+  try {
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateInvoice = async (
+  currentState: CurrentState,
+  data: InvoiceSchema
+) => {
+  try {
+    await prisma.invoice.update({
+      where: { id: data.id },
+      data: {
+        price: data.price,
+        addDiscount: data.addDiscount,
+        note: data.note,
+        progress: data.progress,
+        paymentStatus: data.paymentStatus,
+        paymentMethod: data.paymentMethod,
+        customer: {
+          update: {
+            name: data.customer.name,
+            phone: data.customer.phone,
+            photo: data.customer.photo,
+          },
+        },
+        items: {
+          upsert: data.items.map((item) => ({
+            where: { id: item.id ?? 0 },
+            update: {
+              name: item.name,
+              itemCategory: item.itemCategory,
+              material: item.material,
+              size: item.size,
+              color: item.color,
+              photos: item.photos,
+              note: item.note,
+              estimatedCompletion: item.estimatedCompletion,
+              progress: item.progress,
+              service: {
+                set: item.service.map((id) => ({ id })),
+              },
+            },
+            create: {
+              name: item.name,
+              itemCategory: item.itemCategory,
+              material: item.material,
+              size: item.size,
+              color: item.color,
+              photos: item.photos,
+              note: item.note,
+              estimatedCompletion: item.estimatedCompletion,
+              progress: item.progress,
+              service: {
+                connect: item.service.map((id) => ({ id })),
+              },
+            },
+          })),
+        },
+      },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteInvoice = async (
+  currentState: CurrentState,
+  data: InvoiceSchema
+) => {
+  try {
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteItem = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+  try {
+    await prisma.item.delete({
       where: {
         id: parseInt(id),
       },

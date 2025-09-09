@@ -5,7 +5,7 @@ function AddNewInventoryPage() {
   return (
     <div className="p-4 sm:px-7">
       <HeaderPage
-        title="Inventory Details"
+        title="Add New Inventory"
         desc="Add detailed inventory data."
         calendar={false}
       />

@@ -5,7 +5,7 @@ function AddNewTransactionPage() {
   return (
     <div className="p-4 sm:px-7">
       <HeaderPage
-        title="Transaction Details"
+        title="Add New Transaction"
         desc="Add detailed transaction data."
         calendar={false}
       />

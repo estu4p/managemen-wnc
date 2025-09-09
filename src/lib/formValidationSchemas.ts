@@ -79,3 +79,123 @@ export const transactionSchema = z.object({
 });
 
 export type TransactionSchema = z.infer<typeof transactionSchema>;
+
+export const customerSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(2, { message: "Name must be at least 2 character!" }),
+  phone: z
+    .string()
+    .min(9, { message: "Phone number must be at least 9 character!" }),
+  photo: z.string().optional(),
+});
+
+export type CustomerSchema = z.infer<typeof customerSchema>;
+
+export const invoiceSchema = z.object({
+  id: z.string().optional(),
+  price: z.coerce.number().min(1, { message: "Price is required!" }),
+  addDiscount: z.coerce.number().optional(),
+  note: z.string().optional(),
+  progress: z.string().optional(),
+  paymentStatus: z.enum(["PAID", "UNPAID"]).optional(),
+  paymentMethod: z.enum(["CASH", "QRIS", "TRANSFER", "DEBIT", "OTHER"], {
+    message: "Payment Method is required!",
+  }),
+  customer: z.object({
+    id: z.string().optional(),
+    name: z.string().min(2, { message: "Name must be at least 2 character!" }),
+    phone: z
+      .string()
+      .min(9, { message: "Phone number must be at least 9 character!" }),
+    photo: z.string().optional(),
+  }),
+  items: z
+    .array(
+      z.object({
+        id: z.coerce.number().optional(),
+        name: z.string().min(1, { message: "Item name is required!" }),
+        itemCategory: z.enum([
+          "SHOE",
+          "BAG",
+          "HELMET",
+          "SANDAL",
+          "HAT",
+          "WALLET",
+          "OTHER",
+        ]),
+        material: z.string().optional(),
+        size: z.string().optional(),
+        color: z.string().optional(),
+        photos: z.array(z.string().url()).optional(),
+        note: z.string().optional(),
+        estimatedCompletion: z.coerce.date().optional(),
+        progress: z
+          .enum([
+            "NEW_ORDER",
+            "WAITTING",
+            "ON_PROGRESS",
+            "FINISHING",
+            "DONE",
+            "PICKED_UP",
+            "CANCELED",
+          ])
+          .optional(),
+        // invoiceId: z.string().optional(),
+        service: z
+          .array(z.number())
+          .min(1, { message: "Service is required!" }),
+      })
+    )
+    .min(1),
+});
+
+export type InvoiceSchema = z.infer<typeof invoiceSchema>;
+
+// export const invoiceSchema = z.object({
+//   id: z.string().optional(),
+//   price: z.coerce.number().min(1, { message: "Price is required!" }),
+//   addDiscount: z.coerce.number().optional(),
+//   note: z.string().optional(),
+//   progress: z.string().optional(),
+//   paymentStatus: z.enum(["PAID", "UNPAID"]).optional(),
+//   paymentMethod: z.enum(["CASH", "QRIS", "TRANSFER", "DEBIT", "OTHER"], {
+//     message: "Payment Method is required!",
+//   }),
+//   customerId: z.string().min(1, { message: "Customer is required!" }),
+// });
+
+// export type InvoiceSchema = z.infer<typeof invoiceSchema>;
+
+// export const itemSchema = z.object({
+//   id: z.coerce.number().optional(),
+//   name: z.string().min(1, { message: "Item name is required!" }),
+//   itemCategory: z.enum([
+//     "SHOE",
+//     "BAG",
+//     "HELMET",
+//     "SANDAL",
+//     "HAT",
+//     "WALLET",
+//     "OTHER",
+//   ]),
+//   material: z.string().optional(),
+//   size: z.string().optional(),
+//   color: z.string().optional(),
+//   photos: z.array(z.string().url()).optional(),
+//   note: z.string().optional(),
+//   estimatedCompletion: z.coerce.date().optional(),
+//   progress: z
+//     .enum([
+//       "NEW_ORDER",
+//       "WAITTING",
+//       "ON_PROGRESS",
+//       "FINISHING",
+//       "DONE",
+//       "PICKED_UP",
+//       "CANCELED",
+//     ])
+//     .optional(),
+//   invoiceId: z.string().optional(),
+// });
+
+// export type ItemSchema = z.infer<typeof itemSchema>;

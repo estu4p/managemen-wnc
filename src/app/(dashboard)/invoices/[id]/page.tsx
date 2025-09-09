@@ -1,5 +1,5 @@
 import HeaderPage from "@/components/HeaderPage";
-import InvoiceForm from "@/components/invoice/InvoiceForm";
+import InvoiceForm from "@/components/form/InvoiceForm";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -23,24 +23,32 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
         },
       },
       items: {
-        include: { service: true },
+        include: { service: { select: { id: true } } },
       },
       discounts: true,
     },
   });
 
+  const formInvoice = {
+    ...invoice,
+    items: invoice?.items.map((item) => ({
+      ...item,
+      service: item.service.map((s) => s.id),
+    })),
+  };
+
   if (!invoice) {
     return <h2>Invoice not found</h2>;
   }
 
-  const invoiceData = serialize(invoice);
+  const invoiceData = serialize(formInvoice);
 
   return (
     <div className="p-4 sm:px-7">
-      <div className="flex justify-between items-end">
+      <div className="flex justify-between items-end ">
         <HeaderPage
-          title="Order Details"
-          desc="View and manage order details, including items, customer information, and status updates."
+          title="Invoice Details"
+          desc="View and manage invoice details, including items, customer information, and payment information."
           calendar={false}
         />
         <div className="flex gap-2 mb-3">
@@ -65,7 +73,7 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
         </div>
       </div>
       <div className="mt-6">
-        <InvoiceForm invoice={invoiceData} />
+        <InvoiceForm mode="update" defaultValues={invoiceData} />
       </div>
     </div>
   );

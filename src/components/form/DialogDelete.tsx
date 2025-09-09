@@ -16,6 +16,7 @@ import { Trash2 } from "lucide-react";
 import {
   deleteDiscount,
   deleteInventory,
+  deleteItem,
   deleteRevenueTarget,
   deleteService,
   deleteTransaction,
@@ -29,10 +30,17 @@ const deleteActionMap = {
   target: deleteRevenueTarget,
   inventory: deleteInventory,
   transaction: deleteTransaction,
+  item: deleteItem,
 };
 
 type DialogDeleteProps = {
-  table: "service" | "discount" | "target" | "inventory" | "transaction";
+  table:
+    | "service"
+    | "discount"
+    | "target"
+    | "inventory"
+    | "transaction"
+    | "item";
   title?: string;
   id?: number | string;
 };
@@ -52,7 +60,7 @@ const DialogDelete = ({ table, id, title }: DialogDeleteProps) => {
       toast(`${title} has been deleted!`);
       setDialogOpen(false);
       setTimeout(() => {
-        ["service", "discount", "target"].includes(table)
+        ["service", "discount", "target", "item"].includes(table)
           ? router.refresh()
           : (router.back(), router.refresh());
       }, 300);
@@ -68,6 +76,7 @@ const DialogDelete = ({ table, id, title }: DialogDeleteProps) => {
               size="iconXs"
               variant="destructive"
               className="cursor-pointer"
+              type="button"
             >
               {" "}
               <Trash2 />{" "}
