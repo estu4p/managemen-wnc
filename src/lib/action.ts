@@ -411,47 +411,49 @@ export const createInvoice = async (
   currentState: CurrentState,
   data: InvoiceSchema
 ) => {
-  await prisma.invoice.create({
-    data: {
-      id: data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`,
-      price: data.price,
-      addDiscount: data.addDiscount,
-      note: data.note,
-      progress: data.progress,
-      paymentStatus: data.paymentStatus,
-      paymentMethod: data.paymentMethod,
-      customer: {
-        connectOrCreate: {
-          where: { phone: data.customer.phone },
-          create: {
-            id:
-              data.customer.id ??
-              `cust-${Date.now()}-${faker.number.int(9999)}`,
-            name: data.customer.name,
-            phone: data.customer.phone,
-            photo: data.customer.photo,
+  console.log(data);
+
+  try {
+    await prisma.invoice.create({
+      data: {
+        id: data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`,
+        price: data.price,
+        addDiscount: data.addDiscount,
+        note: data.note,
+        progress: data.progress,
+        paymentStatus: data.paymentStatus,
+        paymentMethod: data.paymentMethod,
+        customer: {
+          connectOrCreate: {
+            where: { phone: data.customer.phone },
+            create: {
+              id:
+                data.customer.id ??
+                `cust-${Date.now()}-${faker.number.int(9999)}`,
+              name: data.customer.name,
+              phone: data.customer.phone,
+              photo: data.customer.photo,
+            },
           },
         },
+        items: {
+          create: data.items.map((item) => ({
+            name: item.name,
+            itemCategory: item.itemCategory,
+            material: item.material,
+            size: item.size,
+            color: item.color,
+            photos: item.photos,
+            note: item.note,
+            estimatedCompletion: item.estimatedCompletion,
+            progress: item.progress,
+            service: {
+              connect: item.service.map((id) => ({ id })),
+            },
+          })),
+        },
       },
-      items: {
-        create: data.items.map((item) => ({
-          name: item.name,
-          itemCategory: item.itemCategory,
-          material: item.material,
-          size: item.size,
-          color: item.color,
-          photos: item.photos,
-          note: item.note,
-          estimatedCompletion: item.estimatedCompletion,
-          progress: item.progress,
-          service: {
-            connect: item.service.map((id) => ({ id })),
-          },
-        })),
-      },
-    },
-  });
-  try {
+    });
     return { success: true, error: false };
   } catch (error) {
     console.log(error);

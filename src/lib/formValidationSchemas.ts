@@ -93,7 +93,7 @@ export type CustomerSchema = z.infer<typeof customerSchema>;
 
 export const invoiceSchema = z.object({
   id: z.string().optional(),
-  price: z.coerce.number().min(1, { message: "Price is required!" }),
+  price: z.coerce.number().min(0, { message: "Price must be 0 or greater!" }),
   addDiscount: z.coerce.number().optional(),
   note: z.string().optional(),
   progress: z.string().optional(),
@@ -103,10 +103,10 @@ export const invoiceSchema = z.object({
   }),
   customer: z.object({
     id: z.string().optional(),
-    name: z.string().min(2, { message: "Name must be at least 2 character!" }),
+    name: z.string().min(2, { message: "Name must be at least 2 characters!" }),
     phone: z
       .string()
-      .min(9, { message: "Phone number must be at least 9 character!" }),
+      .min(9, { message: "Phone number must be at least 9 characters!" }),
     photo: z.string().optional(),
   }),
   items: z
@@ -140,13 +140,21 @@ export const invoiceSchema = z.object({
             "CANCELED",
           ])
           .optional(),
-        // invoiceId: z.string().optional(),
         service: z
           .array(z.number())
           .min(1, { message: "Service is required!" }),
       })
     )
-    .min(1),
+    .min(1, { message: "At least one item is required!" }),
+  discounts: z
+    .array(
+      z.object({
+        amount: z.string().regex(/^\d+(\.\d+)?$/, {
+          message: "Discount must be a number!",
+        }),
+      })
+    )
+    .optional(),
 });
 
 export type InvoiceSchema = z.infer<typeof invoiceSchema>;

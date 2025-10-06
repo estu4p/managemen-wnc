@@ -1,4 +1,5 @@
 import InvoiceForm from "@/components/form/InvoiceForm";
+import NewInvoiceForm from "@/components/form/newInfoiceForm";
 import HeaderPage from "@/components/HeaderPage";
 
 function AddNewInvoicePage() {
@@ -10,7 +11,8 @@ function AddNewInvoicePage() {
         calendar={false}
       />
       <div className="mt-6">
-        <InvoiceForm mode="update" />
+        {/* <InvoiceForm mode="update" /> */}
+        <NewInvoiceForm />
       </div>
     </div>
   );

@@ -20,21 +20,19 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronsUpDown, Plus, SquarePen } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { formatRupiah } from "@/lib/format";
-import { createInvoice, updateInvoice } from "@/lib/action";
+import { createInvoice } from "@/lib/action";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { invoiceSchema, InvoiceSchema } from "@/lib/formValidationSchemas";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { cn } from "@/lib/utils";
 import { Command, CommandGroup, CommandItem } from "../ui/command";
 import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import DialogDelete from "./DialogDelete";
 
 type ServiceSummary = {
   serviceId: number;
@@ -45,13 +43,10 @@ type ServiceSummary = {
 };
 
 type InvoiceFormProps = {
-  mode: "create" | "update";
   defaultValues?: any;
 };
 
-const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [customerIsEditing, setCustomerIsEditing] = useState(false);
+const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
   const [serviceList, setServiceList] = useState<any[]>([]);
   const [itemServices, setItemServices] = useState<ServiceSummary[]>([]);
   const [grandTotal, setGrandTotal] = useState(0);
@@ -59,6 +54,14 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
   const [selectedServices, setSelectedServices] = useState<{
     [itemIndex: number]: number[];
   }>({});
+  const [isLoading, setIsLoading] = useState(false);
+
+  const router = useRouter();
+
+  const [state, formAction] = useActionState(createInvoice, {
+    success: false,
+    error: false,
+  });
 
   useEffect(() => {
     fetch("/api/services")
@@ -114,7 +117,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
       [itemIndex]: selectedServiceIds,
     }));
 
-    // Update form value
     form.setValue(`items.${itemIndex}.service`, selectedServiceIds);
   };
 
@@ -135,7 +137,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     setSelectedServices(initialSelectedServices);
   }, [fields, form]);
 
-  // menghitung service summary
   const calculateServiceSummary = () => {
     const servicesSummary: ServiceSummary[] = [];
 
@@ -167,16 +168,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     // Update grand total
     const newGrandTotal = servicesSummary.reduce((sum, s) => sum + s.total, 0);
     setGrandTotal(newGrandTotal);
-
-    // Hitung diskon
-    const totalDiscountPercent =
-      defaultValues?.discounts?.reduce(
-        (sum: number, d: { amount: string }) => sum + parseFloat(d.amount),
-        0
-      ) ?? 0;
-
-    const discountValue = newGrandTotal * (totalDiscountPercent / 100);
-    setFinalTotal(newGrandTotal - discountValue);
+    setFinalTotal(newGrandTotal);
   };
 
   const handleAppendItem = () => {
@@ -194,7 +186,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
       progress: "NEW_ORDER",
       service: [],
     });
-
     setSelectedServices((prev) => ({
       ...prev,
       [newIndex]: [],
@@ -222,33 +213,75 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     });
   };
 
-  const [state, formAction] = useActionState(updateInvoice, {
-    success: false,
-    error: false,
-  });
-
-  const onSubmit = form.handleSubmit(async (data) => {
-    startTransition(async () => formAction(data));
-  });
-
-  const router = useRouter();
-
   useEffect(() => {
     if (state.success) {
-      toast.success(`Invoice has been updated!`, {
+      toast.success("Invoice has been created successfully!", {
         duration: 4000,
         position: "top-center",
         className: "font-semibold text-black",
         descriptionClassName: "text-black",
       });
       router.refresh();
-      setIsEditing(false);
+
+      // // Reset form setelah berhasil create
+      // setTimeout(() => {
+      //   form.reset({
+      //     id: undefined,
+      //     price: 0,
+      //     addDiscount: undefined,
+      //     note: "",
+      //     progress: "NEW_ORDER",
+      //     paymentStatus: "UNPAID",
+      //     paymentMethod: "CASH",
+      //     customer: {
+      //       id: undefined,
+      //       name: "",
+      //       phone: "",
+      //       photo: "",
+      //     },
+      //     items: [
+      //       {
+      //         id: undefined,
+      //         name: "",
+      //         itemCategory: "SHOE",
+      //         material: "",
+      //         size: "",
+      //         color: "",
+      //         photos: [],
+      //         note: "",
+      //         estimatedCompletion: undefined,
+      //         progress: "NEW_ORDER",
+      //         service: [],
+      //       },
+      //     ],
+      //   });
+      //   setSelectedServices({});
+      //   setItemServices([]);
+      //   setGrandTotal(0);
+      //   setFinalTotal(0);
+      // }, 1000);
     }
-  }, [state, mode]);
+  }, [state, form, router]);
+
+  const onSubmit = form.handleSubmit(
+    (data) => {
+      setIsLoading(true);
+      startTransition(() => {
+        formAction(data);
+        setIsLoading(false);
+      });
+    },
+    (errors) => {
+      toast.error("Please check the form for errors", {
+        duration: 4000,
+        position: "top-center",
+      });
+    }
+  );
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className="space-y-4" method="post">
+      <form onSubmit={onSubmit} className="space-y-4" method="POST">
         {/* Customer */}
         <div className="flex flex-col lg:flex-row">
           <div className="lg:w-[30%] flex justify-between">
@@ -256,14 +289,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
               <h2 className="font-medium">Customer</h2>
               <p className="text-muted-foreground">Input Customer Data</p>
             </div>
-            <Button
-              size="iconXs"
-              className="cursor-pointer mr-4"
-              type="button"
-              onClick={() => setCustomerIsEditing(true)}
-            >
-              <SquarePen />
-            </Button>
           </div>
           {/* Customer */}
           <div className="max-sm:w-[95%] mt-4 lg:mt-0 lg:w-[50%] max-lg:items-center max-lg:justify-center">
@@ -278,11 +303,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                       <span className="text-red-700">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="Enter customer name"
-                        {...field}
-                        disabled={!customerIsEditing}
-                      />
+                      <Input placeholder="Enter customer name" {...field} />
                     </FormControl>
                     <FormDescription>Customer name</FormDescription>
                     <FormMessage />
@@ -302,7 +323,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                       <Input
                         placeholder="Enter customer phone number"
                         {...field}
-                        disabled={!customerIsEditing}
                       />
                     </FormControl>
                     <FormDescription>Phone number has unique</FormDescription>
@@ -311,51 +331,22 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 )}
               />
             </div>
-            {/* buton customer is edditing */}
-            {customerIsEditing && (
-              <div className="mt-3 items-end flex justify-end gap-4">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  className="cursor-pointer"
-                  type="button"
-                  onClick={() => {
-                    form.reset(defaultValues);
-                    setCustomerIsEditing(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="cursor-pointer"
-                  type="button"
-                  onClick={() => setCustomerIsEditing(false)}
-                >
-                  Save
-                </Button>
-              </div>
-            )}
-            {/* end buton customer is edditing */}
           </div>
         </div>
+
         {/* Items */}
         <div>
           <Separator className="my-2" />
           <div className="flex justify-between items-center lg:w-[27%]">
             <div className="mt-4 sm:mt-0">
               <h2 className="font-medium">Item</h2>
-              <p className="text-muted-foreground">
-                {mode === "create" ? "Input Item" : "Update Item"}
-              </p>
+              <p className="text-muted-foreground">Input Item</p>
             </div>
             <Button
               variant="outline"
               size="sm"
               className="cursor-pointer"
               type="button"
-              disabled={!isEditing}
               onClick={handleAppendItem}
             >
               <Plus />
@@ -390,7 +381,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                                   placeholder="Enter item name"
                                   {...field}
                                   value={field.value ?? ""}
-                                  disabled={!isEditing}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -409,7 +399,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                                 <Select
                                   value={field.value ?? ""}
                                   onValueChange={field.onChange}
-                                  disabled={!isEditing}
                                 >
                                   <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Item category" />
@@ -450,7 +439,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                                   placeholder="Item materials"
                                   {...field}
                                   value={field.value ?? ""}
-                                  disabled={!isEditing}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -468,7 +456,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                                   placeholder="Item size"
                                   {...field}
                                   value={field.value ?? ""}
-                                  disabled={!isEditing}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -486,7 +473,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                                   placeholder="Item colors"
                                   {...field}
                                   value={field.value ?? ""}
-                                  disabled={!isEditing}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -498,7 +484,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                       <FormItem>
                         <PhotoInput />
                       </FormItem>
-
                       <FormField
                         control={form.control}
                         name={`items.${index}.service`}
@@ -513,12 +498,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                                   <Button
                                     variant="outline"
                                     role="combobox"
-                                    className={cn(
-                                      "w-full justify-between",
-                                      !field.value?.length &&
-                                        "text-muted-foreground"
-                                    )}
-                                    disabled={!isEditing}
+                                    className="w-full justify-between"
                                   >
                                     {field.value?.length
                                       ? serviceList
@@ -543,7 +523,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
 
                                         return (
                                           <CommandItem
-                                            disabled={!isEditing}
                                             key={service.id}
                                             onSelect={() => {
                                               const current: number[] =
@@ -599,7 +578,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                                 rows={1}
                                 {...field}
                                 value={field.value ?? ""}
-                                disabled={!isEditing}
                               />
                             </FormControl>
                             <FormMessage />
@@ -611,7 +589,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                           variant="destructive"
                           size="sm"
                           type="button"
-                          disabled={!isEditing}
                           onClick={() => handleRemoveItem(index)}
                         >
                           Delete
@@ -625,6 +602,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
             );
           })}
         </div>
+
         {/* Payment */}
         <div className="flex flex-col sm:flex-row">
           <div className="sm:w-[20%] lg:w-[30%]">
@@ -692,14 +670,9 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                         </FormControl>
                         <FormMessage />
                       </FormItem>
-
                       <FormItem className="w-fit">
                         <FormControl>
-                          <Select
-                            defaultValue="nominal"
-                            value={discount.type}
-                            disabled={!isEditing}
-                          >
+                          <Select defaultValue="nominal" value={discount.type}>
                             <SelectTrigger className="w-full">
                               <SelectValue placeholder="K" />
                             </SelectTrigger>
@@ -716,7 +689,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 ))}
               </div>
               <div className="flex justify-end">
-                <Button size="sm" type="button" disabled={!isEditing}>
+                <Button size="sm" type="button">
                   Add New Discount
                 </Button>
               </div>
@@ -739,7 +712,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                       <Select
                         value={field.value ?? ""}
                         onValueChange={field.onChange}
-                        disabled={!isEditing}
                       >
                         <SelectTrigger className="w-full lg:w-1/2">
                           <SelectValue placeholder="Select Payment Status" />
@@ -764,7 +736,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                       <Select
                         value={field.value ?? ""}
                         onValueChange={field.onChange}
-                        disabled={!isEditing}
                       >
                         <SelectTrigger className="w-full lg:w-1/2">
                           <SelectValue placeholder="Select Payment Method" />
@@ -794,7 +765,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                         rows={1}
                         {...field}
                         value={field.value ?? ""}
-                        disabled={!isEditing}
                       />
                     </FormControl>
                     <FormMessage />
@@ -805,57 +775,35 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
           </div>
         </div>
         <div className="flex justify-end gap-4 mr-0 lg:mr-28">
-          {!isEditing ? (
-            <Button
-              variant="default"
-              size="sm"
-              className="cursor-pointer"
-              type="button"
-              onClick={() => setIsEditing(true)}
-            >
-              Edit
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="destructive"
-                size="sm"
-                className="cursor-pointer"
-                type="button"
-                onClick={() => {
-                  form.reset(defaultValues);
-                  setIsEditing(false);
-                  setCustomerIsEditing(false);
-
-                  // Reset selected services
-                  const initialSelectedServices: {
-                    [itemIndex: number]: number[];
-                  } = {};
-                  fields.forEach((_, index) => {
-                    const serviceValue = defaultValues?.items?.[index]?.service;
-                    if (serviceValue && Array.isArray(serviceValue)) {
-                      initialSelectedServices[index] = serviceValue;
-                    }
-                  });
-                  setSelectedServices(initialSelectedServices);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                size="sm"
-                className="cursor-pointer"
-                type="submit"
-              >
-                Save
-              </Button>
-            </>
-          )}
+          <Button
+            variant="destructive"
+            size="sm"
+            className="cursor-pointer"
+            type="button"
+            onClick={() => {
+              form.reset(defaultValues);
+              setSelectedServices({});
+              setItemServices([]);
+              setGrandTotal(0);
+              setFinalTotal(0);
+            }}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            className="cursor-pointer"
+            type="submit"
+            disabled={isLoading}
+          >
+            {isLoading ? "Creating..." : "Save"}
+          </Button>
         </div>
       </form>
     </Form>
   );
 };
 
-export default InvoiceForm;
+export default NewInvoiceForm;
