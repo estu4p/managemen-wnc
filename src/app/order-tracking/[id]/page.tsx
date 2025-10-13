@@ -1,5 +1,5 @@
 import DetailsNote from "@/components/note/NoteDetails";
-import { TrackingMap } from "@/components/note/TrackingMap";
+import TrackingMap from "@/components/note/TrackingMap";
 import {
   Accordion,
   AccordionContent,
@@ -9,46 +9,30 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { formatDate, formatRupiah, formatTime } from "@/lib/format";
 import { Note } from "@/lib/notes";
+import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
-const order = [
-  {
-    id: 1,
-    category: "shoes",
-    name: "Nike Air Max 270",
-    material: "Leather",
-    color: "White, Red",
-    size: "42",
-    photoBefore: [
-      "/images/shoe.jpeg",
-      "/images/shoe.jpeg",
-      "/images/shoe.jpeg",
-    ],
-    service: "Deep Clean",
-    notes: "Kotor, bau, dan berjamur",
-    status: 3,
-  },
-  {
-    id: 1,
-    category: "shoes",
-    name: "Adidas Samba",
-    material: "Suede",
-    color: "Biru, Putih",
-    size: "41",
-    image: "/images/shoe.png",
-    service: "Unyellowing Sole",
-    notes: "-",
-    status: 4,
-  },
-];
+async function NotePage({ params }: { params: { id: string } }) {
+  const id = await params.id;
 
-interface NotePreviewProps {
-  note: Note;
-}
+  const invoice = await prisma.invoice.findUnique({
+    where: { id },
+    include: {
+      customer: true,
+      items: {
+        include: { service: true },
+      },
+      discounts: true,
+    },
+  });
 
-function NotePage({ note }: NotePreviewProps) {
+  if (!invoice) {
+    return <h2>Invoice not found</h2>;
+  }
+
   return (
     <div className="flex justify-center">
       <div className="w-[40rem] min-h-screen md:m-3 p-4 rounded-md border border-border text-sm bg-background">
@@ -63,17 +47,17 @@ function NotePage({ note }: NotePreviewProps) {
         <div className="grid grid-cols-2 gap-4 mt-4 w-full ">
           <div>
             <h3>Name</h3>
-            <p className="font-medium capitalize">
-              {note.customer.name || "- - -"}
-            </p>
+            <p className="font-medium capitalize">{invoice?.customer.name}</p>
           </div>
           <div>
             <h3>Order ID</h3>
-            <p className="font-medium">{note.id || "- - -"}</p>
+            <p className="font-medium">{invoice.id}</p>
           </div>
           <div>
             <h3>Incoming Order</h3>
-            <p className="font-medium">13.29 | 01-05-2025</p>
+            <p className="font-medium">
+              {formatDate(invoice.createdAt)} | {formatTime(invoice.createdAt)}
+            </p>
           </div>
           <div>
             <h3>Estimated Completion</h3>
@@ -86,11 +70,10 @@ function NotePage({ note }: NotePreviewProps) {
           <div>
             <h3>Services</h3>
             <div className="flex"></div>
-            {note.items.map((item, index) => (
-              <span key={item.id} className="font-medium capitalize bg-red-200">
-                {item.service}
-                {index < note.items.length - 1 ? ", " : ""}
-              </span>
+            {invoice.items.map((item, index) => (
+              <li key={item.id} className="font-medium capitalize">
+                {item.name} : {item.service.map((s) => s.name).join(", ")}
+              </li>
             ))}
           </div>
         </div>
@@ -102,7 +85,7 @@ function NotePage({ note }: NotePreviewProps) {
           defaultValue={cn("item-", 0)}
           className="border border-border rounded-md mt-1"
         >
-          {note.items.map((item, index) => (
+          {invoice.items.map((item, index) => (
             <AccordionItem key={item.id} value={cn("item-", index)}>
               <AccordionTrigger className="p-2 flex items-center hover:underline-none">
                 <div className="flex gap-3 items-center">
@@ -116,11 +99,9 @@ function NotePage({ note }: NotePreviewProps) {
                     />
                   </div>
                   <div className="">
-                    <h3 className="font-medium capitalize">
-                      {item.name || "- - -"}
-                    </h3>
+                    <h3 className="font-medium capitalize">{item.name}</h3>
                     <p className="font-normal">
-                      Service: {item.service || "- - -"}
+                      Service: {item.service.map((s) => s.name).join(", ")}
                     </p>
                   </div>
                 </div>
@@ -150,54 +131,13 @@ function NotePage({ note }: NotePreviewProps) {
                       color={item.color || "- - -"}
                       materials={item.material || "- - -"}
                       size={item.size || "- - -"}
-                      notes={item.notes || "- - -"}
+                      notes={item.note || "- - -"}
                     />
                   </TabsContent>
                 </Tabs>
               </AccordionContent>
             </AccordionItem>
           ))}
-          {/* <AccordionItem value="item-2">
-            <AccordionTrigger className="p-2 flex items-center hover:underline-none">
-              <div className="flex gap-3 items-center">
-                <div className="w-[50px] h-[50px]">
-                  <Image
-                    src="/images/shoe.jpeg"
-                    alt="shoe photo"
-                    width={50}
-                    height={50}
-                    className="bg-red-200 w-full h-full object-cover"
-                  />
-                </div>
-                <div className="">
-                  <h3 className="font-medium ">Nike Air 3</h3>
-                  <p className="font-normal">Deep Clean</p>
-                </div>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-2">
-              <Tabs defaultValue="tracking">
-                <TabsList className="bg-transparent p-0 h-auto">
-                  <TabsTrigger
-                    value="tracking"
-                    className="bg-transparent rounded-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-primary data-[state=active]:shadow-none"
-                  >
-                    Tracking
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="details"
-                    className="bg-transparent rounded-none data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-b-primary data-[state=active]:shadow-none"
-                  >
-                    Details
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="tracking">Track your order</TabsContent>
-                <TabsContent value="details">
-                  Show your order details
-                </TabsContent>
-              </Tabs>
-            </AccordionContent>
-          </AccordionItem> */}
         </Accordion>
         <Separator className="my-4" />
         <h3 className="font-medium text-base">Payment</h3>
@@ -224,11 +164,15 @@ function NotePage({ note }: NotePreviewProps) {
           </div>
           <div className="grid grid-cols-2 w-full gap-4  mt-1">
             <h3 className="font-medium">Total</h3>
-            <p className="font-medium">Rp 60.000</p>
+            <p className="font-medium">{formatRupiah(Number(invoice.price))}</p>
           </div>
           <div className="grid grid-cols-2 w-full gap-4  mt-1">
             <h3 className="font-medium">Payment Status</h3>
-            <p>Unpaid</p> {/* Paid / Unpaid / Partial (Rp ...) */}
+            <p>{invoice.paymentStatus}</p>
+          </div>
+          <div className="grid grid-cols-2 w-full gap-4  mt-1">
+            <h3 className="font-medium">Payment Method</h3>
+            <p>{invoice.paymentMethod}</p>
           </div>
         </div>
         <Separator className="my-4" />

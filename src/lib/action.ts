@@ -411,12 +411,12 @@ export const createInvoice = async (
   currentState: CurrentState,
   data: InvoiceSchema
 ) => {
-  console.log(data);
-
   try {
+    const id = data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`;
+
     await prisma.invoice.create({
       data: {
-        id: data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`,
+        id,
         price: data.price,
         addDiscount: data.addDiscount,
         note: data.note,
@@ -454,7 +454,8 @@ export const createInvoice = async (
         },
       },
     });
-    return { success: true, error: false };
+
+    return { success: true, error: false, invoiceId: id };
   } catch (error) {
     console.log(error);
     return { success: false, error: true };

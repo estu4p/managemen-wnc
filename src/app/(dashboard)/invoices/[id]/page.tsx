@@ -1,13 +1,6 @@
 import HeaderPage from "@/components/HeaderPage";
 import InvoiceForm from "@/components/form/InvoiceForm";
 import { Button } from "@/components/ui/button";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { serialize } from "@/lib/format";
 import prisma from "@/lib/prisma";
 
@@ -16,14 +9,9 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
   const invoice = await prisma.invoice.findUnique({
     where: { id },
     include: {
-      customer: {
-        select: {
-          name: true,
-          phone: true,
-        },
-      },
+      customer: true,
       items: {
-        include: { service: { select: { id: true } } },
+        include: { service: true },
       },
       discounts: true,
     },
@@ -34,6 +22,10 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
     items: invoice?.items.map((item) => ({
       ...item,
       service: item.service.map((s) => s.id),
+      serviceDetail: item.service.map((s) => ({
+        id: s.id,
+        name: s.name,
+      })),
     })),
   };
 
@@ -55,21 +47,6 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
           <Button size="sm" variant="destructive">
             Delete
           </Button>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="default" size="sm">
-                Preview
-              </Button>
-            </SheetTrigger>
-            <SheetContent className="max-sm:w-[90%]">
-              <SheetTitle>Order Preview</SheetTitle>
-              <SheetDescription>
-                This is a preview of the order details. You can review the
-                customer information, items, and payment details before
-                finalizing the order.
-              </SheetDescription>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
       <div className="mt-6">

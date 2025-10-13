@@ -1,21 +1,30 @@
 "use client";
 
-import { CheckIcon, FolderCheck } from "lucide-react";
+import {
+  CircleCheck,
+  Clock,
+  Droplets,
+  FileCheck,
+  Sparkles,
+  Wind,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Progress } from "@prisma/client";
 
-// interface Step {
-//   id: number;
-//   label: string;
-//   description?: string;
-//   date?: string;
-//   completed: boolean;
-// }
+const itemProgress = [
+  Progress.NEW_ORDER,
+  Progress.WAITTING,
+  Progress.ON_PROGRESS,
+  Progress.FINISHING,
+  Progress.DONE,
+  Progress.PICKED_UP,
+];
 
 const steps = [
   {
     id: 1,
     label: "Order Received",
-    icon: FolderCheck,
+    icon: FileCheck,
     description:
       "Your order has been successfully submitted and is now registered in the system.",
     date: "Sun 19 Nov, 10.14 AM",
@@ -24,7 +33,7 @@ const steps = [
   {
     id: 2,
     label: "In Queue",
-    icon: FolderCheck,
+    icon: Clock,
     description:
       "Your order is in line and waiting for its turn to be processed.",
     date: "May 2, 2023",
@@ -33,7 +42,7 @@ const steps = [
   {
     id: 3,
     label: "Washing in Progress",
-    icon: FolderCheck,
+    icon: Droplets,
     description: "Your shoes are being cleaned using the proper method.",
     date: "May 3, 2023",
     completed: true,
@@ -41,7 +50,7 @@ const steps = [
   {
     id: 4,
     label: "Drying",
-    icon: FolderCheck,
+    icon: Wind,
     description:
       "Your shoes have been cleaned and are now being air-dried or machine-dried.",
     date: "May 4, 2023",
@@ -50,7 +59,7 @@ const steps = [
   {
     id: 5,
     label: "Finishing",
-    icon: FolderCheck,
+    icon: Sparkles,
     description: "Final touches and quality checks are in progress.",
     date: "May 5, 2023",
     completed: false,
@@ -58,7 +67,7 @@ const steps = [
   {
     id: 6,
     label: "Ready for Pickup",
-    icon: FolderCheck,
+    icon: CircleCheck,
     description:
       "Your shoes are fully cleaned and ready to be picked up or delivered.",
     date: "May 6, 2023",
@@ -66,43 +75,47 @@ const steps = [
   },
 ];
 
-// { steps }: { steps: Step[] }
-
 const TrackingMap = () => {
+  const currentProgress = Progress;
   return (
     <div className="space-y-0 mt-2">
       {steps.map((step, index) => {
         const isLast = index === steps.length - 1;
+        const IconComponent = step.icon;
 
         return (
           <div key={step.id} className="relative">
             <div className="flex items-start gap-2">
               <div className="flex flex-col items-center">
-                <div
-                  className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full border-1 z-10 ",
-                    step.completed
-                      ? "text-primary-foreground border-secondary-green"
-                      : "border-muted-foreground"
-                  )}
-                >
-                  <FolderCheck
+                {/* Circle dengan Border Gradient */}
+                <div className="relative flex p-1.5 items-center justify-center rounded-full z-10 bg-white">
+                  <div
                     className={cn(
-                      "h-5 w-5",
+                      "absolute -inset-[0.5px] rounded-full p-[3px]",
+                      step.completed
+                        ? "bg-gradient-to-b from-secondary-green/40 to-secondary-green"
+                        : "bg-gradient-to-b from-gray-400 to-gray-600"
+                    )}
+                  >
+                    <div className="w-full h-full rounded-full bg-white"></div>
+                  </div>
+                  <IconComponent
+                    className={cn(
+                      "h-4 w-4 relative z-10",
                       step.completed
                         ? "text-secondary-green"
                         : "text-muted-foreground"
                     )}
-                    strokeWidth={2}
+                    strokeWidth={3}
                   />
                 </div>
+
+                {/* Garis Putus-Putus */}
                 {!isLast && (
                   <div
                     className={cn(
-                      "w-[1px] h-14 sm:h-12",
-                      step.completed
-                        ? "bg-secondary-green"
-                        : "bg-muted-foreground"
+                      "w-[1px] h-14 sm:h-12 dashed-vertical-line",
+                      step.completed ? "text-secondary-green" : "text-gray-400"
                     )}
                   />
                 )}

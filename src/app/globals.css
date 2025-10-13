@@ -142,3 +142,10 @@
   --color-secondary-green: oklch(0.84 0.1957 125.16); */
   }
 }
+
+.dashed-vertical-line {
+  background: linear-gradient(to bottom, transparent 50%, currentColor 50%);
+  background-size: 2px 9px;
+  background-repeat: repeat-y;
+  width: 2px;
+}

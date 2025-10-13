@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import InvoiceMonitoring from "@/components/workMonitoring/InvoiceMonitoring";
 import { useSearchParams } from "next/navigation";
 import { DataTable } from "@/components/DataTable";
-import { columns } from "./(dashboard)/invoices/columns";
+import { columns } from "./invoices/columns";
 import Pagination from "@/components/Pagination";
 
 const FilterStatusData = [
@@ -44,7 +44,7 @@ type Invoice = {
   items: { name: string; service: string; status: string }[];
 };
 
-const Home = () => {
+const DashboardHome = () => {
   const [viewMode, setViewMode] = useState<"list" | "card">("list");
 
   const searchParams = useSearchParams();
@@ -135,4 +135,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default DashboardHome;

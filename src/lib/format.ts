@@ -39,3 +39,18 @@ export function formatDateForInput(date?: Date): string {
   if (!date) return "";
   return date.toISOString().split("T")[0];
 }
+
+// ubah 08xxxx jadi 628xxxx
+export function formatPhoneNumber(phone: string): string {
+  const cleaned = phone.replace(/\D/g, "");
+
+  if (cleaned.startsWith("0")) {
+    return "62" + cleaned.slice(1);
+  }
+
+  if (cleaned.startsWith("62")) {
+    return cleaned;
+  }
+
+  return "62" + cleaned;
+}
