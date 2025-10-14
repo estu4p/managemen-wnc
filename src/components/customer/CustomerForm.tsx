@@ -43,7 +43,7 @@ const statusLabels = {
   NEW_ORDER: "New Order",
   WAITTING: "Waiting",
   ON_PROGRESS: "On Progress",
-  PICKER_UP: "Ready for Pick Up", //PICK_UP
+  PICKED_UP: "Ready for Pick Up", //PICK_UP
 };
 
 const CustomerDetails = ({ customer }: { customer: any }) => {

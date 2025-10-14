@@ -20,7 +20,7 @@ const badgeVariants = cva(
         NEW_ORDER: "bg-blue-200 text-blue-500",
         WAITTING: "bg-rose-100 text-rose-500",
         ON_PROGRESS: "bg-amber-100 text-amber-500",
-        PICKER_UP: "bg-lime-100 text-lime-500",
+        PICKED_UP: "bg-lime-100 text-lime-500",
         INCOME: "bg-green-200 text-green-500",
         EXPENSE: "bg-red-200 text-red-500",
       },

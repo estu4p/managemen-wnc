@@ -556,3 +556,25 @@ export const deleteItem = async (
     return { success: false, error: true };
   }
 };
+
+export const updateProgress = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const invoiceId = data.get("id") as string;
+  const progress = data.get("progress") as string;
+
+  try {
+    await prisma.invoice.update({
+      where: {
+        id: invoiceId,
+      },
+      data: { progress },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
+    console.log(error);
+    return { success: false, error: true };
+  }
+};

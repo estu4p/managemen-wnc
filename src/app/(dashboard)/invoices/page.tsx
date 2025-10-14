@@ -10,6 +10,9 @@ import Link from "next/link";
 import { columns } from "./columns";
 import Pagination from "@/components/Pagination";
 
+// export const dynamic = "force-dynamic"; // ⬅️ ini penting
+export const revalidate = 0;
+
 const FilterStatusData = [
   {
     id: "all",

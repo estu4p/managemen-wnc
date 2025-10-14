@@ -1,12 +1,21 @@
-"use client";
-
+import { UpdateProgress } from "@/components/form/UpdateProgress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+import { updateProgress } from "@/lib/action";
 import { formatDate, formatRupiah, formatTime } from "@/lib/format";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoveUpRight } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export type Invoice = {
   id: string;
@@ -73,19 +82,10 @@ export const columns: ColumnDef<Invoice>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const progress = row.original.progress;
-      const statusLabels = {
-        NEW_ORDER: "New Order",
-        WAITTING: "Waiting",
-        ON_PROGRESS: "On Progress",
-        PICKER_UP: "Ready for Pick Up", //PICK_UP
-      };
+      const invoice = row.original;
+      const progress = invoice.progress;
 
-      return (
-        <Badge variant={progress as any}>
-          {statusLabels[progress as keyof typeof statusLabels] || progress}
-        </Badge>
-      );
+      return <UpdateProgress id={invoice.id} progress={progress} />;
     },
   },
   {
