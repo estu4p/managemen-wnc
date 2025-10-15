@@ -21,29 +21,33 @@ const TransactionsTable = ({ data }: { data: Transactions[] }) => {
       </CardHeader>
       <CardContent className="px-4 space-y-2 relative">
         <Separator orientation="vertical" className="absolute top-0 left-10" />
-        {data.map((transaction, index) => (
-          <div key={index}>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center w-full">
-                <div className="h-7 w-7 ">
-                  <span className="font-medium">{index + 1}</span>
+        {data.length > 0 ? (
+          data.map((transaction, index) => (
+            <div key={index}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center w-full">
+                  <div className="h-7 w-7 ">
+                    <span className="font-medium">{index + 1}</span>
+                  </div>
+                  <div className="-space-y-1">
+                    <h5 className="font-medium whitespace-nowrap overflow-hidden text-ellipsis capitalize">
+                      {transaction.title}
+                    </h5>
+                    <span className="text-muted-foreground text-[13px]">
+                      {formatDate(transaction.createdAt)}
+                    </span>
+                  </div>
                 </div>
-                <div className="-space-y-1">
-                  <h5 className="font-medium whitespace-nowrap overflow-hidden text-ellipsis capitalize">
-                    {transaction.title}
-                  </h5>
-                  <span className="text-muted-foreground text-[13px]">
-                    {formatDate(transaction.createdAt)}
-                  </span>
-                </div>
+                <span className="text-end">
+                  {formatRupiah(transaction.amount)}
+                </span>
               </div>
-              <span className="text-end">
-                {formatRupiah(transaction.amount)}
-              </span>
+              <Separator className="my-0" />
             </div>
-            <Separator className="my-0" />
-          </div>
-        ))}
+          ))
+        ) : (
+          <h2>No transaction data available yet.</h2>
+        )}
       </CardContent>
     </Card>
   );

@@ -7,10 +7,32 @@ import prisma from "@/lib/prisma";
 import FinancialChart from "@/components/financial/FinancialChart";
 import { getFinancialSummary } from "@/lib/financial";
 import RevenueTargetCard from "@/components/financial/RevenueTargetCard";
+import { MonthPicker } from "@/components/MonthPicker";
 
-async function FinancialsPage() {
+async function FinancialsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}) {
+  const params = await searchParams;
+
+  const currentMonth = new Date().getMonth() + 1; // 1-12
+  const currentYear = new Date().getFullYear();
+
+  const selectedMonth = params.month ? parseInt(params.month) : currentMonth;
+  const selectedYear = params.year ? parseInt(params.year) : currentYear;
+
+  const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+  const endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59);
+
   const [transactions, summary] = await Promise.all([
     prisma.transaction.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
       take: 5,
       select: {
         id: true,
@@ -23,7 +45,7 @@ async function FinancialsPage() {
         createdAt: "desc",
       },
     }),
-    getFinancialSummary(),
+    getFinancialSummary(startDate, endDate),
   ]);
 
   const transactionsData = transactions.map((transaction) => ({
@@ -31,6 +53,7 @@ async function FinancialsPage() {
     title: transaction.title,
     amount: Number(transaction.amount),
     createdAt: transaction.createdAt,
+    type: transaction.type,
   }));
 
   const revenueTargets = await prisma.revenueTarget.findMany({
@@ -48,10 +71,16 @@ async function FinancialsPage() {
     <div className="px-4 sm:ps-7 flex flex-col lg:flex-row gap-4 lg:gap-0">
       {/* left */}
       <div className="pt-4 lg:border-r lg:border-r-border w-full lg:pr-3">
-        <HeaderPage
-          title="Financial Reports"
-          desc="Detailed overview of your financials situation."
-        />
+        <div className="flex items-end justify-between w-full">
+          <HeaderPage
+            title="Financial Reports"
+            desc="Detailed overview of your financials situation."
+            calendar={false}
+          />
+          <div className="mb-3">
+            <MonthPicker />
+          </div>
+        </div>
         <div className="flex gap-3 flex-wrap">
           <FinancialCard
             title="Total Balance"

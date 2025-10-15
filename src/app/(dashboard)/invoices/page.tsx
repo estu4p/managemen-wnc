@@ -83,14 +83,19 @@ async function InvoicesPage(props: {
     prisma.invoice.count(),
   ]);
 
-  const invoiceData = data.map((inv) => ({
-    id: inv.id,
-    photo: inv.customer.photo,
-    name: inv.customer.name,
-    totalPayment: Number(inv.price),
-    progress: inv.progress,
-    date: inv.createdAt,
-    items: inv.items,
+  const invoiceData = data.map((invoice) => ({
+    id: invoice.id,
+    progress: invoice.progress,
+    totalPayment: Number(invoice.price),
+    date: invoice.createdAt,
+    name: invoice.customer.name,
+    photo: invoice.customer.photo,
+    items: invoice.items.map((item) => ({
+      id: item.id,
+      name: item.name,
+      service: item.service.map((s) => s.name),
+      progress: item.progress,
+    })),
   }));
 
   return (

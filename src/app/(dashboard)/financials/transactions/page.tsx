@@ -11,6 +11,7 @@ import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Search } from "lucide-react";
 import { columns } from "./columns";
+import { MonthPicker } from "@/components/MonthPicker";
 
 const FilterStatusData = [
   {
@@ -56,19 +57,41 @@ async function TransactionDetailsPage(params: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const searchParams = await params.searchParams;
-  const { page, queryParams } = searchParams;
+  const { page, month, year, queryParams } = searchParams;
   const p = page ? parseInt(page) : 1;
+
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
+
+  const selectedMonth = month ? parseInt(month) : currentMonth;
+  const selectedYear = year ? parseInt(year) : currentYear;
+
+  const startDate = new Date(selectedYear, selectedMonth - 1, 1);
+  const endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59);
 
   const [data, count, summary] = await Promise.all([
     prisma.transaction.findMany({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
-    prisma.transaction.count(),
-    getFinancialSummary(),
+    prisma.transaction.count({
+      where: {
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    }),
+    getFinancialSummary(startDate, endDate),
   ]);
 
   const transactionData = data.map((transaction) => ({
@@ -77,13 +100,19 @@ async function TransactionDetailsPage(params: {
     type: transaction.type,
     category: transaction.category,
     amount: Number(transaction.amount),
-    // notes: transaction.notes,
     date: transaction.createdAt,
   }));
 
   return (
     <div className="p-4 sm:px-7">
-      <HeaderPage title="Transaction Details" desc="" />
+      <div className="flex items-end justify-between w-full">
+        <HeaderPage title="Transaction Details" desc="" calendar={false} />
+
+        <div className="flex justify-end mb-4">
+          <MonthPicker />
+        </div>
+      </div>
+
       <div className="flex gap-3 flex-wrap">
         <FinancialCard
           title="Total Balance"
@@ -101,6 +130,7 @@ async function TransactionDetailsPage(params: {
           statistic="-30"
         />
       </div>
+
       <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
         <ToggleGroup
           type="single"
