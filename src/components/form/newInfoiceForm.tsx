@@ -33,6 +33,7 @@ import { Command, CommandGroup, CommandItem } from "../ui/command";
 import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { calculateServiceSummary } from "@/lib/calculateServiceSummary";
 
 type ServiceSummary = {
   serviceId: number;
@@ -121,8 +122,16 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
   };
 
   useEffect(() => {
-    calculateServiceSummary();
-  }, [selectedServices, serviceList]);
+    const result = calculateServiceSummary(
+      selectedServices,
+      serviceList,
+      defaultValues?.discounts
+    );
+
+    setItemServices(result.itemServices);
+    setGrandTotal(result.grandTotal);
+    setFinalTotal(result.finalTotal);
+  }, [selectedServices, serviceList, defaultValues?.discounts]);
 
   useEffect(() => {
     const initialSelectedServices: { [itemIndex: number]: number[] } = {};
@@ -136,51 +145,6 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
 
     setSelectedServices(initialSelectedServices);
   }, [fields, form]);
-
-  // menghitung service summary
-  const calculateServiceSummary = () => {
-    const servicesSummary: ServiceSummary[] = [];
-
-    Object.values(selectedServices).forEach((serviceIds) => {
-      serviceIds.forEach((serviceId) => {
-        const service = serviceList.find((s) => s.id === serviceId);
-        if (service) {
-          const existingService = servicesSummary.find(
-            (s) => s.serviceId === serviceId
-          );
-          if (existingService) {
-            existingService.qty += 1;
-            existingService.total = existingService.qty * existingService.price;
-          } else {
-            servicesSummary.push({
-              serviceId: service.id,
-              service: service.name,
-              qty: 1,
-              price: parseFloat(service.price),
-              total: parseFloat(service.price),
-            });
-          }
-        }
-      });
-    });
-
-    setItemServices(servicesSummary);
-
-    // Update grand total
-    const newGrandTotal = servicesSummary.reduce((sum, s) => sum + s.total, 0);
-    setGrandTotal(newGrandTotal);
-
-    // Hitung diskon
-    const totalDiscountPercent =
-      defaultValues?.discounts?.reduce(
-        (sum: number, d: { amount: string }) => sum + parseFloat(d.amount),
-        0
-      ) ?? 0;
-
-    const discountValue = newGrandTotal * (totalDiscountPercent / 100);
-    const final = newGrandTotal - discountValue;
-    setFinalTotal(parseFloat(final.toFixed(2)));
-  };
 
   useEffect(() => {
     form.setValue("price", finalTotal);

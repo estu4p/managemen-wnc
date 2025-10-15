@@ -5,6 +5,7 @@ import {
   Clock,
   Droplets,
   FileCheck,
+  PackageCheck,
   Sparkles,
   Wind,
 } from "lucide-react";
@@ -18,6 +19,7 @@ const itemProgress = [
   Progress.FINISHING,
   Progress.DONE,
   Progress.PICKED_UP,
+  Progress.CANCELED,
 ];
 
 const steps = [
@@ -28,7 +30,7 @@ const steps = [
     description:
       "Your order has been successfully submitted and is now registered in the system.",
     date: "Sun 19 Nov, 10.14 AM",
-    completed: true,
+    progress: Progress.NEW_ORDER,
   },
   {
     id: 2,
@@ -37,51 +39,72 @@ const steps = [
     description:
       "Your order is in line and waiting for its turn to be processed.",
     date: "May 2, 2023",
-    completed: true,
+    progress: Progress.WAITTING,
   },
   {
     id: 3,
     label: "Washing in Progress",
     icon: Droplets,
-    description: "Your shoes are being cleaned using the proper method.",
+    description: "Your item is being cleaned using the proper method.",
     date: "May 3, 2023",
-    completed: true,
+    progress: Progress.ON_PROGRESS,
   },
+  // {
+  //   id: 4,
+  //   label: "Drying",
+  //   icon: Wind,
+  //   description:
+  //     "Your shoes have been cleaned and are now being air-dried or machine-dried.",
+  //   date: "May 4, 2023",
+  //   progress: Progress.ON_PROGRESS,
+  // },
   {
     id: 4,
-    label: "Drying",
-    icon: Wind,
-    description:
-      "Your shoes have been cleaned and are now being air-dried or machine-dried.",
-    date: "May 4, 2023",
-    completed: false,
-  },
-  {
-    id: 5,
     label: "Finishing",
     icon: Sparkles,
     description: "Final touches and quality checks are in progress.",
     date: "May 5, 2023",
-    completed: false,
+    progress: Progress.FINISHING,
   },
   {
-    id: 6,
+    id: 5,
     label: "Ready for Pickup",
     icon: CircleCheck,
     description:
-      "Your shoes are fully cleaned and ready to be picked up or delivered.",
+      "Your item is fully cleaned and ready to be picked up or delivered.",
     date: "May 6, 2023",
-    completed: false,
+    progress: Progress.DONE,
+  },
+  {
+    id: 6,
+    label: "Picked Up",
+    icon: PackageCheck,
+    description:
+      "Your item has been successfully picked up. Thank you for trusting our service!",
+    date: "May 6, 2023",
+    progress: Progress.PICKED_UP,
   },
 ];
 
-const TrackingMap = () => {
-  const currentProgress = Progress;
+const TrackingMap = ({ currentProgress }: { currentProgress: Progress }) => {
+  const getStepCompletionProgress = (
+    stepProgress: Progress,
+    current: Progress
+  ) => {
+    const currentIndex = itemProgress.indexOf(current);
+    const stepIndex = itemProgress.indexOf(stepProgress);
+    return stepIndex <= currentIndex;
+  };
+
   return (
     <div className="space-y-0 mt-2">
       {steps.map((step, index) => {
         const isLast = index === steps.length - 1;
         const IconComponent = step.icon;
+        const completed = getStepCompletionProgress(
+          step.progress,
+          currentProgress
+        );
 
         return (
           <div key={step.id} className="relative">
@@ -92,7 +115,7 @@ const TrackingMap = () => {
                   <div
                     className={cn(
                       "absolute -inset-[0.5px] rounded-full p-[3px]",
-                      step.completed
+                      completed
                         ? "bg-gradient-to-b from-secondary-green/40 to-secondary-green"
                         : "bg-gradient-to-b from-gray-400 to-gray-600"
                     )}
@@ -102,7 +125,7 @@ const TrackingMap = () => {
                   <IconComponent
                     className={cn(
                       "h-4 w-4 relative z-10",
-                      step.completed
+                      completed
                         ? "text-secondary-green"
                         : "text-muted-foreground"
                     )}
@@ -115,7 +138,7 @@ const TrackingMap = () => {
                   <div
                     className={cn(
                       "w-[1px] h-14 sm:h-12 dashed-vertical-line",
-                      step.completed ? "text-secondary-green" : "text-gray-400"
+                      completed ? "text-secondary-green" : "text-gray-400"
                     )}
                   />
                 )}
@@ -124,7 +147,7 @@ const TrackingMap = () => {
                 <p
                   className={cn(
                     "font-medium text-sm",
-                    step.completed ? "text-foreground" : "text-muted-foreground"
+                    completed ? "text-foreground" : "text-muted-foreground"
                   )}
                 >
                   {step.label}
@@ -138,9 +161,7 @@ const TrackingMap = () => {
                   <p
                     className={cn(
                       "text-xs mt-1.5 sm:mt-1",
-                      step.completed
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                      completed ? "text-foreground" : "text-muted-foreground"
                     )}
                   >
                     {step.date}

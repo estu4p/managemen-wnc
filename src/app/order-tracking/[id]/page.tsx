@@ -1,3 +1,4 @@
+import { Service } from "@/app/(dashboard)/invoices/invoice-settings/columns";
 import DetailsNote from "@/components/note/NoteDetails";
 import TrackingMap from "@/components/note/TrackingMap";
 import {
@@ -9,14 +10,16 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { calculateServiceSummary } from "@/lib/calculateServiceSummary";
 import { formatDate, formatRupiah, formatTime } from "@/lib/format";
-import { Note } from "@/lib/notes";
+import { transformInvoiceForCalculation } from "@/lib/invoiceHelper";
 import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { Progress } from "@prisma/client";
 import Image from "next/image";
 
-async function NotePage({ params }: { params: { id: string } }) {
-  const id = await params.id;
+async function NotePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   const invoice = await prisma.invoice.findUnique({
     where: { id },
@@ -32,6 +35,14 @@ async function NotePage({ params }: { params: { id: string } }) {
   if (!invoice) {
     return <h2>Invoice not found</h2>;
   }
+
+  const { selectedServices, serviceList, discounts } =
+    transformInvoiceForCalculation(invoice);
+  const serviceSummary = calculateServiceSummary(
+    selectedServices,
+    serviceList as Service[],
+    discounts
+  );
 
   return (
     <div className="flex justify-center">
@@ -61,7 +72,17 @@ async function NotePage({ params }: { params: { id: string } }) {
           </div>
           <div>
             <h3>Estimated Completion</h3>
-            <p className="font-medium">2023-10-01</p>
+            {/* <p className="font-medium">2023-10-01</p> */}
+            {invoice.items.map((item, index) => (
+              <li key={item.id} className="font-medium capitalize">
+                {item.name} :{" "}
+                {item.estimatedCompletion
+                  ? `${formatDate(item.estimatedCompletion)} | ${formatTime(
+                      item.estimatedCompletion
+                    )}`
+                  : "Belum ditentukan"}
+              </li>
+            ))}
           </div>
           <div>
             <h3>Items</h3>
@@ -123,7 +144,9 @@ async function NotePage({ params }: { params: { id: string } }) {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="tracking">
-                    <TrackingMap />
+                    <TrackingMap
+                      currentProgress={item.progress || Progress.NEW_ORDER}
+                    />
                   </TabsContent>
                   <TabsContent value="details">
                     <DetailsNote
@@ -144,22 +167,47 @@ async function NotePage({ params }: { params: { id: string } }) {
         <div className=" mt-2">
           <div className="grid grid-cols-2 w-full gap-4">
             <div>
-              <h3 className="font-medium">Subtotal</h3>
-              <p>Deep Clean (1x)</p>
-              <p>Regular Clean (1x)</p>
+              <h3 className="font-medium">Service</h3>
+              {serviceSummary.itemServices.map((service) => (
+                <p key={service.serviceId}>
+                  {service.service} ({service.qty}x)
+                </p>
+              ))}
+              {/* <p>Deep Clean (1x)</p>
+              <p>Regular Clean (1x)</p> */}
             </div>
             <div className="flex flex-col justify-end">
-              <p>Rp 40.000</p>
-              <p>Rp 35.000</p>
+              {/* <p>{formatRupiah(serviceSummary.grandTotal)}</p> */}
+              {serviceSummary.itemServices.map((service) => (
+                <p key={service.serviceId}>{formatRupiah(service.total)}</p>
+              ))}
+              {/* <p>Rp 40.000</p>
+              <p>Rp 35.000</p> */}
             </div>
           </div>
           <div className="grid grid-cols-2 w-full gap-4 mt-1">
             <div>
               <h3 className="font-medium">Discount</h3>
-              <p>Ramadhan Sale</p>
+              {invoice.discounts?.map((discount, index) => (
+                <p key={index}>{discount.title || `Discount ${index + 1}`}</p>
+              ))}
+              {(!invoice.discounts || invoice.discounts.length === 0) && (
+                <p>-</p>
+              )}
             </div>
             <div className="flex flex-col justify-end">
-              <p>20%</p>
+              {invoice.discounts?.map((discount, index) => (
+                <p key={index}>
+                  {typeof discount.amount === "object" &&
+                  "toString" in discount.amount
+                    ? parseFloat(discount.amount.toString())
+                    : parseFloat(discount.amount as string)}
+                  %
+                </p>
+              ))}
+              {(!invoice.discounts || invoice.discounts.length === 0) && (
+                <p>-</p>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-2 w-full gap-4  mt-1">

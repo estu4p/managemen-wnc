@@ -48,6 +48,7 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { watch } from "fs";
+import { calculateServiceSummary } from "@/lib/calculateServiceSummary";
 
 type ServiceSummary = {
   serviceId: number;
@@ -135,8 +136,16 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
   };
 
   useEffect(() => {
-    calculateServiceSummary();
-  }, [selectedServices, serviceList]);
+    const result = calculateServiceSummary(
+      selectedServices,
+      serviceList,
+      defaultValues?.discounts
+    );
+
+    setItemServices(result.itemServices);
+    setGrandTotal(result.grandTotal);
+    setFinalTotal(result.finalTotal);
+  }, [selectedServices, serviceList, defaultValues?.discounts]);
 
   useEffect(() => {
     const initialSelectedServices: { [itemIndex: number]: number[] } = {};
@@ -151,50 +160,50 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     setSelectedServices(initialSelectedServices);
   }, [fields, form]);
 
-  // menghitung service summary
-  const calculateServiceSummary = () => {
-    const servicesSummary: ServiceSummary[] = [];
+  // // menghitung service summary
+  // const calculateServiceSummary = () => {
+  //   const servicesSummary: ServiceSummary[] = [];
 
-    Object.values(selectedServices).forEach((serviceIds) => {
-      serviceIds.forEach((serviceId) => {
-        const service = serviceList.find((s) => s.id === serviceId);
-        if (service) {
-          const existingService = servicesSummary.find(
-            (s) => s.serviceId === serviceId
-          );
-          if (existingService) {
-            existingService.qty += 1;
-            existingService.total = existingService.qty * existingService.price;
-          } else {
-            servicesSummary.push({
-              serviceId: service.id,
-              service: service.name,
-              qty: 1,
-              price: parseFloat(service.price),
-              total: parseFloat(service.price),
-            });
-          }
-        }
-      });
-    });
+  //   Object.values(selectedServices).forEach((serviceIds) => {
+  //     serviceIds.forEach((serviceId) => {
+  //       const service = serviceList.find((s) => s.id === serviceId);
+  //       if (service) {
+  //         const existingService = servicesSummary.find(
+  //           (s) => s.serviceId === serviceId
+  //         );
+  //         if (existingService) {
+  //           existingService.qty += 1;
+  //           existingService.total = existingService.qty * existingService.price;
+  //         } else {
+  //           servicesSummary.push({
+  //             serviceId: service.id,
+  //             service: service.name,
+  //             qty: 1,
+  //             price: parseFloat(service.price),
+  //             total: parseFloat(service.price),
+  //           });
+  //         }
+  //       }
+  //     });
+  //   });
 
-    setItemServices(servicesSummary);
+  //   setItemServices(servicesSummary);
 
-    // Update grand total
-    const newGrandTotal = servicesSummary.reduce((sum, s) => sum + s.total, 0);
-    setGrandTotal(newGrandTotal);
+  //   // Update grand total
+  //   const newGrandTotal = servicesSummary.reduce((sum, s) => sum + s.total, 0);
+  //   setGrandTotal(newGrandTotal);
 
-    // Hitung diskon
-    const totalDiscountPercent =
-      defaultValues?.discounts?.reduce(
-        (sum: number, d: { amount: string }) => sum + parseFloat(d.amount),
-        0
-      ) ?? 0;
+  //   // Hitung diskon
+  //   const totalDiscountPercent =
+  //     defaultValues?.discounts?.reduce(
+  //       (sum: number, d: { amount: string }) => sum + parseFloat(d.amount),
+  //       0
+  //     ) ?? 0;
 
-    const discountValue = newGrandTotal * (totalDiscountPercent / 100);
-    const final = newGrandTotal - discountValue;
-    setFinalTotal(parseFloat(final.toFixed(2)));
-  };
+  //   const discountValue = newGrandTotal * (totalDiscountPercent / 100);
+  //   const final = newGrandTotal - discountValue;
+  //   setFinalTotal(parseFloat(final.toFixed(2)));
+  // };
 
   useEffect(() => {
     form.setValue("price", finalTotal);
@@ -282,6 +291,11 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     <>
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-4" method="post">
+          {/* id */}
+          <div className="text-base">
+            <h2 className="font-medium">Invoice ID</h2>
+            <span>#{defaultValues.id}</span>
+          </div>
           {/* Customer */}
           <div className="flex flex-col lg:flex-row">
             <div className="lg:w-[30%] flex justify-between">
@@ -642,6 +656,48 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                             </FormItem>
                           )}
                         />
+                        <FormField
+                          control={form.control}
+                          name={`items.${index}.progress`}
+                          render={({ field }) => (
+                            <FormItem className="w-full">
+                              <FormLabel>Progress</FormLabel>
+                              <FormControl>
+                                <Select
+                                  value={field.value ?? ""}
+                                  onValueChange={field.onChange}
+                                  disabled={!isEditing}
+                                >
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Item progress" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="NEW_ORDER">
+                                      New Order
+                                    </SelectItem>
+                                    <SelectItem value="WAITTING">
+                                      Waitting
+                                    </SelectItem>
+                                    <SelectItem value="ON_PROGRESS">
+                                      On Progress
+                                    </SelectItem>
+                                    <SelectItem value="FINISHING">
+                                      Finishing
+                                    </SelectItem>
+                                    <SelectItem value="DONE">Done</SelectItem>
+                                    <SelectItem value="PICKED_UP">
+                                      Picked Up
+                                    </SelectItem>
+                                    <SelectItem value="CANCELED">
+                                      Canceled
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                         <div className="flex justify-end gap-4">
                           <Button
                             variant="destructive"
@@ -759,7 +815,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 <div className="flex gap-4 w-full">
                   <Label className="w-full">Total</Label>
                   <input
-                    type="number"
+                    type="hidden"
                     value={finalTotal}
                     name="price"
                     onChange={(e) => e.target.value}
@@ -930,7 +986,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 items.map((item) => {
                   serviceMessage += `
 Layanan :
-- ${item.name} : ${item.serviceDetail.map((s) => s.name)}
+- ${item.name} : ${item.serviceDetail.map((s: { name: any }) => s.name)}
 `;
                 });
                 const paymentMethod = form.watch("paymentMethod");
