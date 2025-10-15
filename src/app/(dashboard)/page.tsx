@@ -12,6 +12,7 @@ import { useSearchParams } from "next/navigation";
 import { DataTable } from "@/components/DataTable";
 import { columns } from "./invoices/columns";
 import Pagination from "@/components/Pagination";
+import { Progress } from "@prisma/client";
 
 const FilterStatusData = [
   {
@@ -53,6 +54,7 @@ const DashboardHome = () => {
 
   const [orders, setOrders] = useState<Invoice[]>([]);
   const [count, setCount] = useState(0);
+  const [progressData, setProgressData] = useState<any[]>([]);
 
   useEffect(() => {
     fetch(`/api/invoices?page=${p}`)
@@ -63,6 +65,35 @@ const DashboardHome = () => {
       });
   }, [p]);
 
+  useEffect(() => {
+    const fetchProgressData = async () => {
+      try {
+        const res = await fetch("/api/invoices/progress");
+        const resData = await res.json();
+
+        const allProgressData = resData.data.flatMap((invoice: any) =>
+          invoice.items.map((item: any) => ({
+            name: item.name,
+            progress: item.progress,
+          }))
+        );
+
+        setProgressData(allProgressData);
+      } catch (error) {
+        console.error("Failed to fetch progress data:", error);
+      }
+    };
+
+    fetchProgressData();
+  }, []);
+
+  // const itemProgress = orders.flatMap((order) =>
+  //   order.items.map((item) => ({
+  //     name: item.name,
+  //     progress: item.progress,
+  //   }))
+  // );
+
   return (
     <div className="p-4 sm:px-7">
       <HeaderPage
@@ -71,7 +102,7 @@ const DashboardHome = () => {
       />
       {/* order data */}
       <div className="">
-        <InvoiceMonitoring data={orders} />
+        <InvoiceMonitoring data={progressData} />
       </div>
       {/*  */}
       <div className="mt-3">

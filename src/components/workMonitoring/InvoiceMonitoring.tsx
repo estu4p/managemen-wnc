@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader } from "../ui/card";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
@@ -31,20 +31,27 @@ const OrderCardData = [
 ];
 
 type Progress = {
-  id: string;
+  name: string;
   progress: string;
 };
 
 const InvoiceMonitoring = ({ data }: { data: Progress[] }) => {
-  const progressCount = data.reduce((acc, curr) => {
-    acc[curr.progress] = (acc[curr.progress] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  useEffect(() => {
+    // Hitung progress count ketika data berubah
+    const progressCount = data.reduce((acc, curr) => {
+      const progressKey =
+        curr.progress === "FINISHING" ? "ON_PROGRESS" : curr.progress;
+      acc[progressKey] = (acc[progressKey] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-  // inject count
+    setCounts(progressCount);
+  }, [data]);
+
   const cardsWithCount = OrderCardData.map((item) => ({
     ...item,
-    count: progressCount[item.key] || 0,
+    count: counts[item.key] || 0,
   }));
 
   return (
@@ -59,6 +66,7 @@ const InvoiceMonitoring = ({ data }: { data: Progress[] }) => {
           </CardHeader>
           <CardContent className="flex items-center justify-between px-4">
             <span className="font-medium text-2xl">{item.count}</span>
+            {/* <span className="font-medium text-2xl">{hi}</span> */}
             <div className={cn("p-2 rounded-full", item.bgIcon)}>
               <Image
                 src={item.icon}

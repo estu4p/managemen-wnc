@@ -19,15 +19,14 @@ type State = {
   error: boolean;
 };
 
-// Urutan progress dari yang paling lambat ke paling cepat - SESUAIKAN DENGAN DATABASE
 const progressOrder = {
   NEW_ORDER: 0,
   WAITTING: 1,
   ON_PROGRESS: 2,
   FINISHING: 3,
-  DONE: 4, // Tambahkan DONE
-  PICKED_UP: 5, // Sesuaikan urutan
-  CANCELED: 6, // Tambahkan CANCELED
+  DONE: 4,
+  PICKED_UP: 5,
+  CANCELED: 6,
 };
 
 export const UpdateProgress = ({
@@ -40,13 +39,12 @@ export const UpdateProgress = ({
   }>({});
   const [isOpen, setIsOpen] = useState(false);
 
-  // Pastikan ini sesuai dengan enum Progress di database
   const statusLabels = {
     NEW_ORDER: "New Order",
     WAITTING: "Waiting",
     ON_PROGRESS: "On Progress",
     FINISHING: "Finishing",
-    DONE: "Done", // Ubah ke "Done" untuk konsistensi
+    DONE: "Done",
     PICKED_UP: "Picked Up",
     CANCELED: "Canceled",
   };

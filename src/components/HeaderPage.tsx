@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Button } from "./ui/button";
 import { CalendarIcon, ChevronDown } from "lucide-react";
@@ -14,6 +16,8 @@ const HeaderPage = ({
   desc: string;
   calendar?: boolean;
 }) => {
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-end justify-between mb-3">
       <div className="">
@@ -30,12 +34,17 @@ const HeaderPage = ({
                 className="rounded-full font-normal p-0"
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {format(new Date(), "d MMMM yyyy")}
+                {date ? format(date, "d MMMM yyyy") : "Select Date"}
                 <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>
             <PopoverContent>
-              <Calendar />
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
             </PopoverContent>
           </Popover>
         </div>
