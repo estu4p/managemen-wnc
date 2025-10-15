@@ -41,7 +41,7 @@ type Invoice = {
   date: Date;
   name: string;
   photo: string;
-  items: { name: string; service: string; status: string }[];
+  items: { name: string; service: string; progress: string }[];
 };
 
 const DashboardHome = () => {

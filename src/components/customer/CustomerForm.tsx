@@ -43,8 +43,21 @@ const statusLabels = {
   NEW_ORDER: "New Order",
   WAITTING: "Waiting",
   ON_PROGRESS: "On Progress",
-  PICKED_UP: "Ready for Pick Up", //PICK_UP
+  FINISHING: "Finishing",
+  DONE: "Ready for Pick Up",
+  PICKED_UP: "Picked Up",
+  CANCELED: "Canceled",
 };
+
+// enum Progress {
+//   NEW_ORDER
+//   WAITTING
+//   ON_PROGRESS
+//   FINISHING
+//   DONE
+//   PICKED_UP
+//   CANCELED
+// }
 
 const CustomerDetails = ({ customer }: { customer: any }) => {
   const [isEditing, setIsEditing] = useState(false);

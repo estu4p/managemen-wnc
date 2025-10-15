@@ -71,6 +71,11 @@ async function InvoicesPage(props: {
             photo: true,
           },
         },
+        items: {
+          include: {
+            service: true,
+          },
+        },
       },
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
@@ -85,6 +90,7 @@ async function InvoicesPage(props: {
     totalPayment: Number(inv.price),
     progress: inv.progress,
     date: inv.createdAt,
+    items: inv.items,
   }));
 
   return (

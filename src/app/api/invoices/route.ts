@@ -32,9 +32,10 @@ export async function GET(request: Request) {
     name: invoice.customer.name,
     photo: invoice.customer.photo,
     items: invoice.items.map((item) => ({
+      id: item.id,
       name: item.name,
       service: item.service.map((s) => s.name),
-      status: item.progress,
+      progress: item.progress,
     })),
   }));
 

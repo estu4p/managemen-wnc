@@ -17,7 +17,10 @@ const statusLabels = {
   NEW_ORDER: "New Order",
   WAITTING: "Waiting",
   ON_PROGRESS: "On Progress",
-  PICKED_UP: "Ready for Pick Up", //PICK_UP
+  FINISHING: "Finishing",
+  DONE: "Ready for Pick Up",
+  PICKED_UP: "Picked Up",
+  CANCELED: "Canceled",
 };
 
 type Invoices = {
@@ -25,7 +28,7 @@ type Invoices = {
   name: string;
   totalPayment: number;
   date: Date;
-  items: { name: string; service: string; status: string }[];
+  items: { name: string; service: string; progress: string }[];
   notes: string;
 };
 
@@ -58,10 +61,10 @@ const OrderCard = ({
                 </CardDescription>
               </div>
             </div>
-            <Badge variant={invoice.items[0].status as any}>
+            <Badge variant={invoice.items[0].progress as any}>
               {statusLabels[
-                invoice.items[0].status as keyof typeof statusLabels
-              ] || invoice.items[0].status}
+                invoice.items[0].progress as keyof typeof statusLabels
+              ] || invoice.items[0].progress}
             </Badge>
           </CardHeader>
           <CardContent className="">

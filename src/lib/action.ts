@@ -11,6 +11,7 @@ import {
   TransactionSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
+import { Progress } from "@prisma/client";
 
 type CurrentState = { success: boolean; error: boolean };
 
@@ -562,19 +563,40 @@ export const updateProgress = async (
   data: FormData
 ) => {
   const invoiceId = data.get("id") as string;
-  const progress = data.get("progress") as string;
 
   try {
-    await prisma.invoice.update({
-      where: {
-        id: invoiceId,
-      },
-      data: { progress },
-    });
+    const itemProgresses: { itemId: number; progress: string }[] = [];
+    console.log("Updating items for invoice:", invoiceId, itemProgresses);
+
+    // Collect all item progresses from form data
+    for (const [key, value] of data.entries()) {
+      if (key.startsWith("progress_")) {
+        const itemId = parseInt(key.replace("progress_", ""));
+        if (!isNaN(itemId)) {
+          itemProgresses.push({
+            itemId,
+            progress: value as string,
+          });
+        }
+      }
+    }
+
+    // Update progress untuk masing-masing item
+    for (const itemProgress of itemProgresses) {
+      await prisma.item.update({
+        where: {
+          id: itemProgress.itemId,
+          // invoiceId: invoiceId,
+        },
+        data: {
+          progress: itemProgress.progress as Progress, // langsung gunakan string, Prisma akan handle conversion ke enum
+        },
+      });
+    }
 
     return { success: true, error: false };
   } catch (error) {
-    console.log(error);
+    console.log("Error updating progress:", error);
     return { success: false, error: true };
   }
 };
