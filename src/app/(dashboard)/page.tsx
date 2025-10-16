@@ -12,7 +12,6 @@ import { useSearchParams } from "next/navigation";
 import { DataTable } from "@/components/DataTable";
 import { columns } from "./invoices/columns";
 import Pagination from "@/components/Pagination";
-import { Progress } from "@prisma/client";
 
 const FilterStatusData = [
   {

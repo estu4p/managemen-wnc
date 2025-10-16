@@ -77,11 +77,6 @@ const menuItems = [
     url: "/inventories",
     icon: Package,
   },
-  {
-    title: "Note",
-    url: "/note",
-    icon: Search,
-  },
 ];
 
 // General items.
@@ -237,7 +232,7 @@ const AppSidebar = () => {
                   </SidebarMenuItem>
                 )
               )}
-              <SidebarSeparator className="ml-0 mt-6 bg-muted-foreground " />
+              <SidebarSeparator className="ml-0 mt-16 bg-muted-foreground " />
               <SidebarGroupLabel className="text-sm text-white mt-6 tracking-widest">
                 GENERAL
               </SidebarGroupLabel>

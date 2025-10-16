@@ -12,6 +12,8 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Search } from "lucide-react";
 import { columns } from "./columns";
 import { MonthPicker } from "@/components/MonthPicker";
+import { format } from "date-fns";
+import { ExportButton } from "@/components/ExportButton";
 
 const FilterStatusData = [
   {
@@ -68,6 +70,11 @@ async function TransactionDetailsPage(params: {
 
   const startDate = new Date(selectedYear, selectedMonth - 1, 1);
   const endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59);
+
+  const exportFilters = {
+    startDate: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
+    endDate: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
+  };
 
   const [data, count, summary] = await Promise.all([
     prisma.transaction.findMany({
@@ -173,7 +180,8 @@ async function TransactionDetailsPage(params: {
             subTitle="Category"
             className="text-sm"
           />
-          <Button size="sm">Export</Button>
+          {/* <Button size="sm">Export</Button> */}
+          <ExportButton filters={exportFilters} />
         </div>
       </div>
       <div className="container mx-auto mt-3">

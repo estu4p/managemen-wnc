@@ -109,11 +109,11 @@ async function FinancialsPage({
         <div className="bg-primary-gray rounded-md w-[230px] p-3 flex flex-col justify-between">
           <div className="">
             <h3 className="font-medium text-base leading-snug">
-              Transaction Details
+              Financial Transaction Details
             </h3>
             <p className="mt-2 leading-tight text-[13px] text-muted-foreground">
-              See your transaction details to get a overview of your income and
-              expenses.
+              View your financial transaction details to get an overview of your
+              income and expenses.
             </p>
           </div>
           <Link href="/financials/transactions/">
@@ -121,7 +121,7 @@ async function FinancialsPage({
               className="mt-6 w-full bg-secondary-green"
               variant="secondary"
             >
-              Transaction Details
+              View Transactions
             </Button>
           </Link>
         </div>

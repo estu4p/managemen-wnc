@@ -9,6 +9,17 @@ export async function GET(request: Request) {
 
   const [invoices, count] = await prisma.$transaction([
     prisma.invoice.findMany({
+      where: {
+        NOT: {
+          items: {
+            every: {
+              progress: {
+                in: ["PICKED_UP", "CANCELED"],
+              },
+            },
+          },
+        },
+      },
       orderBy: {
         createdAt: "desc",
       },
