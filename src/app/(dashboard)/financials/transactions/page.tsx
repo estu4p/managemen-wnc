@@ -14,6 +14,7 @@ import { columns } from "./columns";
 import { MonthPicker } from "@/components/MonthPicker";
 import { format } from "date-fns";
 import { ExportButton } from "@/components/ExportButton";
+import TransactionList from "@/components/financial/TransactionList";
 
 const FilterStatusData = [
   {
@@ -71,10 +72,10 @@ async function TransactionDetailsPage(params: {
   const startDate = new Date(selectedYear, selectedMonth - 1, 1);
   const endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59);
 
-  const exportFilters = {
-    startDate: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
-    endDate: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
-  };
+  // const exportFilters = {
+  //   startDate: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
+  //   endDate: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
+  // };
 
   const [data, count, summary] = await Promise.all([
     prisma.transaction.findMany({
@@ -107,7 +108,7 @@ async function TransactionDetailsPage(params: {
     type: transaction.type,
     category: transaction.category,
     amount: Number(transaction.amount),
-    date: transaction.createdAt,
+    createdAt: transaction.createdAt,
   }));
 
   return (
@@ -138,7 +139,14 @@ async function TransactionDetailsPage(params: {
         />
       </div>
 
-      <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
+      <TransactionList
+        transactions={transactionData}
+        p={p}
+        count={count}
+        endDate={endDate}
+        startDate={startDate}
+      />
+      {/* <div className="mt-3 flex items-center justify-between flex-wrap gap-3">
         <ToggleGroup
           type="single"
           className="gap-2 rounded-none text-white"
@@ -180,14 +188,13 @@ async function TransactionDetailsPage(params: {
             subTitle="Category"
             className="text-sm"
           />
-          {/* <Button size="sm">Export</Button> */}
           <ExportButton filters={exportFilters} />
         </div>
-      </div>
-      <div className="container mx-auto mt-3">
+      </div> */}
+      {/* <div className="container mx-auto mt-3">
         <DataTable columns={columns} data={transactionData} />
         <Pagination page={p} count={count} />
-      </div>
+      </div> */}
     </div>
   );
 }

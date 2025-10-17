@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDate, formatRupiah, formatTime } from "@/lib/format";
 import { ColumnDef } from "@tanstack/react-table";
-import { MoveUpRight } from "lucide-react";
+import { ArrowUpDown, MoveUpRight } from "lucide-react";
 import Link from "next/link";
 
 export type Transaction = {
@@ -13,7 +13,7 @@ export type Transaction = {
   type: string;
   category: string;
   amount: number;
-  date: Date;
+  createdAt: Date;
 };
 
 const typeLabels = {
@@ -55,17 +55,45 @@ export const columns: ColumnDef<Transaction>[] = [
   },
   {
     accessorKey: "amount",
-    header: "Amount",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-transparent"
+        >
+          Amount
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const amount = row.original.amount;
       return formatRupiah(amount);
     },
+    // sorting lebih spesifik
+    sortingFn: (rowA, rowB, columnId) => {
+      const amountA = rowA.getValue(columnId) as number;
+      const amountB = rowB.getValue(columnId) as number;
+      return amountA > amountB ? 1 : amountA < amountB ? -1 : 0;
+    },
   },
   {
-    accessorKey: "date",
-    header: "Date & Time",
+    accessorKey: "createdAt",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-primary-gray"
+        >
+          Date & Time
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      const date = row.getValue("date");
+      const date = row.getValue("createdAt");
       return (
         <>
           {formatDate(date as Date)}
@@ -74,6 +102,12 @@ export const columns: ColumnDef<Transaction>[] = [
           </span>
         </>
       );
+    },
+    // Sorting timestamp
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = new Date(rowA.getValue(columnId) as string);
+      const dateB = new Date(rowB.getValue(columnId) as string);
+      return dateA.getTime() - dateB.getTime();
     },
   },
   {
