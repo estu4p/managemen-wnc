@@ -2,29 +2,11 @@
 
 import { UpdateProgress } from "@/components/form/UpdateProgress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import { updateProgress } from "@/lib/action";
 import { formatDate, formatRupiah, formatTime } from "@/lib/format";
-import { Select } from "@radix-ui/react-select";
 import { ColumnDef } from "@tanstack/react-table";
-import { ChevronDown, MoveUpRight } from "lucide-react";
+import { ArrowUpDown, MoveUpRight } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
-import { toast } from "sonner";
 
 export type Invoice = {
   id: string;
@@ -67,15 +49,49 @@ export const columns: ColumnDef<Invoice>[] = [
   },
   {
     accessorKey: "totalPayment",
-    header: "Total Payment",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-primary-gray -ml-4"
+        >
+          Total Payment
+          <ArrowUpDown className="ml-0.5 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
-      const payment = row.original.totalPayment;
-      return <>{formatRupiah(payment) || "Rp -"}</>;
+      const totalPayment = row.original.totalPayment;
+      return formatRupiah(totalPayment);
+    },
+    // sorting lebih spesifik
+    sortingFn: (rowA, rowB, columnId) => {
+      const totalPaymentA = rowA.getValue(columnId) as number;
+      const totalPaymentB = rowB.getValue(columnId) as number;
+      return totalPaymentA > totalPaymentB
+        ? 1
+        : totalPaymentA < totalPaymentB
+        ? -1
+        : 0;
     },
   },
   {
     accessorKey: "date",
-    header: "Date & Time",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="p-0 hover:bg-primary-gray"
+        >
+          Date & Time
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
     cell: ({ row }) => {
       const date = row.getValue("date");
       return (
@@ -86,6 +102,12 @@ export const columns: ColumnDef<Invoice>[] = [
           </span>
         </>
       );
+    },
+    // Sorting timestamp
+    sortingFn: (rowA, rowB, columnId) => {
+      const dateA = new Date(rowA.getValue(columnId) as string);
+      const dateB = new Date(rowB.getValue(columnId) as string);
+      return dateA.getTime() - dateB.getTime();
     },
   },
   {

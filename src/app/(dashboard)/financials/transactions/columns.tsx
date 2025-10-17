@@ -59,8 +59,9 @@ export const columns: ColumnDef<Transaction>[] = [
       return (
         <Button
           variant="ghost"
+          size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="p-0 hover:bg-transparent"
+          className="p-0 hover:bg-primary-gray"
         >
           Amount
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -84,6 +85,7 @@ export const columns: ColumnDef<Transaction>[] = [
       return (
         <Button
           variant="ghost"
+          size="sm"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="p-0 hover:bg-primary-gray"
         >

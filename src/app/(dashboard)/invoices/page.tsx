@@ -1,5 +1,4 @@
 import { DataTable } from "@/components/DataTable";
-import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,44 +8,9 @@ import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { columns } from "./columns";
 import Pagination from "@/components/Pagination";
+import InvoiceList from "@/components/invoice/InvoiceList";
 
-// export const dynamic = "force-dynamic"; // ⬅️ ini penting
 export const revalidate = 0;
-
-const FilterStatusData = [
-  {
-    id: "all",
-    label: "All",
-  },
-  {
-    id: "soap",
-    label: "Soap",
-  },
-  {
-    id: "brush",
-    label: "Brush",
-  },
-  {
-    id: "cleaningSolution",
-    label: "Cleaning Solution",
-  },
-  {
-    id: "cloth",
-    label: "Cloth",
-  },
-  {
-    id: "spray",
-    label: "Spray",
-  },
-  {
-    id: "accessory",
-    label: "Accessory",
-  },
-  {
-    id: "package",
-    label: "Package",
-  },
-];
 
 async function InvoicesPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
@@ -113,24 +77,17 @@ async function InvoicesPage(props: {
           </Button>
         </Link>
       </div>
-      <div className="mb-3 flex items-center justify-between">
+      {/* <div className="mb-3 w-fit">
         <div className="relative">
           <Input className="text-sm bg-accent" placeholder="Search By Name" />
           <Search className="absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="flex justify-end lg:hidden">
-          <FiltersDropdown
-            filterStatusData={FilterStatusData}
-            subTitle="Category"
-            className="text-sm"
-          />
-        </div>
       </div>
       <div className="">
-        {/* <OrderTable data={invoiceData} page={p} count={count} /> */}
         <DataTable data={invoiceData} columns={columns} />
         <Pagination page={p} count={count} />
-      </div>
+      </div> */}
+      <InvoiceList invoices={invoiceData} p={p} count={count} />
     </div>
   );
 }

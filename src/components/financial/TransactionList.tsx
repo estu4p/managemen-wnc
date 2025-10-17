@@ -53,19 +53,19 @@ const TransactionList = ({
     return result;
   }, [transactions, activeFilter, debouncedSearchQuery]);
 
-  const exportFilters = {
-    startDate: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
-    endDate: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
-    search: debouncedSearchQuery.trim() || undefined,
-    type: activeFilter !== "ALL" ? activeFilter : undefined,
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
   const clearSearch = () => {
     setSearchQuery("");
+  };
+
+  const exportFilters = {
+    startDate: startDate ? format(startDate, "yyyy-MM-dd") : undefined,
+    endDate: endDate ? format(endDate, "yyyy-MM-dd") : undefined,
+    search: debouncedSearchQuery.trim() || undefined,
+    type: activeFilter !== "ALL" ? activeFilter : undefined,
   };
 
   return (
