@@ -109,35 +109,14 @@ async function InventoriesPage(props: {
           </Button>
         </Link>
       </div>
-      <div className="mb-3 flex items-center justify-between">
-        <div className="flex justify-end lg:hidden">
-          <FiltersDropdown
-            filterStatusData={FilterStatusData}
-            subTitle="Category"
-            className="text-sm"
-          />
-        </div>
-      </div>
-      <div>
-        {/* left */}
-        <div className="container mx-auto">
-          {/* <DataList
-            data={inventoryData}
-            columns={columns}
-            page={p}
-            count={count}
-            searchPlaceholder="Search by customer name..."
-            searchKey="search"
-            externalSearch={searchQuery}
-          /> */}
-          <InventoryList
-            data={inventoryData}
-            columns={columns}
-            p={p}
-            count={count}
-            searchQuery={searchQuery}
-          />
-        </div>
+      <div className="container mx-auto">
+        <InventoryList
+          data={inventoryData}
+          columns={columns}
+          p={p}
+          count={count}
+          searchQuery={searchQuery}
+        />
       </div>
     </div>
   );
