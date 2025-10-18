@@ -1,19 +1,17 @@
-import { DataTable } from "@/components/DataTable";
 import FiltersDropdown from "@/components/FiltersDropdown";
 import HeaderPage from "@/components/HeaderPage";
-import Pagination from "@/components/Pagination";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
-import React from "react";
 import { columns } from "./columns";
+import { DataList } from "@/components/DataList";
+import InventoryList from "@/components/inventory/InventoryList";
 
 const FilterStatusData = [
   {
@@ -54,11 +52,22 @@ async function InventoriesPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const searchParams = await props.searchParams;
-  const { page, ...queryParams } = searchParams;
+  const { page, search } = searchParams;
   const p = page ? parseInt(page) : 1;
+  const searchQuery = search || "";
+
+  const whereClause = searchQuery
+    ? {
+        name: {
+          contains: searchQuery,
+          mode: "insensitive" as const,
+        },
+      }
+    : {};
 
   const [data, count] = await prisma.$transaction([
     prisma.inventory.findMany({
+      where: whereClause,
       orderBy: {
         createdAt: "desc",
       },
@@ -72,7 +81,9 @@ async function InventoriesPage(props: {
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
-    prisma.inventory.count(),
+    prisma.inventory.count({
+      where: whereClause,
+    }),
   ]);
 
   const inventoryData = data.map((inv) => ({
@@ -99,10 +110,6 @@ async function InventoriesPage(props: {
         </Link>
       </div>
       <div className="mb-3 flex items-center justify-between">
-        <div className="relative">
-          <Input className="text-sm bg-accent" placeholder="Search By Name" />
-          <Search className="absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        </div>
         <div className="flex justify-end lg:hidden">
           <FiltersDropdown
             filterStatusData={FilterStatusData}
@@ -111,47 +118,25 @@ async function InventoriesPage(props: {
           />
         </div>
       </div>
-      <div className="flex gap-4">
+      <div>
         {/* left */}
         <div className="container mx-auto">
-          <DataTable columns={columns} data={inventoryData} />
-          <Pagination page={p} count={count} />
-        </div>
-        {/* right */}
-        <div className="w-fit max-lg:hidden">
-          <Card className="min-w-[180px] h-fit rounded-md py-3 gap-4">
-            <CardHeader className="gap-0 px-4 font-semibold text-base">
-              Filters
-            </CardHeader>
-            <CardContent className="px-4">
-              <span className="font-medium text-muted-foreground">
-                Category
-              </span>
-              <div className="mt-2 space-y-3">
-                {FilterStatusData.map((item) => (
-                  <div key={item.id} className="flex items-center gap-2">
-                    <Checkbox id={item.id} />
-                    <Label htmlFor={item.id}>{item.label}</Label>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-3">
-                <span className="font-medium text-muted-foreground">
-                  Filter By
-                </span>
-                <RadioGroup className="mt-2">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="recentOrder" id="recentOrder" />
-                    <Label htmlFor="recentOrder">Recent Order</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="oldOrder" id="oldOrder" />
-                    <Label htmlFor="oldOrder">Old Order</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </CardContent>
-          </Card>
+          {/* <DataList
+            data={inventoryData}
+            columns={columns}
+            page={p}
+            count={count}
+            searchPlaceholder="Search by customer name..."
+            searchKey="search"
+            externalSearch={searchQuery}
+          /> */}
+          <InventoryList
+            data={inventoryData}
+            columns={columns}
+            p={p}
+            count={count}
+            searchQuery={searchQuery}
+          />
         </div>
       </div>
     </div>

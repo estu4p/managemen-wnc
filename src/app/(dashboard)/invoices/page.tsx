@@ -1,14 +1,11 @@
-import { DataTable } from "@/components/DataTable";
 import HeaderPage from "@/components/HeaderPage";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import prisma from "@/lib/prisma";
 import { ITEM_PER_PAGE } from "@/lib/settings";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { columns } from "./columns";
-import Pagination from "@/components/Pagination";
-import InvoiceList from "@/components/invoice/InvoiceList";
+import { DataList } from "@/components/DataList";
 
 export const revalidate = 0;
 
@@ -16,11 +13,38 @@ async function InvoicesPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const searchParams = await props.searchParams;
-  const { page, ...queryParams } = searchParams;
+  const { page, search } = searchParams;
   const p = page ? parseInt(page) : 1;
+  const searchQuery = search || "";
+
+  const whereClause = searchQuery
+    ? {
+        OR: [
+          {
+            customer: {
+              name: {
+                contains: searchQuery,
+                mode: "insensitive" as const,
+              },
+            },
+          },
+          {
+            items: {
+              some: {
+                name: {
+                  contains: searchQuery,
+                  mode: "insensitive" as const,
+                },
+              },
+            },
+          },
+        ],
+      }
+    : {};
 
   const [data, count] = await prisma.$transaction([
     prisma.invoice.findMany({
+      where: whereClause,
       orderBy: {
         createdAt: "desc",
       },
@@ -44,7 +68,9 @@ async function InvoicesPage(props: {
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
-    prisma.invoice.count(),
+    prisma.invoice.count({
+      where: whereClause,
+    }),
   ]);
 
   const invoiceData = data.map((invoice) => ({
@@ -77,17 +103,16 @@ async function InvoicesPage(props: {
           </Button>
         </Link>
       </div>
-      {/* <div className="mb-3 w-fit">
-        <div className="relative">
-          <Input className="text-sm bg-accent" placeholder="Search By Name" />
-          <Search className="absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        </div>
-      </div>
-      <div className="">
-        <DataTable data={invoiceData} columns={columns} />
-        <Pagination page={p} count={count} />
-      </div> */}
-      <InvoiceList invoices={invoiceData} p={p} count={count} />
+
+      <DataList
+        data={invoiceData}
+        columns={columns}
+        page={p}
+        count={count}
+        searchPlaceholder="Search by name ..."
+        searchKey="search"
+        externalSearch={searchQuery}
+      />
     </div>
   );
 }

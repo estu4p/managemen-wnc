@@ -22,6 +22,7 @@ import Pagination from "@/components/Pagination";
 import { ITEM_PER_PAGE } from "@/lib/settings";
 import { DataTable } from "@/components/DataTable";
 import { columns } from "./columns";
+import { DataList } from "@/components/DataList";
 
 const FilterStatusData = [
   {
@@ -62,11 +63,22 @@ async function CustomersPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const searchParams = await props.searchParams;
-  const { page, ...queryParams } = searchParams;
+  const { page, search } = searchParams;
   const p = page ? parseInt(page) : 1;
+  const searchQuery = search || "";
+
+  const whereClause = searchQuery
+    ? {
+        name: {
+          contains: searchQuery,
+          mode: "insensitive" as const,
+        },
+      }
+    : {};
 
   const [data, count] = await prisma.$transaction([
     prisma.customer.findMany({
+      where: whereClause,
       orderBy: {
         createdAt: "desc",
       },
@@ -84,7 +96,9 @@ async function CustomersPage(props: {
       take: ITEM_PER_PAGE,
       skip: ITEM_PER_PAGE * (p - 1),
     }),
-    prisma.customer.count(),
+    prisma.customer.count({
+      where: whereClause,
+    }),
   ]);
 
   const customerData = data.map((cust) => ({
@@ -104,64 +118,15 @@ async function CustomersPage(props: {
         desc="Find all customer records, categorized and easy to search."
         calendar={false}
       />
-      <div className="mb-3 flex items-center justify-between">
-        <div className="relative">
-          <Input className="text-sm bg-accent" placeholder="Search By Name" />
-          <Search className="absolute top-1/2 right-3 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        </div>
-        <div className="flex justify-end lg:hidden">
-          <FiltersDropdown
-            filterStatusData={FilterStatusData}
-            subTitle="Category"
-            className="text-sm"
-          />
-        </div>
-      </div>
-      <div className="flex gap-4">
-        {/* left */}
-        {/* <div className="container mx-auto">
-          <DataTable columns={columns} data={data} />
-        </div> */}
-        <div className="container mx-auto">
-          <DataTable columns={columns} data={customerData} />
-          <Pagination page={p} count={count} />
-        </div>
-        <div className="w-fit max-lg:hidden">
-          <Card className="min-w-[180px] h-fit rounded-md py-3 gap-4">
-            <CardHeader className="gap-0 px-4 font-semibold text-base">
-              Filters
-            </CardHeader>
-            <CardContent className="px-4">
-              <span className="font-medium text-muted-foreground">
-                Category
-              </span>
-              <div className="mt-2 space-y-3">
-                {FilterStatusData.map((item) => (
-                  <div key={item.id} className="flex items-center gap-2">
-                    <Checkbox id={item.id} />
-                    <Label htmlFor={item.id}>{item.label}</Label>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-3">
-                <span className="font-medium text-muted-foreground">
-                  Filter By
-                </span>
-                <RadioGroup className="mt-2">
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="recentOrder" id="recentOrder" />
-                    <Label htmlFor="recentOrder">Recent Order</Label>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <RadioGroupItem value="oldOrder" id="oldOrder" />
-                    <Label htmlFor="oldOrder">Old Order</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      <DataList
+        data={customerData}
+        columns={columns}
+        page={p}
+        count={count}
+        searchPlaceholder="Search by customer name..."
+        searchKey="search"
+        externalSearch={searchQuery}
+      />
     </div>
   );
 }
