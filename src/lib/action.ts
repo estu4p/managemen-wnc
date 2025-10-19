@@ -9,6 +9,7 @@ import {
   RevenueTargetSchema,
   ServiceSchema,
   TransactionSchema,
+  UserSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { Progress } from "@prisma/client";
@@ -594,6 +595,48 @@ export const updateProgress = async (
       });
     }
 
+    return { success: true, error: false };
+  } catch (error) {
+    console.log("Error updating progress:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const createUser = async (
+  currentState: CurrentState,
+  data: UserSchema
+) => {
+  const id = `user-${data.id}`;
+
+  try {
+    await prisma.user.create({
+      data: {
+        id: id,
+        username: data.username,
+        name: data.name,
+        role: data.role,
+      },
+    });
+    return { success: true, error: false };
+  } catch (error) {
+    console.log("Error updating progress:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateUser = async (
+  currentState: CurrentState,
+  data: UserSchema
+) => {
+  try {
+    await prisma.user.update({
+      where: { id: data.id },
+      data: {
+        username: data.username,
+        name: data.name,
+        role: data.role,
+      },
+    });
     return { success: true, error: false };
   } catch (error) {
     console.log("Error updating progress:", error);

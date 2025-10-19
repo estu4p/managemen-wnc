@@ -23,6 +23,8 @@ const badgeVariants = cva(
         PICKED_UP: "bg-lime-100 text-lime-500",
         INCOME: "bg-green-200 text-green-500",
         EXPENSE: "bg-red-200 text-red-500",
+        green:
+          "border-transparent bg-secondary-green text-secondary-foreground [a&]:hover:bg-secondary-green/90",
       },
     },
     defaultVariants: {

@@ -159,51 +159,54 @@ export const invoiceSchema = z.object({
 
 export type InvoiceSchema = z.infer<typeof invoiceSchema>;
 
-// export const invoiceSchema = z.object({
-//   id: z.string().optional(),
-//   price: z.coerce.number().min(1, { message: "Price is required!" }),
-//   addDiscount: z.coerce.number().optional(),
-//   note: z.string().optional(),
-//   progress: z.string().optional(),
-//   paymentStatus: z.enum(["PAID", "UNPAID"]).optional(),
-//   paymentMethod: z.enum(["CASH", "QRIS", "TRANSFER", "DEBIT", "OTHER"], {
-//     message: "Payment Method is required!",
-//   }),
-//   customerId: z.string().min(1, { message: "Customer is required!" }),
-// });
+export const userSchema = z.object({
+  id: z.string().optional(),
+  username: z
+    .string()
+    .min(2, { message: "Username must be at least 2 character!" }),
+  name: z.string().min(2, { message: "Name must be at least 2 character!" }),
+  role: z.enum(["ADMIN", "SUPERADMIN"], {
+    message: "Role is required!",
+  }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters!" })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter!",
+    })
+    .regex(/[a-z]/, {
+      message: "Password must contain at least one lowercase letter!",
+    })
+    .regex(/[0-9]/, { message: "Password must contain at least one number!" })
+    .optional(),
+});
 
-// export type InvoiceSchema = z.infer<typeof invoiceSchema>;
+export type UserSchema = z.infer<typeof userSchema>;
 
-// export const itemSchema = z.object({
-//   id: z.coerce.number().optional(),
-//   name: z.string().min(1, { message: "Item name is required!" }),
-//   itemCategory: z.enum([
-//     "SHOE",
-//     "BAG",
-//     "HELMET",
-//     "SANDAL",
-//     "HAT",
-//     "WALLET",
-//     "OTHER",
-//   ]),
-//   material: z.string().optional(),
-//   size: z.string().optional(),
-//   color: z.string().optional(),
-//   photos: z.array(z.string().url()).optional(),
-//   note: z.string().optional(),
-//   estimatedCompletion: z.coerce.date().optional(),
-//   progress: z
-//     .enum([
-//       "NEW_ORDER",
-//       "WAITTING",
-//       "ON_PROGRESS",
-//       "FINISHING",
-//       "DONE",
-//       "PICKED_UP",
-//       "CANCELED",
-//     ])
-//     .optional(),
-//   invoiceId: z.string().optional(),
-// });
+// update user (password optional)
+export const userUpdateSchema = z.object({
+  id: z.string().optional(),
+  username: z
+    .string()
+    .min(2, { message: "Username must be at least 2 character!" }),
+  name: z.string().min(2, { message: "Name must be at least 2 character!" }),
+  role: z.enum(["ADMIN", "SUPERADMIN"], {
+    message: "Role is required!",
+  }),
+  password: z
+    .string()
+    .min(8, { message: "Password must be at least 8 characters!" })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter!",
+    })
+    .regex(/[a-z]/, {
+      message: "Password must contain at least one lowercase letter!",
+    })
+    .regex(/[0-9]/, { message: "Password must contain at least one number!" })
+    .optional()
+    .or(z.literal("")),
+});
 
-// export type ItemSchema = z.infer<typeof itemSchema>;
+export type UserUpdateSchema = z.infer<typeof userUpdateSchema>;
+
+// buat validasi password
