@@ -12,22 +12,23 @@ type Service = {
   price: string | number;
 };
 
-type CalculationOptions = {
-  discounts?: { amount: string }[];
+type Discount = {
+  id: number;
+  price: string;
+  type?: "PERCENTAGE" | "NOMINAL";
 };
 
 export const calculateServiceSummary = (
   selectedServices: { [itemIndex: number]: number[] },
   serviceList: Service[],
-  options?: CalculationOptions | { amount: string }[]
+  discountList: Discount[] = [],
+  selectedDiscounts: number[]
 ): {
   itemServices: ServiceSummary[];
   grandTotal: number;
   finalTotal: number;
+  totalDiscount: number;
 } => {
-  // Handle kedua format parameter
-  const discounts = Array.isArray(options) ? options : options?.discounts || [];
-
   const servicesSummary: ServiceSummary[] = [];
 
   // Hitung summary per layanan
@@ -60,21 +61,31 @@ export const calculateServiceSummary = (
     });
   });
 
-  // Hitung grand total
   const grandTotal = servicesSummary.reduce((sum, s) => sum + s.total, 0);
 
-  // Hitung diskon
-  const totalDiscountPercent = discounts.reduce(
-    (sum: number, d: { amount: string }) => sum + parseFloat(d.amount),
-    0
-  );
+  let totalDiscount = 0;
 
-  const discountValue = grandTotal * (totalDiscountPercent / 100);
-  const finalTotal = parseFloat((grandTotal - discountValue).toFixed(2));
+  selectedDiscounts.forEach((discountId) => {
+    const discount = discountList.find((d) => d.id === discountId);
+    if (discount) {
+      const discountAmount = parseFloat(discount.price);
+      if (discount?.type === "NOMINAL") {
+        totalDiscount += discountAmount;
+      } else {
+        totalDiscount += grandTotal * (discountAmount / 100);
+      }
+    }
+  });
+
+  // Pastikan discount tidak melebihi grand total
+  totalDiscount = Math.min(totalDiscount, grandTotal);
+
+  const finalTotal = Math.max(0, grandTotal - totalDiscount);
 
   return {
     itemServices: servicesSummary,
     grandTotal,
-    finalTotal,
+    finalTotal: parseFloat(finalTotal.toFixed(2)),
+    totalDiscount: parseFloat(totalDiscount.toFixed(2)),
   };
 };

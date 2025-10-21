@@ -146,15 +146,7 @@ export const invoiceSchema = z.object({
       })
     )
     .min(1, { message: "At least one item is required!" }),
-  discounts: z
-    .array(
-      z.object({
-        amount: z.string().regex(/^\d+(\.\d+)?$/, {
-          message: "Discount must be a number!",
-        }),
-      })
-    )
-    .optional(),
+  discounts: z.array(z.number()).optional(),
 });
 
 export type InvoiceSchema = z.infer<typeof invoiceSchema>;

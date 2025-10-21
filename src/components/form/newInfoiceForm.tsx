@@ -56,10 +56,12 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
     [itemIndex: number]: number[];
   }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [discountList, setDiscountList] = useState<any[]>([]);
+  const [selectedDiscounts, setSelectedDiscounts] = useState<number[]>([]);
 
   const router = useRouter();
 
-  const [state, formAction] = useActionState(createInvoice, {
+  const [state, formAction, isPending] = useActionState(createInvoice, {
     success: false,
     error: false,
   });
@@ -68,6 +70,12 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
     fetch("/api/services")
       .then((res) => res.json())
       .then((resData) => setServiceList(resData));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/discounts")
+      .then((res) => res.json())
+      .then((resData) => setDiscountList(resData));
   }, []);
 
   const form = useForm<InvoiceSchema>({
@@ -86,6 +94,7 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
         phone: "",
         photo: "",
       },
+      discounts: [],
       items: [
         {
           id: undefined,
@@ -121,17 +130,23 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
     form.setValue(`items.${itemIndex}.service`, selectedServiceIds);
   };
 
+  const handleDiscountChange = (discountIds: number[]) => {
+    setSelectedDiscounts(discountIds);
+    form.setValue("discounts", discountIds);
+  };
+
   useEffect(() => {
     const result = calculateServiceSummary(
       selectedServices,
       serviceList,
-      defaultValues?.discounts
+      discountList,
+      selectedDiscounts
     );
 
     setItemServices(result.itemServices);
     setGrandTotal(result.grandTotal);
     setFinalTotal(result.finalTotal);
-  }, [selectedServices, serviceList, defaultValues?.discounts]);
+  }, [selectedServices, serviceList, selectedDiscounts]);
 
   useEffect(() => {
     const initialSelectedServices: { [itemIndex: number]: number[] } = {};
@@ -567,16 +582,16 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
                   </div>
                   {itemServices.map((s, index) => (
                     <div key={index} className="flex gap-4 w-full">
-                      <Input value={s.service} className="w-full" disabled />
+                      <Input value={s.service} className="w-full" readOnly />
                       <Input
                         value={s.qty}
                         className="w-[10%] p-0 text-center lg:px-3 lg:py-1"
-                        disabled
+                        readOnly
                       />
                       <Input
                         value={formatRupiah(s.total)}
                         className="w-full"
-                        disabled
+                        readOnly
                       />
                     </div>
                   ))}
@@ -592,57 +607,102 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
                     <h3 className="font-medium w-[10%]">Discount</h3>
                     <h3 className="font-medium w-full"></h3>
                   </div>
-                  {defaultValues?.discounts?.map((discount: any) => (
-                    <div
-                      key={discount.id}
-                      className="flex gap-4 w-full items-start"
-                    >
-                      <FormItem className="w-fit">
+                  {defaultValues?.discounts.length === 0 && (
+                    <div className="text-center text-muted-foreground py-4">
+                      No services selected
+                    </div>
+                  )}
+                  {discountList
+                    .filter((discount) =>
+                      selectedDiscounts.includes(discount.id)
+                    )
+                    .map((discount) => (
+                      <div
+                        key={discount.id}
+                        className="flex gap-4 w-full items-start"
+                      >
+                        <Input value={discount.name} readOnly />
+                        <Input
+                          value={
+                            discount.type === "NOMINAL"
+                              ? formatRupiah(discount.price)
+                              : discount.price + "%"
+                          }
+                          readOnly
+                        />
+                      </div>
+                    ))}
+                </div>
+                <div className="flex justify-end">
+                  <FormField
+                    control={form.control}
+                    name="discounts"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Discounts</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Discount name"
-                            value={discount.title}
-                            disabled
-                          />
+                          <Popover>
+                            <PopoverTrigger
+                              className="flex justify-end w-fit"
+                              asChild
+                            >
+                              <Button size="sm" type="button">
+                                Add Discount
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0">
+                              <Command>
+                                <CommandGroup className="w-[380px]">
+                                  <h3 className="text-sm font-medium ml-2 mt-2">
+                                    Select Available Discounts
+                                  </h3>
+                                  <Separator className="my-2" />
+                                  {discountList.map((discount) => {
+                                    const isSelected = (
+                                      field.value ?? []
+                                    ).includes(discount.id);
+
+                                    return (
+                                      <CommandItem
+                                        key={discount.id}
+                                        onSelect={() => {
+                                          const current: number[] =
+                                            field.value ?? [];
+                                          let newValue: number[];
+
+                                          if (isSelected) {
+                                            newValue = current.filter(
+                                              (id) => id !== discount.id
+                                            );
+                                          } else {
+                                            newValue = [
+                                              ...current,
+                                              discount.id,
+                                            ];
+                                          }
+
+                                          field.onChange(newValue);
+                                          handleDiscountChange(newValue);
+                                        }}
+                                      >
+                                        <Checkbox
+                                          checked={isSelected}
+                                          className="mr-2"
+                                        />
+                                        {discount.name} -{" "}
+                                        {formatRupiah(discount.price)}
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
-                      <div className="flex items-end gap-2">
-                        <FormItem className="">
-                          <FormControl>
-                            <Input
-                              placeholder="Discount"
-                              value={discount.amount}
-                              disabled
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                        <FormItem className="w-fit">
-                          <FormControl>
-                            <Select
-                              defaultValue="nominal"
-                              value={discount.type}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="K" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="NOMINAL">K</SelectItem>
-                                <SelectItem value="PERCENTAGE">%</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-end">
-                  <Button size="sm" type="button">
-                    Add New Discount
-                  </Button>
+                    )}
+                  />
                 </div>
 
                 <div className="flex gap-4 w-full">
@@ -729,7 +789,7 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
             <Button
               variant="destructive"
               size="sm"
-              className="cursor-pointer"
+              className="cursor-pointer disabled:opacity-50"
               type="button"
               onClick={() => {
                 form.reset(defaultValues);
@@ -745,11 +805,18 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
             <Button
               variant="default"
               size="sm"
-              className="cursor-pointer"
+              className="cursor-pointer disabled:opacity-50"
               type="submit"
               disabled={isLoading}
             >
-              {isLoading ? "Creating..." : "Save"}
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Creating...
+                </div>
+              ) : (
+                "Save"
+              )}
             </Button>
           </div>
         </form>

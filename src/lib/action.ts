@@ -518,6 +518,9 @@ export const updateInvoice = async (
             },
           })),
         },
+        discounts: {
+          connect: data.discounts?.map((id) => ({ id })) || [],
+        },
       },
     });
 

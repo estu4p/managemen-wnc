@@ -49,6 +49,7 @@ import {
 } from "../ui/alert-dialog";
 import { watch } from "fs";
 import { calculateServiceSummary } from "@/lib/calculateServiceSummary";
+import { number } from "zod";
 
 type ServiceSummary = {
   serviceId: number;
@@ -67,12 +68,17 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [customerIsEditing, setCustomerIsEditing] = useState(false);
   const [serviceList, setServiceList] = useState<any[]>([]);
+  const [discountList, setDiscountList] = useState<any[]>([]);
   const [itemServices, setItemServices] = useState<ServiceSummary[]>([]);
   const [grandTotal, setGrandTotal] = useState(0);
   const [finalTotal, setFinalTotal] = useState(0);
   const [selectedServices, setSelectedServices] = useState<{
     [itemIndex: number]: number[];
   }>({});
+  const [selectedDiscounts, setSelectedDiscounts] = useState<number[]>([]);
+
+  // console.log("selected Service", selectedServices);
+  // console.log("selected discount", selectedDiscounts);
 
   const [showDialog, setShowDialog] = useState(false);
   const searchParams = useSearchParams();
@@ -81,6 +87,12 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     fetch("/api/services")
       .then((res) => res.json())
       .then((resData) => setServiceList(resData));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/discounts")
+      .then((res) => res.json())
+      .then((resData) => setDiscountList(resData));
   }, []);
 
   const form = useForm<InvoiceSchema>({
@@ -99,6 +111,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
         phone: "",
         photo: "",
       },
+      discounts: [],
       items: [
         {
           id: undefined,
@@ -135,17 +148,32 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     form.setValue(`items.${itemIndex}.service`, selectedServiceIds);
   };
 
+  const handleDiscountChange = (discountIds: number[]) => {
+    setSelectedDiscounts(discountIds);
+
+    form.setValue("discounts", discountIds);
+  };
+
+  useEffect(() => {
+    if (defaultValues?.discounts) {
+      const initialDiscountIds = defaultValues.discounts.map((d: any) => d.id);
+      setSelectedDiscounts(initialDiscountIds);
+      form.setValue("discounts", initialDiscountIds);
+    }
+  }, [defaultValues?.discounts, form]);
+
   useEffect(() => {
     const result = calculateServiceSummary(
       selectedServices,
       serviceList,
-      defaultValues?.discounts
+      discountList,
+      selectedDiscounts
     );
 
     setItemServices(result.itemServices);
     setGrandTotal(result.grandTotal);
     setFinalTotal(result.finalTotal);
-  }, [selectedServices, serviceList, defaultValues?.discounts]);
+  }, [selectedServices, serviceList, selectedDiscounts]);
 
   useEffect(() => {
     const initialSelectedServices: { [itemIndex: number]: number[] } = {};
@@ -159,51 +187,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
 
     setSelectedServices(initialSelectedServices);
   }, [fields, form]);
-
-  // // menghitung service summary
-  // const calculateServiceSummary = () => {
-  //   const servicesSummary: ServiceSummary[] = [];
-
-  //   Object.values(selectedServices).forEach((serviceIds) => {
-  //     serviceIds.forEach((serviceId) => {
-  //       const service = serviceList.find((s) => s.id === serviceId);
-  //       if (service) {
-  //         const existingService = servicesSummary.find(
-  //           (s) => s.serviceId === serviceId
-  //         );
-  //         if (existingService) {
-  //           existingService.qty += 1;
-  //           existingService.total = existingService.qty * existingService.price;
-  //         } else {
-  //           servicesSummary.push({
-  //             serviceId: service.id,
-  //             service: service.name,
-  //             qty: 1,
-  //             price: parseFloat(service.price),
-  //             total: parseFloat(service.price),
-  //           });
-  //         }
-  //       }
-  //     });
-  //   });
-
-  //   setItemServices(servicesSummary);
-
-  //   // Update grand total
-  //   const newGrandTotal = servicesSummary.reduce((sum, s) => sum + s.total, 0);
-  //   setGrandTotal(newGrandTotal);
-
-  //   // Hitung diskon
-  //   const totalDiscountPercent =
-  //     defaultValues?.discounts?.reduce(
-  //       (sum: number, d: { amount: string }) => sum + parseFloat(d.amount),
-  //       0
-  //     ) ?? 0;
-
-  //   const discountValue = newGrandTotal * (totalDiscountPercent / 100);
-  //   const final = newGrandTotal - discountValue;
-  //   setFinalTotal(parseFloat(final.toFixed(2)));
-  // };
 
   useEffect(() => {
     form.setValue("price", finalTotal);
@@ -254,14 +237,12 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     });
   };
 
-  const [state, formAction] = useActionState(updateInvoice, {
+  const [state, formAction, isPending] = useActionState(updateInvoice, {
     success: false,
     error: false,
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    console.log(data);
-
     startTransition(async () => formAction(data));
   });
 
@@ -376,11 +357,19 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                   <Button
                     variant="default"
                     size="sm"
-                    className="cursor-pointer"
+                    className="cursor-pointer disabled:opacity-50"
                     type="button"
+                    disabled={isPending}
                     onClick={() => setCustomerIsEditing(false)}
                   >
-                    Save
+                    {isPending ? (
+                      <div className="flex items-center gap-2">
+                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Updating...
+                      </div>
+                    ) : (
+                      "Save"
+                    )}
                   </Button>
                 </div>
               )}
@@ -733,16 +722,16 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                   </div>
                   {itemServices.map((s, index) => (
                     <div key={index} className="flex gap-4 w-full">
-                      <Input value={s.service} className="w-full" disabled />
+                      <Input value={s.service} className="w-full" readOnly />
                       <Input
                         value={s.qty}
                         className="w-[10%] p-0 text-center lg:px-3 lg:py-1"
-                        disabled
+                        readOnly
                       />
                       <Input
                         value={formatRupiah(s.total)}
                         className="w-full"
-                        disabled
+                        readOnly
                       />
                     </div>
                   ))}
@@ -755,62 +744,109 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 <div className="space-y-2">
                   <div className="flex gap-4 w-full items-start">
                     <h3 className="font-medium w-full">Discount Name</h3>
-                    <h3 className="font-medium w-[10%]">Discount</h3>
-                    <h3 className="font-medium w-full"></h3>
+                    <h3 className="font-medium w-full">Discount</h3>
                   </div>
-                  {defaultValues?.discounts?.map((discount: any) => (
-                    <div
-                      key={discount.id}
-                      className="flex gap-4 w-full items-start"
-                    >
-                      <FormItem className="w-fit">
+                  {selectedDiscounts.length === 0 && (
+                    <div className="text-center text-muted-foreground py-4">
+                      No discounts selected
+                    </div>
+                  )}
+                  {discountList
+                    .filter((discount) =>
+                      selectedDiscounts.includes(discount.id)
+                    )
+                    .map((discount) => (
+                      <div
+                        key={discount.id}
+                        className="flex gap-4 w-full items-start"
+                      >
+                        <Input value={discount.name} readOnly />
+                        <Input
+                          value={
+                            discount.type === "NOMINAL"
+                              ? formatRupiah(discount.price)
+                              : discount.price + "%"
+                          }
+                          readOnly
+                        />
+                      </div>
+                    ))}
+                </div>
+                <div className="flex justify-end">
+                  <FormField
+                    control={form.control}
+                    name="discounts"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel>Discounts</FormLabel>
                         <FormControl>
-                          <Input
-                            placeholder="Discount name"
-                            value={discount.title}
-                            disabled
-                          />
+                          <Popover>
+                            <PopoverTrigger
+                              className="flex justify-end w-fit"
+                              asChild
+                            >
+                              <Button
+                                size="sm"
+                                type="button"
+                                disabled={!isEditing}
+                              >
+                                Add Discount
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-full p-0">
+                              <Command>
+                                <CommandGroup className="w-[380px]">
+                                  <h3 className="text-sm font-medium ml-2 mt-2">
+                                    Select Available Discounts
+                                  </h3>
+                                  <Separator className="my-2" />
+                                  {discountList.map((discount) => {
+                                    const isSelected = (
+                                      field.value ?? []
+                                    ).includes(discount.id);
+
+                                    return (
+                                      <CommandItem
+                                        disabled={!isEditing}
+                                        key={discount.id}
+                                        onSelect={() => {
+                                          const current: number[] =
+                                            field.value ?? [];
+                                          let newValue: number[];
+
+                                          if (isSelected) {
+                                            newValue = current.filter(
+                                              (id) => id !== discount.id
+                                            );
+                                          } else {
+                                            newValue = [
+                                              ...current,
+                                              discount.id,
+                                            ];
+                                          }
+
+                                          field.onChange(newValue);
+                                          handleDiscountChange(newValue);
+                                        }}
+                                      >
+                                        <Checkbox
+                                          checked={isSelected}
+                                          className="mr-2"
+                                        />
+                                        {discount.name} -{" "}
+                                        {formatRupiah(discount.price)}
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </CommandGroup>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
-                      <div className="flex items-end gap-2">
-                        <FormItem className="">
-                          <FormControl>
-                            <Input
-                              placeholder="Discount"
-                              value={discount.amount}
-                              disabled
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-
-                        <FormItem className="w-fit">
-                          <FormControl>
-                            <Select
-                              defaultValue="nominal"
-                              value={discount.type}
-                              disabled={!isEditing}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="K" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="NOMINAL">K</SelectItem>
-                                <SelectItem value="PERCENTAGE">%</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="flex justify-end">
-                  <Button size="sm" type="button" disabled={!isEditing}>
-                    Add New Discount
-                  </Button>
+                    )}
+                  />
                 </div>
                 <div className="flex gap-4 w-full">
                   <Label className="w-full">Total</Label>
@@ -917,7 +953,8 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 <Button
                   variant="destructive"
                   size="sm"
-                  className="cursor-pointer"
+                  disabled={isPending}
+                  className="cursor-pointer disabled:opacity-50"
                   type="button"
                   onClick={() => {
                     form.reset(defaultValues);
@@ -943,10 +980,18 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 <Button
                   variant="default"
                   size="sm"
-                  className="cursor-pointer"
+                  className="cursor-pointer disabled:opacity-50"
                   type="submit"
+                  disabled={isPending}
                 >
-                  Save
+                  {isPending ? (
+                    <div className="flex items-center gap-2">
+                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      Updating...
+                    </div>
+                  ) : (
+                    "Save"
+                  )}
                 </Button>
               </>
             )}
@@ -982,12 +1027,22 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 const totalItem = form.watch("items").length;
                 const note = form.watch("note") ?? "-";
 
+                //                 let serviceMessage = "";
+                //                 items.forEach((item) => {
+                //                   serviceMessage += `
+                // Layanan :
+                // - ${item.name} : ${item.serviceDetail.map((s: any ) => s.name)}
+                // `;
+                //                 });
                 let serviceMessage = "";
-                items.map((item) => {
-                  serviceMessage += `
-Layanan :
-- ${item.name} : ${item.serviceDetail.map((s: { name: any }) => s.name)}
-`;
+                items.forEach((item: any) => {
+                  serviceMessage += `Layanan 
+                  - ${item.name}`;
+                  if (item.serviceDetail && item.serviceDetail.length > 0) {
+                    serviceMessage += `: ${item.serviceDetail
+                      .map((s: any) => s.name)
+                      .join(", ")}`;
+                  }
                 });
                 const paymentMethod = form.watch("paymentMethod");
                 const paymentStatus = form.watch("paymentStatus");
