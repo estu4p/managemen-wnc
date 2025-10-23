@@ -34,7 +34,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "username",
-    header: "User Name",
+    header: "UserName",
   },
   {
     accessorKey: "role",
@@ -108,7 +108,7 @@ export const columns: ColumnDef<User>[] = [
       return (
         <div className="text-right">
           <Button size="iconXs" className="">
-            <Link href={`/settings/${id}`}>
+            <Link href={`/user-management/${id}`}>
               <MoveUpRight />
             </Link>
           </Button>

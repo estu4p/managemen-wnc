@@ -12,12 +12,24 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "../ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await signIn("credentials", {
+      username,
+      password,
+      callbackUrl: "/",
+    });
+  };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -31,7 +43,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="username">Username</FieldLabel>
@@ -41,6 +53,8 @@ export function LoginForm({
                   placeholder="Enter your username"
                   required
                   className="bg-white"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </Field>
               <Field>
@@ -52,6 +66,8 @@ export function LoginForm({
                     placeholder="Enter yout password"
                     required
                     className="bg-white"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                   <Button
                     type="button"
@@ -60,7 +76,7 @@ export function LoginForm({
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 hover:bg-transparent cursor-pointer w-fit h-fit"
                   >
-                    {showPassword ? <EyeOff /> : <Eye />}
+                    {showPassword ? <Eye /> : <EyeOff />}
                   </Button>
                 </div>
               </Field>

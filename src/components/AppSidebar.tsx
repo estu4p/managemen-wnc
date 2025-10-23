@@ -25,8 +25,8 @@ import {
   Home,
   List,
   Package,
-  Search,
   ShieldAlert,
+  UserRoundCog,
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
@@ -37,9 +37,10 @@ import {
   CollapsibleTrigger,
 } from "./ui/collapsible";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 // Menu items.
-const menuItems = [
+const superAdminMenuItems = [
   {
     title: "Work Monitoring",
     url: "/",
@@ -80,11 +81,11 @@ const menuItems = [
 ];
 
 // General items.
-const generalItems = [
+const superAdminGeneralItems = [
   {
-    title: "Settings",
-    url: "/settings",
-    icon: Bolt,
+    title: "User Management",
+    url: "/user-management",
+    icon: UserRoundCog,
   },
   {
     title: "Security",
@@ -93,9 +94,51 @@ const generalItems = [
   },
 ];
 
+const adminGeneralItem = [
+  {
+    title: "Security",
+    url: "/security",
+    icon: ShieldAlert,
+  },
+];
+
+const adminMenuItems = [
+  {
+    title: "Work Monitoring",
+    url: "/",
+    icon: Home,
+  },
+  {
+    title: "Invoices",
+    url: "/invoices",
+    icon: FilePlus,
+    children: [
+      {
+        title: "Invoice List",
+        url: "/invoices",
+        icon: List,
+      },
+      {
+        title: "Invoice Settings",
+        url: "/invoices/invoice-settings",
+        icon: Bolt,
+      },
+    ],
+  },
+  {
+    title: "Customers",
+    url: "/customers",
+    icon: UsersRound,
+  },
+];
+
 const AppSidebar = () => {
   const pathname = usePathname();
   const [openItems, setOpenItems] = useState<string[]>([]);
+  const { data: session } = useSession();
+  const role = session?.user?.role;
+  let menuItems: any[] = [];
+  let generalItems: any[] = [];
 
   const isActive = (path: string) => {
     return pathname == path || pathname.startsWith(path + "/");
@@ -115,6 +158,14 @@ const AppSidebar = () => {
     );
     return openItems.includes(item.title) || hasActiveChild;
   };
+
+  if (role === "ADMIN") {
+    menuItems = adminMenuItems;
+    generalItems = adminGeneralItem;
+  } else {
+    menuItems = superAdminMenuItems;
+    generalItems = superAdminGeneralItems;
+  }
 
   return (
     <Sidebar>
@@ -187,7 +238,7 @@ const AppSidebar = () => {
                           </CollapsibleTrigger>
                           <CollapsibleContent className="transition-all duration-300 ease-in-out data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-1 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-top-1">
                             <SidebarMenuSub>
-                              {item.children?.map((subItem) => (
+                              {item.children?.map((subItem: any) => (
                                 <SidebarMenuSubItem key={subItem.title}>
                                   <SidebarMenuSubButton asChild>
                                     <Link href={subItem.url}>

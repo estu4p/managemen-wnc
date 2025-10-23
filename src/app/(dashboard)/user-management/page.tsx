@@ -48,8 +48,6 @@ async function ManageAdminPage(props: {
     }),
   ]);
 
-  console.log(count);
-
   const userData = data.map((user) => ({
     id: user.id,
     username: user.username,
@@ -62,7 +60,7 @@ async function ManageAdminPage(props: {
     <div className="p-4 sm:px-7">
       <div className="flex items-end justify-between">
         <HeaderPage title="Manage Admin" desc="" calendar={false} />
-        <Link href="/settings/new" className="mb-3">
+        <Link href="/user-management/new" className="mb-3">
           <Button variant="default" size="sm" className="cursor-pointer">
             <Plus />
             Add Admin

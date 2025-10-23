@@ -27,6 +27,7 @@ import {
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 
 type UserFormProps = {
   mode: "create" | "update";
@@ -37,6 +38,7 @@ type UserFormProps = {
 
 const UserForm = ({ mode, defaultValues }: UserFormProps) => {
   const [isEditing, setIsEditing] = useState(mode === "create");
+  const [showPassword, setShowPassword] = useState(false);
 
   const [state, formAction] = useActionState(
     mode === "create" ? createUser : updateUser,
@@ -49,6 +51,7 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
       id: undefined,
       name: "",
       username: "",
+      password: "",
       role: "ADMIN",
     },
   });
@@ -195,16 +198,28 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                   {mode === "update" && (
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="password"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormLabel>Password</FormLabel>
                           <FormControl>
-                            <Input
-                              placeholder="Enter current password "
-                              {...field}
-                              disabled={!isEditing}
-                            />
+                            <div className="relative">
+                              <Input
+                                placeholder="Enter current password "
+                                {...field}
+                                type={showPassword ? "text" : "password"}
+                                disabled={!isEditing}
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 hover:bg-transparent cursor-pointer w-fit h-fit"
+                              >
+                                {showPassword ? <Eye /> : <EyeOff />}
+                              </Button>
+                            </div>
                           </FormControl>
                           <FormDescription>Current password.</FormDescription>
                         </FormItem>

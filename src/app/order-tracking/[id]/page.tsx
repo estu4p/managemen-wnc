@@ -1,6 +1,10 @@
-import { Service } from "@/app/(dashboard)/invoices/invoice-settings/columns";
+import {
+  Discount,
+  Service,
+} from "@/app/(dashboard)/invoices/invoice-settings/columns";
 import DetailsNote from "@/components/note/NoteDetails";
 import TrackingMap from "@/components/note/TrackingMap";
+import OrderTrackingEmpty from "@/components/OrderTrackingEmpty";
 import {
   Accordion,
   AccordionContent,
@@ -33,15 +37,21 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
   });
 
   if (!invoice) {
-    return <h2>Invoice not found</h2>;
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <OrderTrackingEmpty />
+      </div>
+    );
   }
 
-  const { selectedServices, serviceList, discounts } =
+  const { selectedServices, serviceList, discountList, selectedDiscounts } =
     transformInvoiceForCalculation(invoice);
   const serviceSummary = calculateServiceSummary(
     selectedServices,
     serviceList as Service[],
-    discounts
+    // serviceList: Service[],
+    discountList,
+    selectedDiscounts
   );
 
   return (
