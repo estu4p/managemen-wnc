@@ -21,7 +21,12 @@ export default withAuth(
 
     // ADMIN
     if (role === "ADMIN") {
-      const allowedPaths = ["/", "/invoices", "/customers"];
+      const allowedPaths = ["/", "/invoices", "/customers", "/security"];
+
+      if (pathname.startsWith("/invoices/invoice-settings")) {
+        return NextResponse.redirect(new URL("/", req.url));
+      }
+
       const canAccess = allowedPaths.some(
         (path) => pathname === path || pathname.startsWith(`${path}/`)
       );

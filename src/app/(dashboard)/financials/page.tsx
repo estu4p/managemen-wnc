@@ -8,6 +8,7 @@ import FinancialChart from "@/components/financial/FinancialChart";
 import { getFinancialSummary } from "@/lib/financial";
 import RevenueTargetCard from "@/components/financial/RevenueTargetCard";
 import { MonthPicker } from "@/components/MonthPicker";
+import { Plus } from "lucide-react";
 
 async function FinancialsPage({
   searchParams,
@@ -77,8 +78,14 @@ async function FinancialsPage({
             desc="Detailed overview of your financials situation."
             calendar={false}
           />
-          <div className="mb-3">
-            <MonthPicker />
+          <div className="flex gap-3">
+            <Button size="sm" className="hover:bg-transparent hover:text-black">
+              <Plus />
+              <Link href="/financials/transactions/new">Add Transaction</Link>
+            </Button>
+            <div className="mb-3">
+              <MonthPicker />
+            </div>
           </div>
         </div>
         <div className="flex gap-3 flex-wrap">

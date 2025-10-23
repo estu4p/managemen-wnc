@@ -112,18 +112,6 @@ const adminMenuItems = [
     title: "Invoices",
     url: "/invoices",
     icon: FilePlus,
-    children: [
-      {
-        title: "Invoice List",
-        url: "/invoices",
-        icon: List,
-      },
-      {
-        title: "Invoice Settings",
-        url: "/invoices/invoice-settings",
-        icon: Bolt,
-      },
-    ],
   },
   {
     title: "Customers",
