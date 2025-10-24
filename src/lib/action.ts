@@ -533,9 +533,13 @@ export const updateInvoice = async (
 
 export const deleteInvoice = async (
   currentState: CurrentState,
-  data: InvoiceSchema
+  data: FormData
 ) => {
+  const id = data.get("id") as string;
   try {
+    await prisma.invoice.delete({
+      where: { id: id },
+    });
     return { success: true, error: false };
   } catch (error) {
     console.log(error);
@@ -610,12 +614,14 @@ export const createUser = async (
   data: UserSchema
 ) => {
   const id = `user-${data.id}`;
+  const password = "";
 
   try {
     await prisma.user.create({
       data: {
         id: id,
         username: data.username,
+        password: password,
         name: data.name,
         role: data.role,
       },

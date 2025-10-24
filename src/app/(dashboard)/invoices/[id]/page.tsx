@@ -1,4 +1,5 @@
 import HeaderPage from "@/components/HeaderPage";
+import DialogDelete from "@/components/form/DialogDelete";
 import InvoiceForm from "@/components/form/InvoiceForm";
 import { Button } from "@/components/ui/button";
 import { serialize } from "@/lib/format";
@@ -44,9 +45,10 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
           calendar={false}
         />
         <div className="flex gap-2 mb-3">
-          <Button size="sm" variant="destructive">
+          {/* <Button size="sm" variant="destructive">
             Delete
-          </Button>
+          </Button> */}
+          <DialogDelete table="invoice" id={invoice.id} title={invoice.id} />
         </div>
       </div>
       <div className="mt-6">

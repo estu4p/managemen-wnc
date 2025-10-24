@@ -10,6 +10,9 @@ type Targets = {
   title: string;
   untilDate: Date;
   totalTarget: number;
+  totalBalance: number;
+  progress: number;
+  category: string | null;
 };
 
 const RevenueTargetCard = ({ data }: { data: Targets[] }) => {
@@ -21,17 +24,26 @@ const RevenueTargetCard = ({ data }: { data: Targets[] }) => {
           <h3>Revenue Target</h3>
         </div>
       </CardHeader>
-      <CardContent className="px-3 mt-3 gap-0 space-y-2">
+      <CardContent className="px-3 mt-2 gap-0 space-y-2">
         {data.map((target, index) => (
           <div key={index} className="border rounded-md p-2 border-primary">
             <div className="flex items-center justify-between">
-              <span className="font-medium">{target.title}</span>
-              <span className="">{formatRupiah(target.totalTarget)}</span>
+              <span className="font-medium capitalize">{target.title}</span>
+              <span className="text-[13px]">
+                {formatRupiah(target.totalTarget)}
+              </span>
             </div>
-            <p className="text-muted-foreground text-[13px]">
-              Until {formatDate(target.untilDate)}
-            </p>
-            <Progress value={64} className="mt-1.5 h-1.5" />
+            {target.category != "DAILY" && target.category != "MONTHLY" && (
+              <p className="text-muted-foreground text-[13px]">
+                Until {formatDate(target.untilDate)}
+              </p>
+            )}
+
+            <div className="flex justify-between text-[13px]">
+              <span>{formatRupiah(target.totalBalance)}</span>
+              <span>{Math.round(target.progress)}%</span>
+            </div>
+            <Progress value={target.progress} className="mt-1.5 h-1.5" />
           </div>
         ))}
         <div className="flex items-center justify-end">
@@ -47,5 +59,4 @@ const RevenueTargetCard = ({ data }: { data: Targets[] }) => {
     </Card>
   );
 };
-
 export default RevenueTargetCard;

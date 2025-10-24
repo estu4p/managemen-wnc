@@ -5,10 +5,14 @@ import { Button } from "@/components/ui/button";
 import TransactionsTabel from "@/components/financial/TransactionsTable";
 import prisma from "@/lib/prisma";
 import FinancialChart from "@/components/financial/FinancialChart";
-import { getFinancialSummary } from "@/lib/financial";
-import RevenueTargetCard from "@/components/financial/RevenueTargetCard";
+import {
+  getFinancialSummary,
+  getMonthlyFinancialSummary,
+} from "@/lib/financial";
 import { MonthPicker } from "@/components/MonthPicker";
 import { Plus } from "lucide-react";
+import { endOfDay, startOfDay, startOfMonth } from "date-fns";
+import RevenueTargetCard from "@/components/financial/RevenueTargetCard";
 
 async function FinancialsPage({
   searchParams,
@@ -26,7 +30,7 @@ async function FinancialsPage({
   const startDate = new Date(selectedYear, selectedMonth - 1, 1);
   const endDate = new Date(selectedYear, selectedMonth, 0, 23, 59, 59);
 
-  const [transactions, summary] = await Promise.all([
+  const [transactions, summary, monthlySummary] = await Promise.all([
     prisma.transaction.findMany({
       where: {
         createdAt: {
@@ -47,6 +51,7 @@ async function FinancialsPage({
       },
     }),
     getFinancialSummary(startDate, endDate),
+    getMonthlyFinancialSummary(selectedYear),
   ]);
 
   const transactionsData = transactions.map((transaction) => ({
@@ -61,12 +66,63 @@ async function FinancialsPage({
     take: 3,
   });
 
-  const revenueTargetsData = revenueTargets.map((target) => ({
-    id: target.id,
-    title: target.title,
-    untilDate: target.untilDate,
-    totalTarget: Number(target.totalTarget),
-  }));
+  const today = new Date();
+  const revenueTargetsData = await Promise.all(
+    revenueTargets.map(async (target) => {
+      let fromDate = target.fromDate;
+      let untilDate = target.untilDate;
+
+      // Sesuaikan periode berdasarkan category
+      if (target.category === "DAILY") {
+        fromDate = startOfDay(today);
+        untilDate = endOfDay(today);
+      } else if (target.category === "MONTHLY") {
+        fromDate = startOfMonth(today);
+        untilDate = endOfDay(today); // sampai hari ini, bukan endOfMonth
+      }
+
+      const income = await prisma.transaction.aggregate({
+        _sum: { amount: true },
+        where: {
+          type: "INCOME",
+          createdAt: {
+            gte: fromDate,
+            lte: untilDate,
+          },
+        },
+      });
+
+      const expense = await prisma.transaction.aggregate({
+        _sum: { amount: true },
+        where: {
+          type: "EXPENSE",
+          createdAt: {
+            gte: fromDate,
+            lte: untilDate,
+          },
+        },
+      });
+
+      const totalIncome = Number(income._sum.amount ?? 0);
+      const totalExpense = Number(expense._sum.amount ?? 0);
+      const totalBalance = totalIncome - totalExpense;
+
+      const progress = Math.min(
+        (totalBalance / Number(target.totalTarget)) * 100,
+        100
+      );
+
+      return {
+        id: target.id,
+        title: target.title,
+        untilDate: target.untilDate,
+        totalTarget: Number(target.totalTarget),
+        totalBalance,
+        progress,
+        category: target.category,
+      };
+    })
+  );
 
   return (
     <div className="px-4 sm:ps-7 flex flex-col lg:flex-row gap-4 lg:gap-0">
@@ -78,7 +134,7 @@ async function FinancialsPage({
             desc="Detailed overview of your financials situation."
             calendar={false}
           />
-          <div className="flex gap-3">
+          <div className="flex flex-col lg:flex-row gap-3">
             <Button size="sm" className="hover:bg-transparent hover:text-black">
               <Plus />
               <Link href="/financials/transactions/new">Add Transaction</Link>
@@ -107,7 +163,7 @@ async function FinancialsPage({
         </div>
         <div className="mt-3 flex gap-3 flex-col lg:flex-row">
           <TransactionsTabel data={transactionsData} />
-          <FinancialChart />
+          <FinancialChart data={monthlySummary} />
         </div>
       </div>
       {/* right */}

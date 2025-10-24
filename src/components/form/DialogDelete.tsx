@@ -16,6 +16,7 @@ import { Trash2 } from "lucide-react";
 import {
   deleteDiscount,
   deleteInventory,
+  deleteInvoice,
   deleteItem,
   deleteRevenueTarget,
   deleteService,
@@ -31,6 +32,7 @@ const deleteActionMap = {
   inventory: deleteInventory,
   transaction: deleteTransaction,
   item: deleteItem,
+  invoice: deleteInvoice,
 };
 
 type DialogDeleteProps = {
@@ -40,7 +42,8 @@ type DialogDeleteProps = {
     | "target"
     | "inventory"
     | "transaction"
-    | "item";
+    | "item"
+    | "invoice";
   title?: string;
   id?: number | string;
 };
