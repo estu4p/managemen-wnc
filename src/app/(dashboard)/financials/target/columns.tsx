@@ -16,6 +16,8 @@ export type RevenueTarget = {
   untilDate: Date;
   totalTarget: number;
   status: string;
+  totalBalance: number;
+  progress: number;
 };
 
 export const Columns: ColumnDef<RevenueTarget>[] = [
@@ -29,10 +31,18 @@ export const Columns: ColumnDef<RevenueTarget>[] = [
   {
     accessorKey: "title",
     header: "Title",
+    cell: ({ row }) => {
+      const title = row.original.title;
+      return <h5 className="capitalize">{title}</h5>;
+    },
   },
   {
     accessorKey: "category",
     header: "Category",
+    cell: ({ row }) => {
+      const catogory = row.original.category;
+      return <h5 className="lowercase first-letter:uppercase">{catogory}</h5>;
+    },
   },
   {
     accessorKey: "totalTarget",
@@ -44,20 +54,15 @@ export const Columns: ColumnDef<RevenueTarget>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "progress",
+    header: "Progress",
     cell: ({ row }) => {
-      const status = row.original.status;
+      const target = row.original;
       return (
-        <div className="flex items-center gap-2 py-1 w-[100px]">
-          <Progress value={80} className="h-1.5 flex-1" />
-          {status === "PROCESS" && (
-            <Timer className="text-secondary-green w-5 h-5" />
-          )}
-          {status === "SUCCESS" && (
-            <CheckCircle className="text-green-500 w-5 h-5" />
-          )}
-          {status === "FAILED" && <XCircle className="text-red-500 w-5 h-5" />}
+        <div className="flex gap-2">
+          <span>{formatRupiah(target.totalBalance)}</span>
+          {/* <Progress value={target.progress} className="mt-1.5 h-1.5" /> */}
+          <span>({Math.round(target.progress)}%)</span>
         </div>
       );
     },
@@ -67,7 +72,14 @@ export const Columns: ColumnDef<RevenueTarget>[] = [
     header: "From Date",
     cell: ({ row }) => {
       const fromDate = row.original.fromDate;
-      return formatDate(fromDate);
+      const category = row.original.category;
+      return (
+        <span>
+          {category === "DAILY" || category === "MONTHLY"
+            ? "-"
+            : formatDate(fromDate)}
+        </span>
+      );
     },
   },
   {
@@ -75,7 +87,14 @@ export const Columns: ColumnDef<RevenueTarget>[] = [
     header: "Until Date",
     cell: ({ row }) => {
       const untilDate = row.original.untilDate;
-      return formatDate(untilDate);
+      const category = row.original.category;
+      return (
+        <span>
+          {category === "DAILY" || category === "MONTHLY"
+            ? "-"
+            : formatDate(untilDate)}
+        </span>
+      );
     },
   },
   {

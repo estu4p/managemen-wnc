@@ -72,13 +72,12 @@ async function FinancialsPage({
       let fromDate = target.fromDate;
       let untilDate = target.untilDate;
 
-      // Sesuaikan periode berdasarkan category
       if (target.category === "DAILY") {
         fromDate = startOfDay(today);
         untilDate = endOfDay(today);
       } else if (target.category === "MONTHLY") {
         fromDate = startOfMonth(today);
-        untilDate = endOfDay(today); // sampai hari ini, bukan endOfMonth
+        untilDate = endOfDay(today);
       }
 
       const income = await prisma.transaction.aggregate({
