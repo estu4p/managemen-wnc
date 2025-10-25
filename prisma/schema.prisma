@@ -49,7 +49,7 @@ model Invoice {
   note String?
   progress String @default("NEW_ORDER")
   paymentStatus PaymentStatus @default(UNPAID)
-  paymentMethod PaymentMethod
+  paymentMethod PaymentMethod?
   customerId String
   customer Customer @relation(fields: [customerId], references: [id])
   items Item[]
@@ -119,6 +119,7 @@ model Transaction {
   id Int @id @default(autoincrement())
   title String
   type TransactionType
+  invoiceId String?
   category CashFlowCategory
   amount Decimal @db.Decimal(12, 2)
   notes String?

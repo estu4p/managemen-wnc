@@ -31,30 +31,30 @@ async function main() {
   //   });
   // }
 
-  // // 3. Service
-  // for (let i = 1; i <= 5; i++) {
-  //   await prisma.service.create({
-  //     data: {
-  //       name: `Service ${i}`,
-  //       price: faker.number.float({ min: 10000, max: 50000 }),
-  //     },
-  //   });
-  // }
+  // 3. Service
+  for (let i = 1; i <= 5; i++) {
+    await prisma.service.create({
+      data: {
+        name: `Service ${i}`,
+        price: faker.number.float({ min: 10000, max: 50000 }),
+      },
+    });
+  }
 
-  // // 4. Discount
-  // for (let i = 1; i <= 5; i++) {
-  //   const fromDate = faker.date.past();
-  //   const untilDate = faker.date.future();
-  //   await prisma.discount.create({
-  //     data: {
-  //       title: `Discount ${i}`,
-  //       amount: faker.number.float({ min: 5, max: 20 }),
-  //       fromDate,
-  //       untilDate: untilDate,
-  //       type: faker.helpers.arrayElement(["PERCENTAGE", "NOMINAL"]) as any,
-  //     },
-  //   });
-  // }
+  // 4. Discount
+  for (let i = 1; i <= 5; i++) {
+    const fromDate = faker.date.past();
+    const untilDate = faker.date.future();
+    await prisma.discount.create({
+      data: {
+        title: `Discount ${i}`,
+        amount: faker.number.float({ min: 5, max: 20 }),
+        fromDate,
+        untilDate: untilDate,
+        type: faker.helpers.arrayElement(["PERCENTAGE", "NOMINAL"]) as any,
+      },
+    });
+  }
 
   // // 5. Invoice + Items
   // const services = await prisma.service.findMany();

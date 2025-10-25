@@ -58,6 +58,7 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [discountList, setDiscountList] = useState<any[]>([]);
   const [selectedDiscounts, setSelectedDiscounts] = useState<number[]>([]);
+  const [isPaymentStatusPaid, setIsPaymentStatusPaid] = useState(true);
 
   const router = useRouter();
 

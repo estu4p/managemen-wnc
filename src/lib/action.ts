@@ -289,6 +289,7 @@ export const createTransaction = async (
         id: data.id,
         title: data.title,
         type: data.type,
+        invoiceId: data.invoiceId,
         category: data.category,
         amount: data.amount,
         notes: data.notes,
@@ -416,14 +417,14 @@ export const createInvoice = async (
   try {
     const id = data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`;
 
-    await prisma.invoice.create({
+    const invoice = await prisma.invoice.create({
       data: {
         id,
         price: data.price,
         addDiscount: data.addDiscount,
         note: data.note,
         progress: data.progress,
-        paymentStatus: data.paymentStatus,
+        paymentStatus: data.paymentStatus ?? "UNPAID",
         paymentMethod: data.paymentMethod,
         customer: {
           connectOrCreate: {
@@ -454,8 +455,29 @@ export const createInvoice = async (
             },
           })),
         },
+        discounts: {
+          connect: data.discounts?.map((id) => ({ id })) || [],
+        },
       },
     });
+
+    if (data.paymentStatus === "PAID") {
+      const existingTransaction = await prisma.transaction.findFirst({
+        where: { invoiceId: invoice.id },
+      });
+
+      if (!existingTransaction) {
+        await prisma.transaction.create({
+          data: {
+            title: `Payment ${data.customer.name}`,
+            type: "INCOME",
+            invoiceId: invoice.id,
+            amount: data.price,
+            category: "SERVICE_INCOME",
+          },
+        });
+      }
+    }
 
     return { success: true, error: false, invoiceId: id };
   } catch (error) {
@@ -469,7 +491,12 @@ export const updateInvoice = async (
   data: InvoiceSchema
 ) => {
   try {
-    await prisma.invoice.update({
+    const existing = await prisma.invoice.findUnique({
+      where: { id: data.id },
+      select: { paymentStatus: true },
+    });
+
+    const invoice = await prisma.invoice.update({
       where: { id: data.id },
       data: {
         price: data.price,
@@ -523,6 +550,32 @@ export const updateInvoice = async (
         },
       },
     });
+
+    if (existing?.paymentStatus !== "PAID" && data.paymentStatus === "PAID") {
+      console.log(existing?.paymentStatus);
+
+      const existingTransaction = await prisma.transaction.findFirst({
+        where: { invoiceId: invoice.id },
+      });
+
+      if (!existingTransaction) {
+        await prisma.transaction.create({
+          data: {
+            title: `Payment ${data.customer.name}`,
+            type: "INCOME",
+            invoiceId: invoice.id,
+            amount: data.price,
+            category: "SERVICE_INCOME",
+          },
+        });
+      }
+    }
+
+    if (existing?.paymentStatus === "PAID" && data.paymentStatus !== "PAID") {
+      await prisma.transaction.deleteMany({
+        where: { invoiceId: invoice.id },
+      });
+    }
 
     return { success: true, error: false };
   } catch (error) {

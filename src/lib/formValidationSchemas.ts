@@ -59,6 +59,7 @@ export const transactionSchema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: "Title is required!" }),
   type: z.enum(["EXPENSE", "INCOME"], { message: "Type is required!" }),
+  invoiceId: z.string().optional(),
   category: z.enum(
     [
       "SERVICE_INCOME",
@@ -98,9 +99,11 @@ export const invoiceSchema = z.object({
   note: z.string().optional(),
   progress: z.string().optional(),
   paymentStatus: z.enum(["PAID", "UNPAID"]).optional(),
-  paymentMethod: z.enum(["CASH", "QRIS", "TRANSFER", "DEBIT", "OTHER"], {
-    message: "Payment Method is required!",
-  }),
+  paymentMethod: z
+    .enum(["CASH", "QRIS", "TRANSFER", "DEBIT", "OTHER"], {
+      message: "Payment Method is required!",
+    })
+    .optional(),
   customer: z.object({
     id: z.string().optional(),
     name: z.string().min(2, { message: "Name must be at least 2 characters!" }),

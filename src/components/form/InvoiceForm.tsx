@@ -1036,8 +1036,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 //                 });
                 let serviceMessage = "";
                 items.forEach((item: any) => {
-                  serviceMessage += `Layanan 
-                  - ${item.name}`;
+                  serviceMessage += `- ${item.name}`;
                   if (item.serviceDetail && item.serviceDetail.length > 0) {
                     serviceMessage += `: ${item.serviceDetail
                       .map((s: any) => s.name)
@@ -1076,6 +1075,9 @@ Grand Total : ${totalPrice}
 *Pembayaran:* ${paymentMethod}
 =================
 
+*Lihat proses dan detail pesanan Anda :*
+http://localhost:3000/order-tracking/${invoiceNumber}
+
  *Syarat dan Ketentuan:*
 1. Pengambilan barang harap disertai nota  
 2. Barang tidak diambil >1 bulan → hilang/rusak tidak diganti  
@@ -1083,8 +1085,6 @@ Grand Total : ${totalPrice}
 4. Klaim luntur di luar tanggungan  
 5. Hak klaim berlaku 2 jam setelah barang diambil  
 6. Konsumen dianggap setuju dengan perhitungan di atas
-
-*Link Nota:* http://localhost:3000/order-tracking/${invoiceNumber}
 
 Terima kasih telah mempercayakan perawatan sepatu Anda di *Wash and Care*
 `;
