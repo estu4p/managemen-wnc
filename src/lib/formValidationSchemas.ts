@@ -163,6 +163,7 @@ export const userSchema = z.object({
   role: z.enum(["ADMIN", "SUPERADMIN"], {
     message: "Role is required!",
   }),
+  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters!" })

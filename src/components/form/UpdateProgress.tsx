@@ -63,7 +63,7 @@ export const UpdateProgress = ({
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Status updated successfully");
+      toast.success("Progress updated successfully");
       setIsOpen(false);
 
       setTimeout(() => {
@@ -72,11 +72,10 @@ export const UpdateProgress = ({
     }
 
     if (state.error) {
-      toast.error("Failed to update status");
+      toast.error("Failed to update progress");
     }
   }, [state, router]);
 
-  // Inisialisasi selectedProgresses ketika items berubah
   useEffect(() => {
     const initialProgresses: { [key: number]: string } = {};
     items.forEach((item: any) => {
@@ -85,7 +84,6 @@ export const UpdateProgress = ({
     setSelectedProgresses(initialProgresses);
   }, [items, progress]);
 
-  // Handler untuk mengubah progres item tertentu
   const handleProgressChange = (itemId: number, newProgress: string) => {
     setSelectedProgresses((prev) => ({
       ...prev,
@@ -93,16 +91,13 @@ export const UpdateProgress = ({
     }));
   };
 
-  // Fungsi untuk mendapatkan progress ter lambat
   const getSlowestProgress = () => {
     if (items.length === 0) return progress;
 
-    // Gunakan progress yang sudah dipilih jika ada, kalau tidak gunakan progress asli item
     const allProgresses = items.map((item: any) => {
       return selectedProgresses[item.id] || item.progress || progress;
     });
 
-    // Cari progress dengan nilai terendah (paling lambat)
     let slowestProgress = allProgresses[0];
     let slowestOrder =
       progressOrder[slowestProgress as keyof typeof progressOrder] || 0;

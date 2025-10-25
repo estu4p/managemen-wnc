@@ -11,10 +11,11 @@ async function main() {
     await prisma.user.create({
       data: {
         id: `user-${i}`,
+        name: faker.person.fullName(),
         username: `user${i}`,
         password: hashPassword,
-        name: faker.person.fullName(),
         role: i % 2 === 0 ? "ADMIN" : "SUPERADMIN",
+        status: "ACTIVE",
       },
     });
   }

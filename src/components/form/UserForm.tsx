@@ -53,6 +53,7 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
       username: "",
       password: "",
       role: "ADMIN",
+      status: "ACTIVE",
     },
   });
 
@@ -152,7 +153,7 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                   />
                   <FormField
                     control={form.control}
-                    name="role"
+                    name="status"
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormLabel>
@@ -161,8 +162,8 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                         </FormLabel>
                         <FormControl>
                           <Select
-                            // value={field.value ?? ""}
-                            value="active"
+                            value={field.value ?? ""}
+                            // value="active"
                             onValueChange={field.onChange}
                             disabled={!isEditing}
                           >

@@ -53,6 +53,7 @@ async function ManageAdminPage(props: {
     username: user.username,
     name: user.name,
     role: user.role,
+    status: user.status,
     createdAt: user.createdAt,
   }));
 

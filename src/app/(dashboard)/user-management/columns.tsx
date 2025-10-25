@@ -1,5 +1,6 @@
 "use client";
 
+import UpdateStatusUser from "@/components/form/UpdateStatusUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export type User = {
   username: string;
   name: string;
   role: "ADMIN" | "SUPERADMIN";
+  status: string;
   createdAt: Date;
 };
 
@@ -44,52 +46,10 @@ export const columns: ColumnDef<User>[] = [
     // accessorKey: "role",
     header: "Status",
     cell: ({ row }) => {
-      const [selectStatus, setSelectStatus] = useState("active");
+      const id = row.original.id;
+      const status = row.original.status;
 
-      return (
-        <Popover>
-          <PopoverTrigger>
-            <Badge variant="default" className="cursor-pointer">
-              Active
-            </Badge>
-          </PopoverTrigger>
-          <PopoverContent className="text-sm bg-accent">
-            <div className="flex items-center justify-between">
-              <h4>Select Status : </h4>
-              <div className="flex gap-2">
-                <Badge
-                  variant={`${selectStatus === "active" ? "green" : "outline"}`}
-                  className="cursor-pointer"
-                  onClick={() => setSelectStatus("active")}
-                >
-                  Active
-                </Badge>
-                <Badge
-                  variant={`${
-                    selectStatus === "nonActive" ? "green" : "outline"
-                  }`}
-                  className="cursor-pointer"
-                  onClick={() => setSelectStatus("nonActive")}
-                >
-                  Non-Active
-                </Badge>
-              </div>
-            </div>
-            <Separator className="my-2 h-4" />
-            <div className="flex items-center justify-between">
-              <div className="text-[13px]">
-                <span>Status now:</span>
-                <span className="text-secondary-green ml-3 underline">
-                  {selectStatus}
-                </span>
-              </div>
-              <button className="bg-primary rounded-md text-white px-3 py-0.5 font-medium cursor-pointer">
-                Save
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      );
+      return <UpdateStatusUser id={id} status={status} />;
     },
   },
   {

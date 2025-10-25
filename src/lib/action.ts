@@ -12,7 +12,7 @@ import {
   UserSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
-import { Progress } from "@prisma/client";
+import { Progress, UserStatus } from "@prisma/client";
 
 type CurrentState = { success: boolean; error: boolean };
 
@@ -677,6 +677,7 @@ export const createUser = async (
         password: password,
         name: data.name,
         role: data.role,
+        status: data.status ?? "ACTIVE",
       },
     });
     return { success: true, error: false };
@@ -697,8 +698,30 @@ export const updateUser = async (
         username: data.username,
         name: data.name,
         role: data.role,
+        status: data.status ?? "ACTIVE",
       },
     });
+    return { success: true, error: false };
+  } catch (error) {
+    console.log("Error updating progress:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const updateStatusUser = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+
+  try {
+    await prisma.user.update({
+      where: { id: id },
+      data: {
+        status: data.get("status") as UserStatus,
+      },
+    });
+
     return { success: true, error: false };
   } catch (error) {
     console.log("Error updating progress:", error);

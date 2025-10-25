@@ -26,18 +26,13 @@ import { MoveUpRight } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
 import { formatDate, formatRupiah, formatTime } from "@/lib/format";
-
-const FormSchema = z.object({
-  name: z.string().min(2, {
-    message: "Name must be at least 2 characters.",
-  }),
-  phone: z.string().min(10, {
-    message: "Phone number must be at least 10 characters.",
-  }),
-});
+import { updateCustomer } from "@/lib/action";
+import { customerSchema, CustomerSchema } from "@/lib/formValidationSchemas";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const statusLabels = {
   NEW_ORDER: "New Order",
@@ -67,21 +62,39 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
     0
   );
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      name: "",
-      phone: "",
-    },
+  const [state, formAction] = useActionState(updateCustomer, {
+    success: false,
+    error: false,
   });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
-    // console.log("Form Data:", data);
-  }
+  const form = useForm<CustomerSchema>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: customer,
+  });
+
+  const onSubmit = form.handleSubmit((data) => {
+    startTransition(() => formAction(data));
+  });
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success(`Customer has been updated!`, {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+      });
+      router.refresh();
+      setIsEditing(false);
+    }
+  }, [state, router]);
+
   return (
     <div className="mt-6">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
           {/* Customer */}
           <div className="flex flex-col lg:flex-row">
             <div className="sm:w-[20%] lg:w-[30%]">
@@ -108,9 +121,8 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                         <FormControl>
                           <Input
                             placeholder="Enter customer name"
-                            value={customer.name}
-                            //   {...field}
-                            disabled
+                            {...field}
+                            disabled={!isEditing}
                             className="font-medium"
                           />
                         </FormControl>
@@ -127,9 +139,8 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                         <FormControl>
                           <Input
                             placeholder="Enter customer phone number"
-                            //   {...field}
-                            value={customer.phone}
-                            disabled
+                            {...field}
+                            disabled={!isEditing}
                             className="font-medium"
                           />
                         </FormControl>
@@ -176,6 +187,7 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                       size="sm"
                       className="cursor-pointer"
                       onClick={() => setIsEditing(true)}
+                      type="button"
                     >
                       Edit
                     </Button>
@@ -185,13 +197,19 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                         variant="destructive"
                         size="sm"
                         className="cursor-pointer"
+                        type="button"
+                        onClick={() => {
+                          form.reset(customer);
+                          setIsEditing(false);
+                        }}
                       >
-                        Delete
+                        Cancel
                       </Button>
                       <Button
                         variant="default"
                         size="sm"
                         className="cursor-pointer"
+                        type="submit"
                       >
                         Save
                       </Button>
@@ -201,41 +219,12 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
               </div>
             </div>
           </div>
-          {/* Orders */}
-          <div>
-            <Separator className="my-2" />
-            <div className="flex flex-col sm:flex-row mt-4">
-              <div className="sm:w-[20%] lg:w-[30%]">
-                <h2 className="font-medium">Orders</h2>
-                <p className="text-muted-foreground">Customer order history</p>
-              </div>
-              {/* <div className="w-[50%] space-y-6"> */}
-              {/* <div className="sm:w-[50%] mt-4 sm:mt-0 flex items-center justify-center"></div> */}
-              <div className="sm:w-[50%] mt-4 sm:mt-0 flex items-center justify-center">
-                {/* <div className="w-[95%] space-y-6"> */}
-                <div className="space-y-6 sm:w-[70%] lg:w-full">
-                  <div className="grid grid-cols-2 gap-6 items-start">
-                    <div className="space-y-2">
-                      <Label>For Free</Label>
-                      <div className="">
-                        <p>{totalItems}/5</p>
-                        <Progress value={4 * 20} className="mt-1.5 h-1.5" />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Total Items</Label>
-                      <Input value={totalItems} disabled />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <Separator className="my-2" />
           {/* History */}
           <div className="flex flex-col sm:flex-row mt-4">
             <div className="sm:w-[20%] lg:min-w-[30%]">
               <h2 className="font-medium">History</h2>
-              <p className="text-muted-foreground">Customer invoice history</p>
+              <p className="text-muted-foreground">Customer order history</p>
             </div>
             <div className="container mx-auto">
               <div className=" rounded-md border h-fit">

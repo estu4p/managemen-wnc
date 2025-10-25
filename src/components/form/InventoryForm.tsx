@@ -80,7 +80,7 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast(
+      toast.success(
         `Inventory has been ${mode === "create" ? "created" : "updated"}!`,
         {
           duration: 4000,
