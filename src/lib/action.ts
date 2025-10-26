@@ -10,9 +10,11 @@ import {
   ServiceSchema,
   TransactionSchema,
   UserSchema,
+  UserUpdateSchema,
 } from "./formValidationSchemas";
 import prisma from "./prisma";
 import { Progress, UserStatus } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 type CurrentState = { success: boolean; error: boolean };
 
@@ -666,15 +668,15 @@ export const createUser = async (
   currentState: CurrentState,
   data: UserSchema
 ) => {
-  const id = `user-${data.id}`;
-  const password = "";
+  const id = `user-${Date.now()}`;
+  const hashedPassword = await bcrypt.hash(data.password, 10);
 
   try {
     await prisma.user.create({
       data: {
         id: id,
         username: data.username,
-        password: password,
+        password: hashedPassword,
         name: data.name,
         role: data.role,
         status: data.status ?? "ACTIVE",
@@ -689,18 +691,28 @@ export const createUser = async (
 
 export const updateUser = async (
   currentState: CurrentState,
-  data: UserSchema
+  data: UserUpdateSchema
 ) => {
+  console.log(data);
+
   try {
+    const updateData: any = {
+      username: data.username,
+      name: data.name,
+      role: data.role,
+      status: data.status ?? "ACTIVE",
+    };
+
+    if (data.password && data.password.trim() !== "") {
+      const hashedPassword = await bcrypt.hash(data.password, 10);
+      updateData.password = hashedPassword;
+    }
+
     await prisma.user.update({
       where: { id: data.id },
-      data: {
-        username: data.username,
-        name: data.name,
-        role: data.role,
-        status: data.status ?? "ACTIVE",
-      },
+      data: updateData,
     });
+
     return { success: true, error: false };
   } catch (error) {
     console.log("Error updating progress:", error);
@@ -725,6 +737,23 @@ export const updateStatusUser = async (
     return { success: true, error: false };
   } catch (error) {
     console.log("Error updating progress:", error);
+    return { success: false, error: true };
+  }
+};
+
+export const deleteUser = async (
+  currentState: CurrentState,
+  data: FormData
+) => {
+  const id = data.get("id") as string;
+
+  try {
+    await prisma.user.delete({
+      where: { id: id },
+    });
+
+    return { success: true, error: false };
+  } catch (error) {
     return { success: false, error: true };
   }
 };

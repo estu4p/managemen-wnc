@@ -1,3 +1,4 @@
+import DialogDelete from "@/components/form/DialogDelete";
 import UserForm from "@/components/form/UserForm";
 import HeaderPage from "@/components/HeaderPage";
 import { Button } from "@/components/ui/button";
@@ -25,11 +26,7 @@ async function AdminDetailPage({
           desc="View and manage admin details, including username, status, and password user."
           calendar={false}
         />
-        <div className="flex gap-2 mb-3">
-          <Button size="sm" variant="destructive">
-            Delete
-          </Button>
-        </div>
+        <DialogDelete table="user" id={id} title="User" />
       </div>
       <UserForm mode="update" defaultValues={user} />
     </div>

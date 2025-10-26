@@ -8,6 +8,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Separator } from "../ui/separator";
@@ -16,7 +17,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { User } from "@prisma/client";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { createUser, updateUser } from "@/lib/action";
-import { userSchema, UserSchema } from "@/lib/formValidationSchemas";
+import {
+  userSchema,
+  UserSchema,
+  userUpdateSchema,
+} from "@/lib/formValidationSchemas";
 import {
   Select,
   SelectContent,
@@ -45,20 +50,24 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
     { success: false, error: false }
   );
 
-  const form = useForm<UserSchema>({
-    resolver: zodResolver(userSchema),
-    defaultValues: defaultValues ?? {
-      id: undefined,
-      name: "",
-      username: "",
+  const schema = mode === "create" ? userSchema : userUpdateSchema;
+  type FormType = z.infer<typeof userSchema> | z.infer<typeof userUpdateSchema>;
+
+  const form = useForm<FormType>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      id: defaultValues?.id ?? undefined,
+      name: defaultValues?.name ?? "",
+      username: defaultValues?.username ?? "",
       password: "",
-      role: "ADMIN",
-      status: "ACTIVE",
+      confirmPassword: "",
+      role: defaultValues?.role ?? "ADMIN",
+      status: defaultValues?.status ?? "ACTIVE",
     },
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    startTransition(() => formAction(data));
+    startTransition(() => formAction(data as any));
   });
 
   const router = useRouter();
@@ -107,6 +116,7 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                         <FormDescription>
                           Displayed on the profile.
                         </FormDescription>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -127,6 +137,7 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                           />
                         </FormControl>
                         <FormDescription>Used to log in.</FormDescription>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -143,11 +154,26 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                           <span className="text-red-700">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter name" {...field} readOnly />
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={!isEditing}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Inventory category" />
+                            </SelectTrigger>
+                            <SelectContent id="role">
+                              <SelectItem value="ADMIN">Admin</SelectItem>
+                              <SelectItem value="SUPERADMIN">
+                                Super Admin
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                         <FormDescription>
                           Select the user's role.
                         </FormDescription>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -179,6 +205,7 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                         <FormDescription>
                           Set the account status.
                         </FormDescription>
+                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -196,46 +223,16 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
               </div>
               <div className="flex max-sm:w-[95%] mt-4 lg:mt-0 lg:w-[50%] max-lg:items-center max-lg:justify-center">
                 <div className="flex flex-col gap-6 items-start sm:w-[70%] lg:w-full">
-                  {mode === "update" && (
+                  <div className="flex gap-6 max-sm:flex-col items-start w-full">
                     <FormField
                       control={form.control}
                       name="password"
                       render={({ field }) => (
                         <FormItem className="w-full">
-                          <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <Input
-                                placeholder="Enter current password "
-                                {...field}
-                                type={showPassword ? "text" : "password"}
-                                disabled={!isEditing}
-                              />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 hover:bg-transparent cursor-pointer w-fit h-fit"
-                              >
-                                {showPassword ? <Eye /> : <EyeOff />}
-                              </Button>
-                            </div>
-                          </FormControl>
-                          <FormDescription>Current password.</FormDescription>
-                        </FormItem>
-                      )}
-                    />
-                  )}
-                  <div className="flex gap-6 max-sm:flex-col items-start w-full">
-                    <FormField
-                      control={form.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
                           <FormLabel>New Password</FormLabel>
                           <FormControl>
                             <Input
+                              type="password"
                               placeholder="Enter new password"
                               {...field}
                               disabled={!isEditing}
@@ -244,12 +241,13 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                           <FormDescription>
                             At least 8 chars, incl. upper, lower, and number.
                           </FormDescription>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />
                     <FormField
                       control={form.control}
-                      name="username"
+                      name="confirmPassword"
                       render={({ field }) => (
                         <FormItem className="w-full">
                           <FormLabel>
@@ -258,7 +256,8 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                           </FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="Enter confirm new name"
+                              type="password"
+                              placeholder="Enter confirm new password"
                               {...field}
                               disabled={!isEditing}
                             />
@@ -266,6 +265,7 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
                           <FormDescription>
                             Re-enter to confirm.
                           </FormDescription>
+                          <FormMessage />
                         </FormItem>
                       )}
                     />

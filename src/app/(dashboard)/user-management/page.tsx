@@ -6,6 +6,8 @@ import { ITEM_PER_PAGE } from "@/lib/settings";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { columns } from "./columns";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 async function ManageAdminPage(props: {
   searchParams: Promise<{ [key: string]: string | undefined }>;
@@ -14,25 +16,32 @@ async function ManageAdminPage(props: {
   const { page, search } = searchParams;
   const p = page ? parseInt(page) : 1;
   const searchQuery = search || "";
+  const session = await getServerSession(authOptions);
+  const userId = session?.user?.id;
 
-  const whereClause = searchQuery
-    ? {
-        OR: [
-          {
-            name: {
-              contains: searchQuery,
-              mode: "insensitive" as const,
+  const whereClause = {
+    NOT: {
+      id: userId,
+    },
+    ...(searchQuery
+      ? {
+          OR: [
+            {
+              name: {
+                contains: searchQuery,
+                mode: "insensitive" as const,
+              },
             },
-          },
-          {
-            username: {
-              contains: searchQuery,
-              mode: "insensitive" as const,
+            {
+              username: {
+                contains: searchQuery,
+                mode: "insensitive" as const,
+              },
             },
-          },
-        ],
-      }
-    : {};
+          ],
+        }
+      : {}),
+  };
 
   const [data, count] = await prisma.$transaction([
     prisma.user.findMany({
@@ -64,7 +73,7 @@ async function ManageAdminPage(props: {
         <Link href="/user-management/new" className="mb-3">
           <Button variant="default" size="sm" className="cursor-pointer">
             <Plus />
-            Add Admin
+            Add User
           </Button>
         </Link>
       </div>

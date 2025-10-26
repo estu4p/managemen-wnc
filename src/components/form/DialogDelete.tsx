@@ -21,6 +21,7 @@ import {
   deleteRevenueTarget,
   deleteService,
   deleteTransaction,
+  deleteUser,
 } from "@/lib/action";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ const deleteActionMap = {
   transaction: deleteTransaction,
   item: deleteItem,
   invoice: deleteInvoice,
+  user: deleteUser,
 };
 
 type DialogDeleteProps = {
@@ -43,7 +45,8 @@ type DialogDeleteProps = {
     | "inventory"
     | "transaction"
     | "item"
-    | "invoice";
+    | "invoice"
+    | "user";
   title?: string;
   id?: number | string;
 };

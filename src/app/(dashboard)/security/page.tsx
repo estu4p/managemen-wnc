@@ -10,7 +10,6 @@ const SecurityPage = async () => {
   const userId = session?.user?.id;
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  console.log(user?.name);
 
   return (
     <div className="p-4 sm:px-7">

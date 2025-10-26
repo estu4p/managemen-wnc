@@ -154,54 +154,84 @@ export const invoiceSchema = z.object({
 
 export type InvoiceSchema = z.infer<typeof invoiceSchema>;
 
-export const userSchema = z.object({
-  id: z.string().optional(),
-  username: z
-    .string()
-    .min(2, { message: "Username must be at least 2 character!" }),
-  name: z.string().min(2, { message: "Name must be at least 2 character!" }),
-  role: z.enum(["ADMIN", "SUPERADMIN"], {
-    message: "Role is required!",
-  }),
-  status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters!" })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter!",
-    })
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter!",
-    })
-    .regex(/[0-9]/, { message: "Password must contain at least one number!" })
-    .optional(),
-});
+export const userSchema = z
+  .object({
+    id: z.string().optional(),
+    username: z
+      .string()
+      .min(2, { message: "Username must be at least 2 character!" }),
+    name: z.string().min(2, { message: "Name must be at least 2 character!" }),
+    role: z.enum(["ADMIN", "SUPERADMIN"], {
+      message: "Role is required!",
+    }),
+    status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters!" })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least one uppercase letter!",
+      })
+      .regex(/[a-z]/, {
+        message: "Password must contain at least one lowercase letter!",
+      })
+      .regex(/[0-9]/, {
+        message: "Password must contain at least one number!",
+      }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match!",
+    path: ["confirmPassword"],
+  });
 
 export type UserSchema = z.infer<typeof userSchema>;
 
 // update user (password optional)
-export const userUpdateSchema = z.object({
-  id: z.string().optional(),
-  username: z
-    .string()
-    .min(2, { message: "Username must be at least 2 character!" }),
-  name: z.string().min(2, { message: "Name must be at least 2 character!" }),
-  role: z.enum(["ADMIN", "SUPERADMIN"], {
-    message: "Role is required!",
-  }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters!" })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter!",
-    })
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter!",
-    })
-    .regex(/[0-9]/, { message: "Password must contain at least one number!" })
-    .optional()
-    .or(z.literal("")),
-});
+export const userUpdateSchema = z
+  .object({
+    id: z.string().optional(),
+    username: z
+      .string()
+      .min(2, { message: "Username must be at least 2 characters!" }),
+    name: z.string().min(2, { message: "Name must be at least 2 characters!" }),
+    role: z.enum(["ADMIN", "SUPERADMIN"], {
+      message: "Role is required!",
+    }),
+    status: z.enum(["ACTIVE", "INACTIVE"]).optional(),
+    password: z
+      .string()
+      .optional()
+      .refine(
+        (val) => !val || val.length >= 8,
+        "Password must be at least 8 characters!"
+      )
+      .refine(
+        (val) => !val || /[A-Z]/.test(val),
+        "Password must contain at least one uppercase letter!"
+      )
+      .refine(
+        (val) => !val || /[a-z]/.test(val),
+        "Password must contain at least one lowercase letter!"
+      )
+      .refine(
+        (val) => !val || /[0-9]/.test(val),
+        "Password must contain at least one number!"
+      ),
+    confirmPassword: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      // hanya cek jika password diisi
+      if (data.password) {
+        return data.password === data.confirmPassword;
+      }
+      return true;
+    },
+    {
+      message: "Passwords do not match!",
+      path: ["confirmPassword"],
+    }
+  );
 
 export type UserUpdateSchema = z.infer<typeof userUpdateSchema>;
 

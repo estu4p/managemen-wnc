@@ -52,7 +52,10 @@ const UpdateStatusUser = ({ id, status }: UpdateStatusUserProps) => {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger>
-        <Badge variant="default" className="cursor-pointer text-xs lowercase">
+        <Badge
+          variant={status !== "ACTIVE" ? "EXPENSE" : "NEW_ORDER"}
+          className="cursor-pointer text-xs lowercase"
+        >
           {status}
         </Badge>
       </PopoverTrigger>
