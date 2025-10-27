@@ -6,7 +6,6 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const role = req.nextauth.token?.role;
 
-    // Halaman publik
     if (
       pathname.startsWith("/order-tracking") ||
       pathname.startsWith("/login")
@@ -14,12 +13,10 @@ export default withAuth(
       return NextResponse.next();
     }
 
-    // Belum login
     if (!role) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
 
-    // ADMIN
     if (role === "ADMIN") {
       const allowedPaths = ["/", "/invoices", "/customers", "/security"];
 
@@ -35,7 +32,6 @@ export default withAuth(
       }
     }
 
-    // SUPERADMIN bebas
     return NextResponse.next();
   },
   {
@@ -46,5 +42,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/((?!api|_next|static|favicon.ico).*)"],
+  matcher: ["/((?!api/auth|_next|static|favicon.ico).*)"],
 };
