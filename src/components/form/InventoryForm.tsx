@@ -66,7 +66,7 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
       category: "",
       unit: "OTHER",
       initialStock: undefined,
-      currentStock: 0,
+      currentStock: undefined,
       price: undefined,
       photo: "",
     },
@@ -87,9 +87,10 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
           position: "top-center",
           className: "font-semibold text-black",
           descriptionClassName: "text-black",
+          richColors: true,
         }
       );
-      router.refresh();
+      router.push("/inventories");
       setIsEditing(false);
     }
   }, [state, router, mode]);

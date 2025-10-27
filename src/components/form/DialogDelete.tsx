@@ -63,7 +63,13 @@ const DialogDelete = ({ table, id, title }: DialogDeleteProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast(`${title} has been deleted!`);
+      toast.success(`${title} has been deleted!`, {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
       setDialogOpen(false);
       setTimeout(() => {
         ["service", "discount", "target", "item"].includes(table)

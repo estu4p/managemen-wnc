@@ -36,7 +36,13 @@ const UpdateStatusUser = ({ id, status }: UpdateStatusUserProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Status updated successfully");
+      toast.success("Status updated successfully", {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
       setIsOpen(false);
 
       setTimeout(() => {
@@ -45,7 +51,13 @@ const UpdateStatusUser = ({ id, status }: UpdateStatusUserProps) => {
     }
 
     if (state.error) {
-      toast.error("Failed to update status");
+      toast.error("Failed to update status", {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
     }
   }, [state, router]);
 

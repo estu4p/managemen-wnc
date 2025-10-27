@@ -215,6 +215,7 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
         position: "top-center",
         className: "font-semibold text-black",
         descriptionClassName: "text-black",
+        richColors: true,
       });
 
       setTimeout(() => {
@@ -235,6 +236,9 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
       toast.error("Please check the form for errors", {
         duration: 4000,
         position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
       });
     }
   );

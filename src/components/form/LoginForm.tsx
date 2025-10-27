@@ -13,6 +13,7 @@ import { Input } from "../ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { toast } from "sonner";
 
 export function LoginForm({
   className,
@@ -24,11 +25,31 @@ export function LoginForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signIn("credentials", {
+    const res = await signIn("credentials", {
+      redirect: false,
       username,
       password,
       callbackUrl: "/",
     });
+
+    if (res?.error) {
+      toast.error(res.error, {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
+    } else {
+      toast.success("Login Successful!", {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
+      window.location.href = "/";
+    }
   };
 
   return (

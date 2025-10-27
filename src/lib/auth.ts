@@ -18,7 +18,7 @@ export const authOptions = {
         }
 
         const user = await prisma.user.findUnique({
-          where: { username: credentials.username },
+          where: { username: credentials.username, status: "ACTIVE" },
         });
 
         if (!user) throw new Error("User not found");

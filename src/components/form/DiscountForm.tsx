@@ -109,15 +109,16 @@ const DiscountForm = ({ mode, defaultValues }: DiscountFormProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast(`Service has been ${mode === "create" ? "created" : "updated"}!`, {
-        // description: `The new service has been ${
-        //   mode === "create" ? "saved" : "updated"
-        // } to the database.`,
-        duration: 4000,
-        position: "top-center",
-        className: "font-semibold text-black",
-        descriptionClassName: "text-black",
-      });
+      toast.success(
+        `Service has been ${mode === "create" ? "created" : "updated"}!`,
+        {
+          duration: 4000,
+          position: "top-center",
+          className: "font-semibold text-black",
+          descriptionClassName: "text-black",
+          richColors: true,
+        }
+      );
       setDialogOpen(false);
       setTimeout(() => {
         router.refresh();

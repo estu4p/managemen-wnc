@@ -66,13 +66,14 @@ const TransactionForm = ({
 
   useEffect(() => {
     if (state.success) {
-      toast(
+      toast.success(
         `Transaction has been ${mode === "create" ? "created" : "updated"}!`,
         {
           duration: 4000,
           position: "top-center",
           className: "font-semibold text-black",
           descriptionClassName: "text-black",
+          richColors: true,
         }
       );
       router.refresh();

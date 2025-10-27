@@ -255,6 +255,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
         position: "top-center",
         className: "font-semibold text-black",
         descriptionClassName: "text-black",
+        richColors: true,
       });
       router.refresh();
       setIsEditing(false);

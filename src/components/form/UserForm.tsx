@@ -74,12 +74,16 @@ const UserForm = ({ mode, defaultValues }: UserFormProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast(`User has been ${mode === "create" ? "created" : "updated"}!`, {
-        duration: 4000,
-        position: "top-center",
-        className: "font-semibold text-black",
-        descriptionClassName: "text-black",
-      });
+      toast.success(
+        `User has been ${mode === "create" ? "created" : "updated"}!`,
+        {
+          duration: 4000,
+          position: "top-center",
+          className: "font-semibold text-black",
+          descriptionClassName: "text-black",
+          richColors: true,
+        }
+      );
       router.refresh();
       setIsEditing(false);
     }

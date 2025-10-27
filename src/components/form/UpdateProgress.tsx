@@ -63,7 +63,13 @@ export const UpdateProgress = ({
 
   useEffect(() => {
     if (state.success) {
-      toast.success("Progress updated successfully");
+      toast.success("Progress updated successfully", {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
       setIsOpen(false);
 
       setTimeout(() => {
@@ -72,7 +78,13 @@ export const UpdateProgress = ({
     }
 
     if (state.error) {
-      toast.error("Failed to update progress");
+      toast.error("Failed to update progress", {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
     }
   }, [state, router]);
 
