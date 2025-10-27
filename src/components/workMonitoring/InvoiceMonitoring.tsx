@@ -70,11 +70,17 @@ const InvoiceMonitoring = ({ data }: { data: Progress[] }) => {
             <span className="font-medium text-2xl">{item.count}</span>
             {/* <span className="font-medium text-2xl">{hi}</span> */}
             <div className={cn("p-2 rounded-full", item.bgIcon)}>
-              <Image
+              {/* <Image
                 src={item.icon}
                 alt="icon new order"
                 height={20}
                 width={20}
+              /> */}
+              {/* <img src={item.icon} alt={item.title} width={20} height={20} /> */}
+              <img
+                src={item.icon}
+                alt={`icon ${item.title}`}
+                className="w-5 h-5 object-contain"
               />
             </div>
           </CardContent>

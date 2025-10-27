@@ -250,17 +250,28 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
 
   useEffect(() => {
     if (state.success) {
-      toast.success(`Invoice has been updated!`, {
+      toast.success("Invoice has been updated!", {
         duration: 4000,
         position: "top-center",
         className: "font-semibold text-black",
         descriptionClassName: "text-black",
         richColors: true,
       });
+
       router.refresh();
       setIsEditing(false);
     }
-  }, [state, mode]);
+
+    if (state.error) {
+      toast.error(state.message ?? "Failed to update invoice!", {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
+    }
+  }, [state]);
 
   // show share modal
   useEffect(() => {
@@ -340,7 +351,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                   )}
                 />
               </div>
-              {/* buton customer is edditing */}
               {customerIsEditing && (
                 <div className="mt-3 items-end flex justify-end gap-4">
                   <Button
@@ -354,23 +364,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                     }}
                   >
                     Cancel
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    className="cursor-pointer disabled:opacity-50"
-                    type="button"
-                    disabled={isPending}
-                    onClick={() => setCustomerIsEditing(false)}
-                  >
-                    {isPending ? (
-                      <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Updating...
-                      </div>
-                    ) : (
-                      "Save"
-                    )}
                   </Button>
                 </div>
               )}

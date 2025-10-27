@@ -47,6 +47,14 @@ type InvoiceFormProps = {
   defaultValues?: any;
 };
 
+type Customer = {
+  id: string;
+  name: string;
+  phone: string;
+  photo: string;
+  createdAt: Date;
+};
+
 const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
   const [serviceList, setServiceList] = useState<any[]>([]);
   const [itemServices, setItemServices] = useState<ServiceSummary[]>([]);
@@ -58,8 +66,9 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [discountList, setDiscountList] = useState<any[]>([]);
   const [selectedDiscounts, setSelectedDiscounts] = useState<number[]>([]);
-  const [isPaymentStatusPaid, setIsPaymentStatusPaid] = useState(true);
-
+  const [open, setOpen] = useState(false);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [searchPhone, setSearchPhone] = useState("");
   const router = useRouter();
 
   const [state, formAction, isPending] = useActionState(createInvoice, {
@@ -208,6 +217,37 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
     });
   };
 
+  // search phone customer
+  useEffect(() => {
+    if (searchPhone.length < 3) {
+      setOpen(false);
+      return;
+    }
+
+    const fetchCustomer = async () => {
+      try {
+        const res = await fetch(`/api/customers/search?phone=${searchPhone}`);
+        const data = await res.json();
+        setCustomers(data);
+        setOpen(data.length > 0);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    const timeout = setTimeout(fetchCustomer, 300);
+    return () => clearTimeout(timeout);
+  }, [searchPhone]);
+
+  const handleSelectCustomer = (customer: any) => {
+    form.setValue("customer.name", customer.name);
+    form.setValue("customer.phone", customer.phone);
+    toast.info(`Loaded ${customer.name}`, {
+      position: "top-center",
+    });
+    setOpen(false);
+  };
+
   useEffect(() => {
     if (state.success) {
       toast.success("Invoice has been created successfully!", {
@@ -217,10 +257,19 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
         descriptionClassName: "text-black",
         richColors: true,
       });
-
+      setIsLoading(true);
       setTimeout(() => {
         router.push(`/invoices/${state.invoiceId}?share=true`);
       }, 1000);
+    }
+    if (state.error) {
+      toast.error(state.message ?? "Failed to update invoice!", {
+        duration: 4000,
+        position: "top-center",
+        className: "font-semibold text-black",
+        descriptionClassName: "text-black",
+        richColors: true,
+      });
     }
   }, [state, form, router]);
 
@@ -281,15 +330,46 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>
-                        Phone Number
-                        <span className="text-red-700">*</span>
+                        Phone Number <span className="text-red-700">*</span>
                       </FormLabel>
-                      <FormControl>
+
+                      <div className="relative">
                         <Input
                           placeholder="Enter customer phone number"
+                          autoComplete="off"
                           {...field}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            field.onChange(value);
+                            setSearchPhone(value);
+                          }}
                         />
-                      </FormControl>
+
+                        {open && customers.length > 0 && (
+                          <div className="absolute z-50 mt-1 w-full rounded-md border bg-white shadow-md p-2">
+                            <span className="text-[13px] text-muted-foreground">
+                              Select if phone matches.
+                            </span>
+                            <Separator className="my-1" />
+                            {customers.map((customer) => (
+                              <div
+                                key={customer.id}
+                                onClick={() => handleSelectCustomer(customer)}
+                                className="cursor-pointer hover:bg-gray-100"
+                              >
+                                <p className="font-semibold">
+                                  {customer.phone}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {customer.name}
+                                </p>
+                                <Separator className="my-0.5" />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
                       <FormDescription>Phone number has unique</FormDescription>
                       <FormMessage />
                     </FormItem>

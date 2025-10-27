@@ -16,7 +16,12 @@ import prisma from "./prisma";
 import { Progress, UserStatus } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-type CurrentState = { success: boolean; error: boolean };
+type CurrentState = {
+  success: boolean;
+  error: boolean;
+  invoiceId?: string;
+  message?: string;
+};
 
 export const createService = async (
   currentState: CurrentState,
@@ -415,123 +420,42 @@ export const deleteCustomer = async (
 export const createInvoice = async (
   currentState: CurrentState,
   data: InvoiceSchema
-) => {
+): Promise<CurrentState> => {
   try {
     const id = data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`;
 
-    const invoice = await prisma.invoice.create({
-      data: {
-        id,
-        price: data.price,
-        addDiscount: data.addDiscount,
-        note: data.note,
-        progress: data.progress,
-        paymentStatus: data.paymentStatus ?? "UNPAID",
-        paymentMethod: data.paymentMethod,
-        customer: {
-          connectOrCreate: {
-            where: { phone: data.customer.phone },
-            create: {
-              id:
-                data.customer.id ??
-                `cust-${Date.now()}-${faker.number.int(9999)}`,
-              name: data.customer.name,
-              phone: data.customer.phone,
-              photo: data.customer.photo,
-            },
-          },
-        },
-        items: {
-          create: data.items.map((item) => ({
-            name: item.name,
-            itemCategory: item.itemCategory,
-            material: item.material,
-            size: item.size,
-            color: item.color,
-            photos: item.photos,
-            note: item.note,
-            estimatedCompletion: item.estimatedCompletion,
-            progress: item.progress,
-            service: {
-              connect: item.service.map((id) => ({ id })),
-            },
-          })),
-        },
-        discounts: {
-          connect: data.discounts?.map((id) => ({ id })) || [],
-        },
-      },
-    });
-
-    if (data.paymentStatus === "PAID") {
-      const existingTransaction = await prisma.transaction.findFirst({
-        where: { invoiceId: invoice.id },
+    const result = await prisma.$transaction(async (tx) => {
+      let customer = await tx.customer.findUnique({
+        where: { phone: data.customer.phone },
       });
 
-      if (!existingTransaction) {
-        await prisma.transaction.create({
+      if (!customer) {
+        customer = await tx.customer.create({
           data: {
-            title: `Payment ${data.customer.name}`,
-            type: "INCOME",
-            invoiceId: invoice.id,
-            amount: data.price,
-            category: "SERVICE_INCOME",
-          },
-        });
-      }
-    }
-
-    return { success: true, error: false, invoiceId: id };
-  } catch (error) {
-    console.log(error);
-    return { success: false, error: true };
-  }
-};
-
-export const updateInvoice = async (
-  currentState: CurrentState,
-  data: InvoiceSchema
-) => {
-  try {
-    const existing = await prisma.invoice.findUnique({
-      where: { id: data.id },
-      select: { paymentStatus: true },
-    });
-
-    const invoice = await prisma.invoice.update({
-      where: { id: data.id },
-      data: {
-        price: data.price,
-        addDiscount: data.addDiscount,
-        note: data.note,
-        progress: data.progress,
-        paymentStatus: data.paymentStatus,
-        paymentMethod: data.paymentMethod,
-        customer: {
-          update: {
+            id:
+              data.customer.id ??
+              `cust-${Date.now()}-${faker.number.int(9999)}`,
             name: data.customer.name,
             phone: data.customer.phone,
             photo: data.customer.photo,
           },
-        },
-        items: {
-          upsert: data.items.map((item) => ({
-            where: { id: item.id ?? 0 },
-            update: {
-              name: item.name,
-              itemCategory: item.itemCategory,
-              material: item.material,
-              size: item.size,
-              color: item.color,
-              photos: item.photos,
-              note: item.note,
-              estimatedCompletion: item.estimatedCompletion,
-              progress: item.progress,
-              service: {
-                set: item.service.map((id) => ({ id })),
-              },
-            },
-            create: {
+        });
+      }
+
+      const invoice = await tx.invoice.create({
+        data: {
+          id,
+          price: data.price,
+          addDiscount: data.addDiscount,
+          note: data.note,
+          progress: data.progress ?? "NEW_ORDER",
+          paymentStatus: data.paymentStatus ?? "UNPAID",
+          paymentMethod: data.paymentMethod,
+          customer: {
+            connect: { id: customer.id },
+          },
+          items: {
+            create: data.items.map((item) => ({
               name: item.name,
               itemCategory: item.itemCategory,
               material: item.material,
@@ -544,45 +468,174 @@ export const updateInvoice = async (
               service: {
                 connect: item.service.map((id) => ({ id })),
               },
+            })),
+          },
+          discounts: {
+            connect: data.discounts?.map((id) => ({ id })) || [],
+          },
+        },
+      });
+
+      if (data.paymentStatus === "PAID") {
+        const existingTransaction = await tx.transaction.findFirst({
+          where: { invoiceId: invoice.id },
+        });
+
+        if (!existingTransaction) {
+          await tx.transaction.create({
+            data: {
+              title: `Payment ${data.customer.name}`,
+              type: "INCOME",
+              invoiceId: invoice.id,
+              amount: data.price,
+              category: "SERVICE_INCOME",
             },
-          })),
-        },
-        discounts: {
-          connect: data.discounts?.map((id) => ({ id })) || [],
-        },
-      },
+          });
+        }
+      }
+
+      return invoice;
     });
 
-    if (existing?.paymentStatus !== "PAID" && data.paymentStatus === "PAID") {
-      console.log(existing?.paymentStatus);
+    return { success: true, error: false, invoiceId: id };
+  } catch (error: any) {
+    console.error("Update Invoice Error:", error);
 
-      const existingTransaction = await prisma.transaction.findFirst({
-        where: { invoiceId: invoice.id },
+    if (error.code === "P2002" && error.meta?.target?.includes("phone")) {
+      return {
+        success: false,
+        error: true,
+        message: "Phone number already exists for another customer.",
+      };
+    }
+
+    return {
+      success: false,
+      error: true,
+      message: "Failed to update invoice.",
+    };
+  }
+};
+
+export const updateInvoice = async (
+  currentState: CurrentState,
+  data: InvoiceSchema
+) => {
+  try {
+    await prisma.$transaction(async (tx) => {
+      // 🔍 Ambil status pembayaran lama
+      const existing = await tx.invoice.findUnique({
+        where: { id: data.id },
+        select: { paymentStatus: true },
       });
 
-      if (!existingTransaction) {
-        await prisma.transaction.create({
-          data: {
-            title: `Payment ${data.customer.name}`,
-            type: "INCOME",
-            invoiceId: invoice.id,
-            amount: data.price,
-            category: "SERVICE_INCOME",
+      if (!existing) throw new Error("Invoice not found");
+
+      // 🧾 Update data invoice
+      const invoice = await tx.invoice.update({
+        where: { id: data.id },
+        data: {
+          price: data.price,
+          addDiscount: data.addDiscount,
+          note: data.note,
+          progress: data.progress,
+          paymentStatus: data.paymentStatus,
+          paymentMethod: data.paymentMethod,
+          customer: {
+            update: {
+              name: data.customer.name,
+              phone: data.customer.phone,
+              photo: data.customer.photo,
+            },
           },
+          // 🧱 Update item — pisahkan antara update & create
+          items: {
+            deleteMany: {
+              id: { notIn: data.items.filter((i) => i.id).map((i) => i.id!) },
+            },
+            upsert: data.items.map((item) => ({
+              where: { id: item.id ?? 0 },
+              update: {
+                name: item.name,
+                itemCategory: item.itemCategory,
+                material: item.material,
+                size: item.size,
+                color: item.color,
+                photos: item.photos,
+                note: item.note,
+                estimatedCompletion: item.estimatedCompletion,
+                progress: item.progress,
+                service: {
+                  set: item.service.map((id) => ({ id })),
+                },
+              },
+              create: {
+                name: item.name,
+                itemCategory: item.itemCategory,
+                material: item.material,
+                size: item.size,
+                color: item.color,
+                photos: item.photos,
+                note: item.note,
+                estimatedCompletion: item.estimatedCompletion,
+                progress: item.progress,
+                service: {
+                  connect: item.service.map((id) => ({ id })),
+                },
+              },
+            })),
+          },
+          discounts: {
+            set: [], // bersihkan dulu
+            connect: data.discounts?.map((id) => ({ id })) || [],
+          },
+        },
+      });
+
+      // 💰 Transaksi otomatis jika status berubah
+      if (existing.paymentStatus !== "PAID" && data.paymentStatus === "PAID") {
+        const exists = await tx.transaction.findFirst({
+          where: { invoiceId: invoice.id },
+        });
+
+        if (!exists) {
+          await tx.transaction.create({
+            data: {
+              title: `Payment ${data.customer.name}`,
+              type: "INCOME",
+              invoiceId: invoice.id,
+              amount: data.price,
+              category: "SERVICE_INCOME",
+            },
+          });
+        }
+      }
+
+      // ❌ Hapus transaksi kalau dibatalkan pembayarannya
+      if (existing.paymentStatus === "PAID" && data.paymentStatus !== "PAID") {
+        await tx.transaction.deleteMany({
+          where: { invoiceId: invoice.id },
         });
       }
-    }
-
-    if (existing?.paymentStatus === "PAID" && data.paymentStatus !== "PAID") {
-      await prisma.transaction.deleteMany({
-        where: { invoiceId: invoice.id },
-      });
-    }
+    });
 
     return { success: true, error: false };
-  } catch (error) {
-    console.log(error);
-    return { success: false, error: true };
+  } catch (error: any) {
+    console.error("Update Invoice Error:", error);
+
+    if (error.code === "P2002" && error.meta?.target?.includes("phone")) {
+      return {
+        success: false,
+        error: true,
+        message: "Phone number already exists for another customer.",
+      };
+    }
+
+    return {
+      success: false,
+      error: true,
+      message: "Failed to update invoice.",
+    };
   }
 };
 
