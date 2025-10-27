@@ -523,7 +523,6 @@ export const updateInvoice = async (
 ) => {
   try {
     await prisma.$transaction(async (tx) => {
-      // 🔍 Ambil status pembayaran lama
       const existing = await tx.invoice.findUnique({
         where: { id: data.id },
         select: { paymentStatus: true },
@@ -531,7 +530,6 @@ export const updateInvoice = async (
 
       if (!existing) throw new Error("Invoice not found");
 
-      // 🧾 Update data invoice
       const invoice = await tx.invoice.update({
         where: { id: data.id },
         data: {
@@ -548,7 +546,6 @@ export const updateInvoice = async (
               photo: data.customer.photo,
             },
           },
-          // 🧱 Update item — pisahkan antara update & create
           items: {
             deleteMany: {
               id: { notIn: data.items.filter((i) => i.id).map((i) => i.id!) },
@@ -586,13 +583,12 @@ export const updateInvoice = async (
             })),
           },
           discounts: {
-            set: [], // bersihkan dulu
+            set: [],
             connect: data.discounts?.map((id) => ({ id })) || [],
           },
         },
       });
 
-      // 💰 Transaksi otomatis jika status berubah
       if (existing.paymentStatus !== "PAID" && data.paymentStatus === "PAID") {
         const exists = await tx.transaction.findFirst({
           where: { invoiceId: invoice.id },
@@ -611,7 +607,6 @@ export const updateInvoice = async (
         }
       }
 
-      // ❌ Hapus transaksi kalau dibatalkan pembayarannya
       if (existing.paymentStatus === "PAID" && data.paymentStatus !== "PAID") {
         await tx.transaction.deleteMany({
           where: { invoiceId: invoice.id },

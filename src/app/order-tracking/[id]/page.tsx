@@ -1,7 +1,4 @@
-import {
-  Discount,
-  Service,
-} from "@/app/(dashboard)/invoices/invoice-settings/columns";
+import { Service } from "@/app/(dashboard)/invoices/invoice-settings/columns";
 import DetailsNote from "@/components/note/NoteDetails";
 import TrackingMap from "@/components/note/TrackingMap";
 import OrderTrackingEmpty from "@/components/OrderTrackingEmpty";
@@ -96,7 +93,9 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
           </div>
           <div>
             <h3>Items</h3>
-            <p className="font-medium capitalize">2 Items (Shoes)</p>
+            <p className="font-medium capitalize">
+              {invoice.items.length} item
+            </p>
           </div>
           <div>
             <h3>Services</h3>
@@ -126,7 +125,7 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
                       alt="shoe photo"
                       width={50}
                       height={50}
-                      className="bg-red-200 w-full h-full object-cover"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <div className="">

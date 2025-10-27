@@ -29,7 +29,7 @@ export const transformInvoiceForCalculation = (
     )
   );
 
-  const discountList = invoice.discount.map((disc: any) => ({
+  const discountList = invoice.discounts.map((disc: any) => ({
     id: disc.id,
     title: disc.name,
     amount: disc.price,
