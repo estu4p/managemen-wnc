@@ -44,7 +44,6 @@ export function ExportButton({ filters = {} }: ExportButtonProps) {
       const a = document.createElement("a");
       a.href = url;
 
-      // Dapatkan filename dari header atau buat default
       const contentDisposition = response.headers.get("Content-Disposition");
       let filename = `transactions-${
         new Date().toISOString().split("T")[0]

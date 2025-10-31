@@ -47,9 +47,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
-import { watch } from "fs";
 import { calculateServiceSummary } from "@/lib/calculateServiceSummary";
-import { number } from "zod";
+import { uploadMultipleToCloudinary } from "@/lib/upload";
 
 type ServiceSummary = {
   serviceId: number;
@@ -87,8 +86,13 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
   const [openCustomersPhone, setOpenCustomersPhone] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchPhone, setSearchPhone] = useState("");
-
   const [showDialog, setShowDialog] = useState(false);
+  const [isUploadingPhotos, setIsUploadingPhotos] = useState(false);
+  const [itemPhotos, setItemPhotos] = useState<{ [key: number]: File[] }>({});
+  const [existingPhotoUrls, setExistingPhotoUrls] = useState<{
+    [key: number]: string[];
+  }>({});
+
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -143,6 +147,21 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     name: "items",
   });
 
+  // Handlers untuk photos
+  const handleItemPhotosChange = (itemIndex: number, files: File[]) => {
+    setItemPhotos((prev) => ({
+      ...prev,
+      [itemIndex]: files,
+    }));
+  };
+
+  const handleItemUrlsChange = (itemIndex: number, urls: string[]) => {
+    setExistingPhotoUrls((prev) => ({
+      ...prev,
+      [itemIndex]: urls.filter((url) => !url.startsWith("blob:")),
+    }));
+  };
+
   const handleServiceChange = (
     itemIndex: number,
     selectedServiceIds: number[]
@@ -158,7 +177,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
 
   const handleDiscountChange = (discountIds: number[]) => {
     setSelectedDiscounts(discountIds);
-
     form.setValue("discounts", discountIds);
   };
 
@@ -243,6 +261,19 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
 
       return reindexed;
     });
+
+    // Juga hapus photos state untuk item yang dihapus
+    setItemPhotos((prev) => {
+      const newItemPhotos = { ...prev };
+      delete newItemPhotos[index];
+      return newItemPhotos;
+    });
+
+    setExistingPhotoUrls((prev) => {
+      const newUrls = { ...prev };
+      delete newUrls[index];
+      return newUrls;
+    });
   };
 
   // search phone customer
@@ -281,9 +312,76 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
     error: false,
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    startTransition(async () => formAction(data));
-  });
+  const onSubmit = form.handleSubmit(
+    async (data) => {
+      if (!isEditing) return;
+
+      setIsUploadingPhotos(true);
+
+      try {
+        const updatedItems = [];
+
+        // Process each item
+        for (let i = 0; i < data.items.length; i++) {
+          const item = data.items[i];
+          const filesToUpload = itemPhotos[i] || [];
+
+          let newPhotoUrls: string[] = [];
+
+          // Upload new photos if any
+          if (filesToUpload.length > 0) {
+            const { urls, error } = await uploadMultipleToCloudinary(
+              filesToUpload
+            );
+            if (error) {
+              toast.error(`Failed to upload photos for item ${i + 1}`);
+            } else {
+              newPhotoUrls = urls;
+              toast.success(`Uploaded ${urls.length} photos for item ${i + 1}`);
+            }
+          }
+
+          // Combine existing and new photos
+          const existingPhotos = item.photos || [];
+          const existingUrlsFromState = existingPhotoUrls[i] || [];
+          const allPhotos = [
+            ...new Set([
+              ...existingPhotos,
+              ...existingUrlsFromState,
+              ...newPhotoUrls,
+            ]),
+          ];
+
+          updatedItems.push({
+            ...item,
+            photos: allPhotos,
+          });
+        }
+
+        // Create final data
+        const formDataWithPhotos = {
+          ...data,
+          items: updatedItems,
+        };
+
+        startTransition(() => {
+          formAction(formDataWithPhotos);
+        });
+      } catch (error) {
+        console.error("Upload error:", error);
+        toast.error("Failed to process photos");
+        setIsUploadingPhotos(false);
+      }
+    },
+    (errors) => {
+      console.error("Form errors:", errors);
+      toast.error("Please check the form for errors", {
+        duration: 4000,
+        position: "top-center",
+      });
+      setIsUploadingPhotos(false);
+    }
+  );
 
   const router = useRouter();
 
@@ -299,6 +397,11 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
 
       router.refresh();
       setIsEditing(false);
+      setIsUploadingPhotos(false);
+
+      // Reset photo states setelah update berhasil
+      setItemPhotos({});
+      setExistingPhotoUrls({});
     }
 
     if (state.error) {
@@ -309,6 +412,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
         descriptionClassName: "text-black",
         richColors: true,
       });
+      setIsUploadingPhotos(false);
     }
   }, [state]);
 
@@ -600,7 +704,20 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                         </div>
                         {/* photos */}
                         <FormItem>
-                          <PhotoInput />
+                          {/* <FormLabel>Photos</FormLabel> */}
+                          <PhotoInput
+                            onFilesChange={(files: File[]) =>
+                              handleItemPhotosChange(index, files)
+                            }
+                            onUrlsChange={(urls: string[]) =>
+                              handleItemUrlsChange(index, urls)
+                            }
+                            existingPhotos={
+                              form.watch(`items.${index}.photos`) || []
+                            }
+                            itemIndex={index}
+                            isUploading={isUploadingPhotos && isEditing}
+                          />
                         </FormItem>
 
                         <FormField
@@ -1018,13 +1135,14 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 <Button
                   variant="destructive"
                   size="sm"
-                  disabled={isPending}
+                  disabled={isPending || isUploadingPhotos}
                   className="cursor-pointer disabled:opacity-50"
                   type="button"
                   onClick={() => {
                     form.reset(defaultValues);
                     setIsEditing(false);
                     setCustomerIsEditing(false);
+                    setIsUploadingPhotos(false);
 
                     // Reset selected services
                     const initialSelectedServices: {
@@ -1038,6 +1156,10 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                       }
                     });
                     setSelectedServices(initialSelectedServices);
+
+                    // Reset photo states
+                    setItemPhotos({});
+                    setExistingPhotoUrls({});
                   }}
                 >
                   Cancel
@@ -1047,12 +1169,14 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                   size="sm"
                   className="cursor-pointer disabled:opacity-50"
                   type="submit"
-                  disabled={isPending}
+                  disabled={isPending || isUploadingPhotos}
                 >
-                  {isPending ? (
+                  {isPending || isUploadingPhotos ? (
                     <div className="flex items-center gap-2">
                       <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Updating...
+                      {isUploadingPhotos
+                        ? "Uploading Photos..."
+                        : "Updating..."}
                     </div>
                   ) : (
                     "Save"
@@ -1086,19 +1210,11 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
                 const createdAt = defaultValues?.createdAt ?? Date.now();
                 const incomingDate = formatDate(createdAt);
                 const incomingTime = formatTime(createdAt);
-                // const estimated = form.watch("items")
                 const totalPrice = finalTotal;
                 const items = form.watch("items");
                 const totalItem = form.watch("items").length;
                 const note = form.watch("note") ?? "-";
 
-                //                 let serviceMessage = "";
-                //                 items.forEach((item) => {
-                //                   serviceMessage += `
-                // Layanan :
-                // - ${item.name} : ${item.serviceDetail.map((s: any ) => s.name)}
-                // `;
-                //                 });
                 let serviceMessage = "";
                 items.forEach((item: any) => {
                   serviceMessage += `- ${item.name}`;

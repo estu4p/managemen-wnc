@@ -1,4 +1,4 @@
-import NewInvoiceForm from "@/components/form/newInfoiceForm";
+import NewInvoiceForm from "@/components/form/NewInvoiceForm";
 import HeaderPage from "@/components/HeaderPage";
 
 function AddNewInvoicePage() {

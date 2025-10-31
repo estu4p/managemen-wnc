@@ -100,7 +100,7 @@ export const invoiceSchema = z.object({
   progress: z.string().optional(),
   paymentStatus: z.enum(["PAID", "UNPAID"]).optional(),
   paymentMethod: z
-    .enum(["CASH", "QRIS", "TRANSFER", "DEBIT", "OTHER"], {
+    .enum(["CASH", "QRIS", "TRANSFER", "DEBIT", "OTHER", "UNPAID"], {
       message: "Payment Method is required!",
     })
     .optional(),

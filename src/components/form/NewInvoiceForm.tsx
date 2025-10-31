@@ -21,7 +21,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { formatRupiah } from "@/lib/format";
@@ -34,6 +34,7 @@ import { Checkbox } from "../ui/checkbox";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { calculateServiceSummary } from "@/lib/calculateServiceSummary";
+import { uploadMultipleToCloudinary } from "@/lib/upload";
 
 type ServiceSummary = {
   serviceId: number;
@@ -69,6 +70,10 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
   const [open, setOpen] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchPhone, setSearchPhone] = useState("");
+  const [itemPhotos, setItemPhotos] = useState<{ [key: number]: File[] }>({});
+  const [existingPhotoUrls, setExistingPhotoUrls] = useState<{
+    [key: number]: string[];
+  }>({});
   const router = useRouter();
 
   const [state, formAction, isPending] = useActionState(createInvoice, {
@@ -97,7 +102,7 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
       note: "",
       progress: "NEW_ORDER",
       paymentStatus: "UNPAID",
-      paymentMethod: "CASH",
+      paymentMethod: "UNPAID",
       customer: {
         id: undefined,
         name: "",
@@ -215,6 +220,19 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
 
       return reindexed;
     });
+
+    // Juga hapus photos state untuk item yang dihapus
+    setItemPhotos((prev) => {
+      const newItemPhotos = { ...prev };
+      delete newItemPhotos[index];
+      return newItemPhotos;
+    });
+
+    setExistingPhotoUrls((prev) => {
+      const newUrls = { ...prev };
+      delete newUrls[index];
+      return newUrls;
+    });
   };
 
   // search phone customer
@@ -273,21 +291,92 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
     }
   }, [state, form, router]);
 
+  // Handler untuk photos
+  const handleItemPhotosChange = (itemIndex: number, files: File[]) => {
+    setItemPhotos((prev) => ({
+      ...prev,
+      [itemIndex]: files,
+    }));
+  };
+
+  const handleItemUrlsChange = (itemIndex: number, urls: string[]) => {
+    setExistingPhotoUrls((prev) => ({
+      ...prev,
+      [itemIndex]: urls.filter((url) => !url.startsWith("blob:")),
+    }));
+  };
+
   const onSubmit = form.handleSubmit(
-    (data) => {
+    async (data) => {
+      console.log("Form data before upload:", data);
       setIsLoading(true);
-      startTransition(() => {
-        formAction(data);
+
+      try {
+        // Upload photos untuk setiap item yang memiliki file baru
+        const uploadedPhotoUrls: { [key: number]: string[] } = {};
+
+        // Upload photos untuk setiap item
+        for (const itemIndex in itemPhotos) {
+          const files = itemPhotos[itemIndex];
+          if (files && files.length > 0) {
+            try {
+              const { urls, error } = await uploadMultipleToCloudinary(files);
+
+              if (error) {
+                toast.error(
+                  `Failed to upload photos for item ${
+                    parseInt(itemIndex) + 1
+                  }: ${error}`
+                );
+                continue;
+              }
+
+              uploadedPhotoUrls[parseInt(itemIndex)] = urls;
+              toast.success(
+                `Uploaded ${urls.length} photos for item ${
+                  parseInt(itemIndex) + 1
+                }`
+              );
+            } catch (error) {
+              console.error(`Upload error for item ${itemIndex}:`, error);
+              toast.error(
+                `Failed to upload photos for item ${parseInt(itemIndex) + 1}`
+              );
+            }
+          }
+        }
+
+        // Gabungkan URL photos yang sudah ada dengan yang baru diupload
+        const formDataWithPhotos = {
+          ...data,
+          items: data.items.map((item, index) => {
+            const existingUrls = existingPhotoUrls[index] || item.photos || [];
+            const newUrls = uploadedPhotoUrls[index] || [];
+            const allPhotos = [...existingUrls, ...newUrls];
+
+            return {
+              ...item,
+              photos: allPhotos,
+            };
+          }),
+        };
+
+        console.log("Form data with photos:", formDataWithPhotos);
+
+        startTransition(() => {
+          formAction(formDataWithPhotos);
+        });
+      } catch (error) {
+        console.error("Upload error:", error);
+        toast.error("Failed to upload photos");
         setIsLoading(false);
-      });
+      }
     },
     (errors) => {
+      console.error("Form errors:", errors);
       toast.error("Please check the form for errors", {
         duration: 4000,
         position: "top-center",
-        className: "font-semibold text-black",
-        descriptionClassName: "text-black",
-        richColors: true,
       });
     }
   );
@@ -529,8 +618,28 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
                           />
                         </div>
                         {/* photos */}
+                        {/* <FormItem>
+                          <PhotoInput
+                            onFilesChange={handleItemPhotosChange}
+                            existingPhotos={
+                              form.watch(`items.${index}.photos`) || []
+                            }
+                          />
+                        </FormItem> */}
                         <FormItem>
-                          <PhotoInput />
+                          <FormLabel>Photos</FormLabel>
+                          <PhotoInput
+                            onFilesChange={(files: File[]) =>
+                              handleItemPhotosChange(index, files)
+                            }
+                            onUrlsChange={(urls: string[]) =>
+                              handleItemUrlsChange(index, urls)
+                            }
+                            existingPhotos={
+                              form.watch(`items.${index}.photos`) || []
+                            }
+                            itemIndex={index}
+                          />
                         </FormItem>
                         <FormField
                           control={form.control}
@@ -842,6 +951,7 @@ const NewInvoiceForm = ({ defaultValues }: InvoiceFormProps) => {
                             <SelectItem value="TRANSFER">TRANSFER</SelectItem>
                             <SelectItem value="DEBIT">DEBIT</SelectItem>
                             <SelectItem value="OTHER">OTHER</SelectItem>
+                            <SelectItem value="UNPAID">UNPAID</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
