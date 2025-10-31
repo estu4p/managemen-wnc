@@ -51,6 +51,17 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
     selectedDiscounts
   );
 
+  const getFirstPhoto = (photos: any): string => {
+    if (
+      Array.isArray(photos) &&
+      photos.length > 0 &&
+      typeof photos[0] === "string"
+    ) {
+      return photos[0];
+    }
+    return "/images/shoe.jpeg";
+  };
+
   return (
     <div className="flex justify-center">
       <div className="w-[40rem] min-h-screen md:m-3 p-4 rounded-md border border-border text-sm bg-background">
@@ -121,7 +132,7 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
                 <div className="flex gap-3 items-center">
                   <div className="w-[50px] h-[50px]">
                     <Image
-                      src="/images/shoe.jpeg"
+                      src={getFirstPhoto(item.photos)}
                       alt="shoe photo"
                       width={50}
                       height={50}
@@ -164,6 +175,7 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
                       materials={item.material || "- - -"}
                       size={item.size || "- - -"}
                       notes={item.note || "- - -"}
+                      photos={item.photos || []}
                     />
                   </TabsContent>
                 </Tabs>
