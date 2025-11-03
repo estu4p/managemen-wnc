@@ -274,17 +274,6 @@ const InventoryForm = ({ mode, defaultValues }: InventoryFormProps) => {
                       )}
                     />
                   </div>
-                  <div className="">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <PhotoInput />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
                   <div className="flex justify-end gap-4">
                     {!isEditing ? (
                       <Button

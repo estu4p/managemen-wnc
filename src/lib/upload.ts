@@ -32,3 +32,25 @@ export async function uploadMultipleToCloudinary(
     return { urls: [], error: "Failed to upload images to Cloudinary" };
   }
 }
+
+export async function uploadToCloudinary(
+  file: File
+): Promise<{ url: string; error?: string }> {
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const base64String = `data:${file.type};base64,${buffer.toString(
+      "base64"
+    )}`;
+
+    const result = await cloudinary.uploader.upload(base64String, {
+      folder: "wnc-profile-photos",
+      resource_type: "image",
+    });
+
+    return { url: result.secure_url };
+  } catch (error) {
+    console.error("Cloudinary upload error:", error);
+    return { url: "", error: "Failed to upload image to Cloudinary" };
+  }
+}

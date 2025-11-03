@@ -361,7 +361,9 @@ export const createCustomer = async (
   try {
     await prisma.customer.create({
       data: {
-        id: data.id ?? `cust-${Date.now()}-${faker.number.int(9999)}`,
+        id:
+          data.id ??
+          `cust-${Date.now().toString().slice(-6)}-${faker.number.int(9999)}`,
         name: data.name,
         phone: data.phone,
         photo: data.photo,
@@ -422,7 +424,9 @@ export const createInvoice = async (
   data: InvoiceSchema
 ): Promise<CurrentState> => {
   try {
-    const id = data.id ?? `wnc-${Date.now()}-${faker.number.int(9999)}`;
+    const id =
+      data.id ??
+      `wnc-${Date.now().toString().slice(-6)}-${faker.number.int(9999)}`;
 
     const result = await prisma.$transaction(async (tx) => {
       let customer = await tx.customer.findUnique({
@@ -434,7 +438,9 @@ export const createInvoice = async (
           data: {
             id:
               data.customer.id ??
-              `cust-${Date.now()}-${faker.number.int(9999)}`,
+              `cust-${Date.now().toString().slice(-6)}-${faker.number.int(
+                9999
+              )}`,
             name: data.customer.name,
             phone: data.customer.phone,
             photo: data.customer.photo,
@@ -716,7 +722,7 @@ export const createUser = async (
   currentState: CurrentState,
   data: UserSchema
 ) => {
-  const id = `user-${Date.now()}`;
+  const id = `user-${Date.now().toString().slice(-6)}`;
   const hashedPassword = await bcrypt.hash(data.password, 10);
 
   try {

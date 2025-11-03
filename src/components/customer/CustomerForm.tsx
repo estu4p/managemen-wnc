@@ -8,11 +8,8 @@ import {
   FormLabel,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { Label } from "../ui/label";
-import { Progress } from "../ui/progress";
 import {
   Table,
   TableBody,
@@ -24,7 +21,6 @@ import {
 import Link from "next/link";
 import { MoveUpRight } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useEffect, useState } from "react";
 import { Badge } from "../ui/badge";
@@ -33,6 +29,8 @@ import { updateCustomer } from "@/lib/action";
 import { customerSchema, CustomerSchema } from "@/lib/formValidationSchemas";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { uploadToCloudinary } from "@/lib/upload";
+import PhotoProfileInput from "../PhotoProfileInput";
 
 const statusLabels = {
   NEW_ORDER: "New Order",
@@ -44,18 +42,19 @@ const statusLabels = {
   CANCELED: "Canceled",
 };
 
-// enum Progress {
-//   NEW_ORDER
-//   WAITTING
-//   ON_PROGRESS
-//   FINISHING
-//   DONE
-//   PICKED_UP
-//   CANCELED
-// }
-
 const CustomerDetails = ({ customer }: { customer: any }) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleProfilePhotoChange = (file: File | null) => {
+    setProfilePhoto(file);
+  };
+
+  const handleProfileUrlChange = (url: string) => {
+    setProfilePhotoUrl(url);
+  };
 
   const totalItems = customer.invoices.reduce(
     (sum: any, inv: { _count: { items: any } }) => sum + inv._count.items,
@@ -72,8 +71,36 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
     defaultValues: customer,
   });
 
-  const onSubmit = form.handleSubmit((data) => {
-    startTransition(() => formAction(data));
+  const onSubmit = form.handleSubmit(async (data) => {
+    setIsUploading(true);
+
+    try {
+      let finalPhotoUrl = data.photo;
+
+      if (profilePhoto) {
+        const { url, error } = await uploadToCloudinary(profilePhoto);
+
+        if (error) {
+          toast.error("Failed to upload profile photo");
+          setIsUploading(false);
+          return;
+        }
+
+        finalPhotoUrl = url;
+      }
+      const formDataWithPhoto = {
+        ...data,
+        photo: finalPhotoUrl,
+      };
+
+      console.log("Submitting data:", formDataWithPhoto);
+
+      startTransition(() => formAction(formDataWithPhoto));
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload profile photo");
+      setIsUploading(false);
+    }
   });
 
   const router = useRouter();
@@ -89,6 +116,7 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
       });
       router.refresh();
       setIsEditing(false);
+      setIsUploading(false);
     }
   }, [state, router]);
 
@@ -155,30 +183,16 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                 <div className="flex gap-6 items-start">
                   <div>
                     <h3 className="font-medium mb-2">Photo Profile</h3>
-                    <div className="flex gap-4">
-                      <Avatar className="size-9">
-                        {customer.photo && <AvatarImage src={customer.photo} />}
-                        <AvatarFallback>
-                          {customer.name
-                            .split(" ")
-                            .map((n: any[]) => n[0])
-                            .join("")
-                            .toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="space-y-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="bg-primary-gray text-primary"
-                        >
-                          Edit photo profile
-                        </Button>
-                        <h4 className="text-muted-foreground">
-                          Edit photo profile
-                        </h4>
-                      </div>
-                    </div>
+                    <FormItem>
+                      <PhotoProfileInput
+                        onFileChange={handleProfilePhotoChange}
+                        onUrlChange={handleProfileUrlChange}
+                        existingPhoto={form.watch("photo") || ""}
+                        customerName={customer.name}
+                        isUploading={isUploading}
+                        isEditing={!isEditing}
+                      />
+                    </FormItem>
                   </div>
                 </div>
                 <div className="flex justify-end gap-4">
@@ -209,10 +223,18 @@ const CustomerDetails = ({ customer }: { customer: any }) => {
                       <Button
                         variant="default"
                         size="sm"
-                        className="cursor-pointer"
+                        className="cursor-pointer disabled:opacity-50"
                         type="submit"
+                        disabled={isUploading}
                       >
-                        Save
+                        {isUploading ? (
+                          <div className="flex items-center gap-2">
+                            <div className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                            {isUploading ? "Uploading Photo..." : "Saving..."}
+                          </div>
+                        ) : (
+                          "Save"
+                        )}
                       </Button>
                     </>
                   )}
