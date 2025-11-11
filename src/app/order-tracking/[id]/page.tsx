@@ -17,7 +17,9 @@ import { transformInvoiceForCalculation } from "@/lib/invoiceHelper";
 import prisma from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { Progress } from "@prisma/client";
+import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 async function NotePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -246,14 +248,28 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
         <Separator className="my-4" />
         <Card className="mt-4 p-2">
           <CardContent className="px-2  text-muted-foreground">
-            <div className="sm:flex ">
-              <span className="min-w-fit mr-1">Note : </span>
-              <p className="text-justify">
-                Apabila terdapat kesalahan pada nota harap lapor kepada Admin
-                Wash & Care melalui WhatsApp.
-                <br />
+            <div className="">
+              <div className="sm:flex ">
+                <span className="min-w-fit mr-1">Note : </span>
+                <p className="text-justify">
+                  Apabila terdapat kesalahan pada nota harap lapor kepada Admin
+                  Wash & Care melalui WhatsApp.
+                </p>
+              </div>
+              <p className="font-medium">
                 Terimakasih telah menggunakan jasa Wash & Care.
               </p>
+              <Link
+                href="https://docs.google.com/forms/d/e/1FAIpQLSf1czzr8ohDUq3kw0RaxiFz6eJtVPZHpXgYu-7BR0hiXyCNmQ/viewform?usp=header"
+                target="_blank"
+                className="flex gap-1 items-center mt-1"
+              >
+                <p className="underline">
+                  Klik di sini untuk memberikan feedback atau masukan jika
+                  terjadi masalah
+                </p>
+                <ArrowUpRight className="h-5 w-5" />
+              </Link>
             </div>
             {/* <p>Terimakasih telah menggunakan jasa Wash & Care.</p> */}
           </CardContent>
