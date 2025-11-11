@@ -16,6 +16,7 @@ export type Invoice = {
   progress: string;
   date: Date;
   items: any;
+  phone: string;
 };
 
 export const columns: ColumnDef<Invoice>[] = [
@@ -66,7 +67,6 @@ export const columns: ColumnDef<Invoice>[] = [
       const totalPayment = row.original.totalPayment;
       return formatRupiah(totalPayment);
     },
-    // sorting lebih spesifik
     sortingFn: (rowA, rowB, columnId) => {
       const totalPaymentA = rowA.getValue(columnId) as number;
       const totalPaymentB = rowB.getValue(columnId) as number;
@@ -103,7 +103,6 @@ export const columns: ColumnDef<Invoice>[] = [
         </>
       );
     },
-    // Sorting timestamp
     sortingFn: (rowA, rowB, columnId) => {
       const dateA = new Date(rowA.getValue(columnId) as string);
       const dateB = new Date(rowB.getValue(columnId) as string);
@@ -118,8 +117,18 @@ export const columns: ColumnDef<Invoice>[] = [
       const progress = invoice.progress;
       const items = invoice.items;
       const id = invoice.id;
+      const customerName = invoice.name;
+      const phone = invoice.phone;
 
-      return <UpdateProgress id={id} progress={progress} items={items} />;
+      return (
+        <UpdateProgress
+          id={id}
+          progress={progress}
+          items={items}
+          customerName={customerName}
+          phone={phone}
+        />
+      );
     },
   },
   {

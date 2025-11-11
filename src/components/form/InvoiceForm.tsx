@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, SquarePen } from "lucide-react";
+import { Plus, Share, Share2, SquarePen } from "lucide-react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import { startTransition, useActionState, useEffect, useState } from "react";
@@ -398,8 +398,6 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
       router.refresh();
       setIsEditing(false);
       setIsUploadingPhotos(false);
-
-      // Reset photo states setelah update berhasil
       setItemPhotos({});
       setExistingPhotoUrls({});
     }
@@ -428,9 +426,21 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
       <Form {...form}>
         <form onSubmit={onSubmit} className="space-y-4">
           {/* id */}
-          <div className="text-base">
-            <h2 className="font-medium">Invoice ID</h2>
-            <span>#{defaultValues.id}</span>
+          <div className="flex items-center gap-[110px]">
+            {/* <div className=""> */}
+            <div className="text-base">
+              <h2 className="font-medium">Invoice ID</h2>
+              <span>#{defaultValues.id}</span>
+            </div>
+            <Button
+              type="button"
+              size="sm"
+              variant="default"
+              onClick={() => setShowDialog(true)}
+            >
+              <Share2 className="mr-2" />
+              Share
+            </Button>
           </div>
           {/* Customer */}
           <div className="flex flex-col lg:flex-row">

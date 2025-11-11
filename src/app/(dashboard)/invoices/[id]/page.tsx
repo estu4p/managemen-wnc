@@ -37,14 +37,14 @@ async function OrderDetailsPage({ params }: { params: { id: string } }) {
   const invoiceData = serialize(formInvoice);
 
   return (
-    <div className="p-4 sm:px-7">
+    <div className="p-4 sm:px-7 relative">
       <div className="flex justify-between items-end ">
         <HeaderPage
           title="Invoice Details"
           desc="View and manage invoice details, including items, customer information, and payment information."
           calendar={false}
         />
-        <div className="flex gap-2 mb-3">
+        <div className="flex gap-4 mb-4">
           {/* <Button size="sm" variant="destructive">
             Delete
           </Button> */}

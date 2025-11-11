@@ -57,6 +57,7 @@ async function InvoicesPage(props: {
           select: {
             name: true,
             photo: true,
+            phone: true,
           },
         },
         items: {
@@ -79,6 +80,7 @@ async function InvoicesPage(props: {
     totalPayment: Number(invoice.price),
     date: invoice.createdAt,
     name: invoice.customer.name,
+    phone: invoice.customer.phone,
     photo: invoice.customer.photo,
     items: invoice.items.map((item) => ({
       id: item.id,

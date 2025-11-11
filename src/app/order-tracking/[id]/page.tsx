@@ -90,7 +90,6 @@ async function NotePage({ params }: { params: Promise<{ id: string }> }) {
           </div>
           <div>
             <h3>Estimated Completion</h3>
-            {/* <p className="font-medium">2023-10-01</p> */}
             {invoice.items.map((item, index) => (
               <li key={item.id} className="font-medium capitalize">
                 {item.name} :{" "}
