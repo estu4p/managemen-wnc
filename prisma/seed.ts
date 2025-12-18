@@ -6,20 +6,19 @@ const prisma = new PrismaClient();
 
 async function main() {
   // 1. User
-  const hashPassword = await bcrypt.hash("Admin1234", 10);
-  for (let i = 1; i <= 5; i++) {
-    await prisma.user.create({
-      data: {
-        id: `user-${i}`,
-        name: faker.person.fullName(),
-        username: `user${i}`,
-        password: hashPassword,
-        role: i % 2 === 0 ? "ADMIN" : "SUPERADMIN",
-        status: "ACTIVE",
-      },
-    });
-  }
-
+  // const hashPassword = await bcrypt.hash("Admin1234", 10);
+  // for (let i = 1; i <= 5; i++) {
+  //   await prisma.user.create({
+  //     data: {
+  //       id: `user-${i}`,
+  //       name: faker.person.fullName(),
+  //       username: `user${i}`,
+  //       password: hashPassword,
+  //       role: i % 2 === 0 ? "ADMIN" : "SUPERADMIN",
+  //       status: "ACTIVE",
+  //     },
+  //   });
+  // }
   // // 2. Customer
   // for (let i = 1; i <= 10; i++) {
   //   await prisma.customer.create({
@@ -31,47 +30,41 @@ async function main() {
   //     },
   //   });
   // }
-
   // 3. Service
-  for (let i = 1; i <= 5; i++) {
-    await prisma.service.create({
-      data: {
-        name: `Service ${i}`,
-        price: faker.number.float({ min: 10000, max: 50000 }),
-      },
-    });
-  }
-
+  // for (let i = 1; i <= 5; i++) {
+  //   await prisma.service.create({
+  //     data: {
+  //       name: `Service ${i}`,
+  //       price: faker.number.float({ min: 10000, max: 50000 }),
+  //     },
+  //   });
+  // }
   // 4. Discount
-  for (let i = 1; i <= 5; i++) {
-    const fromDate = faker.date.past();
-    const untilDate = faker.date.future();
-    await prisma.discount.create({
-      data: {
-        title: `Discount ${i}`,
-        amount: faker.number.float({ min: 5, max: 20 }),
-        fromDate,
-        untilDate: untilDate,
-        type: faker.helpers.arrayElement(["PERCENTAGE", "NOMINAL"]) as any,
-      },
-    });
-  }
-
+  // for (let i = 1; i <= 5; i++) {
+  //   const fromDate = faker.date.past();
+  //   const untilDate = faker.date.future();
+  //   await prisma.discount.create({
+  //     data: {
+  //       title: `Discount ${i}`,
+  //       amount: faker.number.float({ min: 5, max: 20 }),
+  //       fromDate,
+  //       untilDate: untilDate,
+  //       type: faker.helpers.arrayElement(["PERCENTAGE", "NOMINAL"]) as any,
+  //     },
+  //   });
+  // }
   // // 5. Invoice + Items
   // const services = await prisma.service.findMany();
   // const customers = await prisma.customer.findMany();
   // const discounts = await prisma.discount.findMany();
-
   // for (let i = 1; i <= 15; i++) {
   //   const randomCustomer =
   //     customers[Math.floor(Math.random() * customers.length)];
   //   const randomDiscount = faker.helpers.arrayElement(discounts);
-
   //   const invoice = await prisma.invoice.create({
   //     data: {
   //       id: `inv-${i}`,
   //       price: faker.number.float({ min: 50000, max: 200000 }),
-
   //       note: faker.lorem.sentence(),
   //       paymentMethod: faker.helpers.arrayElement([
   //         "CASH",
@@ -88,7 +81,6 @@ async function main() {
   //         : undefined,
   //     },
   //   });
-
   //   // Tambahkan beberapa item ke invoice
   //   for (let j = 1; j <= faker.number.int({ min: 1, max: 3 }); j++) {
   //     const randomService = faker.helpers.arrayElement(services);
@@ -125,7 +117,6 @@ async function main() {
   //     });
   //   }
   // }
-
   // // 6. Inventory
   // for (let i = 1; i <= 10; i++) {
   //   await prisma.inventory.create({
@@ -154,7 +145,6 @@ async function main() {
   //     },
   //   });
   // }
-
   // // 7. RevenueTarget
   // for (let i = 1; i <= 5; i++) {
   //   const fromDate = faker.date.past();
@@ -175,7 +165,6 @@ async function main() {
   //     },
   //   });
   // }
-
   // // 8. Transaction
   // for (let i = 1; i <= 20; i++) {
   //   await prisma.transaction.create({
@@ -199,7 +188,6 @@ async function main() {
   //     },
   //   });
   // }
-
   // // 9. FinancialReport
   // for (let i = 1; i <= 5; i++) {
   //   await prisma.financialReport.create({
@@ -215,11 +203,8 @@ async function main() {
   //       month: faker.number.int({ min: 1, max: 12 }),
   //       week: faker.number.int({ min: 1, max: 52 }),
   //       totalIncome: faker.number.float({ min: 1000000, max: 5000000 }),
-
   //       totalExpense: faker.number.float({ min: 500000, max: 4000000 }),
-
   //       totalProfit: faker.number.float({ min: 100000, max: 2000000 }),
-
   //       totalItemDone: faker.number.int({ min: 0, max: 50 }),
   //       totalProductSold: faker.number.int({ min: 0, max: 100 }),
   //       notes: faker.lorem.sentence(),
