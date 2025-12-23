@@ -73,6 +73,7 @@ export function LoginForm({
                   type="username"
                   placeholder="Enter your username"
                   required
+                  autoComplete="off"
                   className="bg-white"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -86,6 +87,7 @@ export function LoginForm({
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter yout password"
                     required
+                    autoComplete="off"
                     className="bg-white"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}

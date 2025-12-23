@@ -236,3 +236,28 @@ export const userUpdateSchema = z
 export type UserUpdateSchema = z.infer<typeof userUpdateSchema>;
 
 // buat validasi password
+
+// nota schema
+export const notaSchema = z.object({
+  invoiceNumber: z.string().optional(),
+  phone: z.string().optional(),
+  phoneNumber: z.string(),
+  customerName: z.string(),
+  createdAt: z.coerce.date(),
+  incomingDate: z.string(),
+  incomingTime: z.string(),
+  totalPrice: z.number(),
+  items: z.array(z.any()),
+  totalItem: z.number(),
+  note: z.string(),
+  serviceMessage: z.string(),
+  paymentMethod: z.enum([
+    "CASH",
+    "QRIS",
+    "TRANSFER",
+    "DEBIT",
+    "OTHER",
+    "UNPAID",
+  ]),
+  paymentStatus: z.enum(["PAID", "UNPAID"]),
+});

@@ -330,9 +330,8 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
 
           // Upload new photos if any
           if (filesToUpload.length > 0) {
-            const { urls, error } = await uploadMultipleToCloudinary(
-              filesToUpload
-            );
+            const { urls, error } =
+              await uploadMultipleToCloudinary(filesToUpload);
             if (error) {
               toast.error(`Failed to upload photos for item ${i + 1}`);
             } else {
@@ -420,6 +419,33 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
       setShowDialog(true);
     }
   }, [searchParams]);
+
+  const sendNote = async () => {
+    const res = await fetch(`/api/send-message`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        invoiceNumber: form.watch("id"),
+        phone: form.watch("customer.phone"),
+        phoneNumber: form.watch("customer.phone"),
+        customerName: form.watch("customer.name"),
+        createdAt: defaultValues?.createdAt ?? Date.now(),
+        incomingDate: formatDate(defaultValues?.createdAt ?? Date.now()),
+        incomingTime: formatTime(defaultValues?.createdAt ?? Date.now()),
+        totalPrice: finalTotal,
+        items: form.watch("items"),
+        totalItem: form.watch("items").length,
+        note: form.watch("note") ?? "-",
+
+        serviceMessage: "",
+        paymentStatus: form.watch("paymentStatus"),
+        paymentMethod: form.watch("paymentMethod"),
+      }),
+    });
+
+    const data = await res.json();
+    console.log(data);
+  };
 
   return (
     <>
@@ -1211,84 +1237,7 @@ const InvoiceForm = ({ mode, defaultValues }: InvoiceFormProps) => {
             <Button variant="secondary" onClick={() => setShowDialog(false)}>
               Close
             </Button>
-            <Button
-              onClick={() => {
-                const invoiceNumber = form.watch("id");
-                const phone = form.watch("customer.phone");
-                const phoneNumber = formatPhoneNumber(phone);
-                const customerName = form.watch("customer.name");
-                const createdAt = defaultValues?.createdAt ?? Date.now();
-                const incomingDate = formatDate(createdAt);
-                const incomingTime = formatTime(createdAt);
-                const totalPrice = finalTotal;
-                const items = form.watch("items");
-                const totalItem = form.watch("items").length;
-                const note = form.watch("note") ?? "-";
-
-                let serviceMessage = "";
-                items.forEach((item: any) => {
-                  serviceMessage += `- ${item.name}`;
-                  if (item.serviceDetail && item.serviceDetail.length > 0) {
-                    serviceMessage += `: ${item.serviceDetail
-                      .map((s: any) => s.name)
-                      .join(", ")}`;
-                  }
-                });
-                const paymentMethod = form.watch("paymentMethod");
-                const paymentStatus = form.watch("paymentStatus");
-                const message = `
-*INVOICE DIGITAL - TRANSAKSI REGULER*
-
-*Wash and Care*
-Nogotirto, Gamping, Sleman, DIY
-📞 087852916445
-
-=================
-*Nomor Nota:* ${invoiceNumber}
-*Pelanggan:* cs ${customerName}
-
-*Tanggal Terima:* ${incomingDate} | ${incomingTime}
-*Tanggal Selesai:* 11/10/2022 16:40
-=================
-
-*Detail Pesanan:*
-Orderan (Jumlah) : ${totalItem} Item
-Layanan :
-${serviceMessage}
-Ket: ${note}
-
-=================
-*Detail Biaya:*
-Total Tagihan : ${totalPrice}  
-Grand Total : ${totalPrice}  
-
-*Status:* ${paymentStatus}
-*Pembayaran:* ${paymentMethod}
-=================
-
-*Lihat proses dan detail pesanan Anda :*
-http://localhost:3000/order-tracking/${invoiceNumber}
-
- *Syarat dan Ketentuan:*
-1. Pengambilan barang harap disertai nota  
-2. Barang tidak diambil >1 bulan → hilang/rusak tidak diganti  
-3. Barang rusak karena proses pengerjaan diganti max 5x biaya  
-4. Klaim luntur di luar tanggungan  
-5. Hak klaim berlaku 2 jam setelah barang diambil  
-6. Konsumen dianggap setuju dengan perhitungan di atas
-
-Terima kasih telah mempercayakan perawatan sepatu Anda di *Wash and Care*
-`;
-                const whatsAppUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-                  message
-                )}`;
-
-                window.open(whatsAppUrl, "_blank");
-                setShowDialog(false);
-              }}
-            >
-              Continue
-            </Button>
+            <Button onClick={() => sendNote()}>Continue</Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
